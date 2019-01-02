@@ -1,18 +1,15 @@
 #!/usr/bin/env python2
 
-import rospy
-from std_msgs.msg import String, Int8, Int16, Int32
-from robobo_msgs.srv import MoveWheels, SetEmotion, Talk
+import robobo
 
-rospy.init_node("robobo__demo")
+#TODO
+if __name__ == "__main__":
+    rob = robobo.HardwareRobobo()
+    rob.connect(uri='http://192.168.1.247:11311')
 
-robobo_move_srv = rospy.ServiceProxy('robot/moveWheels', MoveWheels)
-robobo_emotion_srv = rospy.ServiceProxy('robot/setEmotion', SetEmotion)
-robobo_talk_srv = rospy.ServiceProxy('robot/talk', Talk)
-
-robobo_emotion_srv(String('sad'))
-robobo_move_srv(Int8(20), Int8(-20), Int32(2000), Int16(0))
-robobo_talk_srv(String('Hi, my name is Robobo'))
-rospy.sleep(1)
-robobo_move_srv(Int8(-20), Int8(20), Int32(2000), Int16(0))
-robobo_emotion_srv(String('happy'))
+    rob.set_emotion('sad')
+    rob.move(20, -20, 2000, 0)
+    rob.talk('Hi, my name is Robobo 2')
+    rob.sleep(1)
+    rob.move(-20, 20, 2000, 0)
+    rob.set_emotion('happy')
