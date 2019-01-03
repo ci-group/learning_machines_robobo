@@ -29,9 +29,8 @@ class HardwareRobobo(Robobo):
     def set_emotion(self, emotion):
         self._emotion_srv(String(emotion))
 
-    #TODO proper names
-    def move(self, a, b, c, d):
-        self._move_srv(Int8(a), Int8(b), Int32(c), Int16(d))
+    def move(self, left, right, millis, blockid=0):
+        self._move_srv(Int8(left), Int8(right), Int32(millis), Int16(blockid))
     
     def talk(self, message):
         self._talk_srv(String(message))

@@ -14,8 +14,7 @@ class Robobo:
     def set_emotion(self, emotion):
         raise NotImplementedError("Not implemented")
 
-    #TODO proper names
-    def move(self, a, b, c, d):
+    def move(self, left, right, millis):
         raise NotImplementedError("Not implemented")
     
     def talk(self, message):
