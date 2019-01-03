@@ -2,6 +2,7 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 from robobo.base import Robobo
 
 import os
+import time
 import rospy
 from std_msgs.msg import String, Int8, Int16, Int32
 from robobo_msgs.srv import MoveWheels, SetEmotion, Talk, SetLed
@@ -9,12 +10,10 @@ from robobo_msgs.msg import IRs
 
 class HardwareRobobo(Robobo):
     def __init__(self):
-        self._uri = ""
+        self._uri = None
 
-    def connect(self, uri):
-        if uri is not None:
-            self._uri = uri
-
+    def connect(self, address, port=11311):
+        self._uri = "http://{}:{}".format(address, port)
         os.environ['ROS_MASTER_URI'] = self._uri
 
         rospy.init_node("robobo_demo")
@@ -31,6 +30,7 @@ class HardwareRobobo(Robobo):
 
     def move(self, left, right, millis, blockid=0):
         self._move_srv(Int8(left), Int8(right), Int32(millis), Int16(blockid))
+        time.sleep(millis/1000.0)
     
     def talk(self, message):
         self._talk_srv(String(message))
