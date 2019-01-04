@@ -23,7 +23,7 @@ class Robobo:
     def set_led(self, selector, color):
         raise NotImplementedError("Not implemented")
     
-    def set_irs_listener(self, listener):
+    def read_irs(self):
         raise NotImplementedError("Not implemented")
 
     def get_image_front(self):

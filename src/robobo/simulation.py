@@ -149,8 +149,61 @@ class SimulationRobobo(Robobo):
     def set_led(self, selector, color):
         raise NotImplementedError("Not implemeted yet")
     
-    def set_irs_listener(self, listener):
-        raise NotImplementedError("Not implemeted yet")
+    def read_irs(self):
+        """
+        returns sensor readings: [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        """      
+        detectionStateIrFrontC, detectedPointIrFrontC, detectedObjectHandleIrFrontC, \
+        detectedSurfaceNormalVectorIrFrontC = self._vrep_read_proximity_sensor(
+            self._IrFrontC, vrep.simx_opmode_buffer)
+        detectionStateIrBackC, detectedPointIrIrBackC, detectedObjectHandleIrBackC, \
+        detectedSurfaceNormalVectorIrBackC = self._vrep_read_proximity_sensor(
+            self._IrBackC, vrep.simx_opmode_buffer)
+        detectionStateIrFrontLL, detectedPointIrFrontLL, detectedObjectHandleIrFrontLL, \
+        detectedSurfaceNormalVectorIrFrontLL = self._vrep_read_proximity_sensor(
+            self._IrFrontLL, vrep.simx_opmode_buffer)
+        detectionStateIrFrontRR, detectedPointIrFrontRR, detectedObjectHandleIrFrontRR, \
+        detectedSurfaceNormalVectorIrFrontRR = self._vrep_read_proximity_sensor(
+            self._IrFrontRR, vrep.simx_opmode_buffer)
+        detectionStateIrBackL, detectedPointIrBackL, detectedObjectHandleIrBackL, \
+        detectedSurfaceNormalVectorIrBackL = self._vrep_read_proximity_sensor(
+            self._IrBackL, vrep.simx_opmode_buffer)
+
+        detectionStateIrBackR, detectedPointIrBackR, detectedObjectHandleIrBackR, \
+        detectedSurfaceNormalVectorIrBackR = self._vrep_read_proximity_sensor(
+            self._IrBackR, vrep.simx_opmode_buffer)
+
+        detectionStateIrFrontR, detectedPointIrFrontR, detectedObjectHandleIrFrontR, \
+        detectedSurfaceNormalVectorIrFrontR = self._vrep_read_proximity_sensor(
+            self._IrFrontR, vrep.simx_opmode_buffer)
+
+        detectionStateIrFrontL, detectedPointIrFrontL, detectedObjectHandleIrFrontL, \
+        detectedSurfaceNormalVectorIrFrontL = self._vrep_read_proximity_sensor(
+            self._IrFrontL, vrep.simx_opmode_buffer)
+
+        vect = [np.sqrt(detectedPointIrBackR[0]   ** 2 + detectedPointIrBackR[1]   ** 2 + detectedPointIrBackR[2]   ** 2)
+                if detectionStateIrBackR   else False,
+                np.sqrt(detectedPointIrIrBackC[0] ** 2 + detectedPointIrIrBackC[1] ** 2 + detectedPointIrIrBackC[2] ** 2)
+                if detectionStateIrBackC   else False,
+                np.sqrt(detectedPointIrBackL[0] ** 2   + detectedPointIrBackL[1]   ** 2 + detectedPointIrBackL[2]   ** 2)
+                if detectionStateIrBackL   else False,
+                np.sqrt(detectedPointIrFrontRR[0] ** 2 + detectedPointIrFrontRR[1] ** 2 + detectedPointIrFrontRR[2] ** 2)
+                if detectionStateIrFrontRR else False,
+                np.sqrt(detectedPointIrFrontR[0] ** 2  + detectedPointIrFrontR[1]  ** 2 + detectedPointIrFrontR[2]  ** 2)
+                if detectionStateIrFrontR  else False,
+                np.sqrt(detectedPointIrFrontC[0] ** 2  + detectedPointIrFrontC[1]  ** 2 + detectedPointIrFrontC[2]  ** 2)
+                if detectionStateIrBackC   else False,
+                np.sqrt(detectedPointIrFrontL[0] ** 2  + detectedPointIrFrontL[1]  ** 2 + detectedPointIrFrontL[2]  ** 2)
+                if detectionStateIrFrontL  else False,
+                np.sqrt(detectedPointIrFrontLL[0] ** 2 + detectedPointIrFrontLL[1] ** 2 + detectedPointIrFrontLL[2] ** 2)
+                if detectionStateIrFrontLL else False]
+
+        # old_min = 0
+        # old_max = 0.20
+        # new_min = 18000
+        # new_max = 0
+        # return [(((old_value - old_min) * (new_max - new_min)) / (old_max - old_min)) + new_min for old_value in vect]
+        return vect
 
     def get_image_front(self):
         return self._get_image(self._FrontalCamera)

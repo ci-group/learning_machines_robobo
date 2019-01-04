@@ -28,13 +28,20 @@ class HardwareRobobo(Robobo):
 
     def connect(self, address, port=11311):
         self._uri = "http://{}:{}".format(address, port)
+        self._irs_values = [0.0 for _ in range(8)]
         self._set_env()
 
         rospy.init_node("robobo_demo")
+
+        # Service Proxys
         self._move_srv        = rospy.ServiceProxy(HardwareRobobo.MOVE_WHEELS_TOPIC, MoveWheels)
         self._emotion_srv     = rospy.ServiceProxy(HardwareRobobo.SET_EMOTION_TOPIC, SetEmotion)
         self._talk_srv        = rospy.ServiceProxy(HardwareRobobo.TALK_TOPIC,        Talk)
         self._leds_srv        = rospy.ServiceProxy(HardwareRobobo.SET_LED_TOPIC,     SetLed)
+
+        # Sensor Receivers
+        self._IRsub = rospy.Subscriber("robot/irs", IRs, self._irs_callback)
+
         if self._enable_camera:
             self._image_subscribe_front = rospy.Subscriber(HardwareRobobo.IMAGE_TOPIC, CompressedImage, self._camera_callback_front, queue_size=1)
             self._receiving_image_front = None
@@ -64,9 +71,24 @@ class HardwareRobobo(Robobo):
         self._set_env()
         self._leds(String(selector), String(color))
     
-    def set_irs_listener(self, listener):
-        self._set_env()
-        self._IRsub = rospy.Subscriber("robot/irs", IRs, listener)
+    def read_irs(self):
+        """
+        returns sensor readings: [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        """
+        return self._irs_values
+
+    def _irs_callback(self, ros_data):
+        self._irs_values = [
+            ros_data.BackR.range,
+            ros_data.BackR.range,
+            ros_data.BackL.range,
+            ros_data.FrontRR.range,
+            ros_data.FrontR.range,
+            ros_data.FrontC.range,
+            ros_data.FrontL.range,
+            ros_data.FrontLL.range
+        ]
+        # print(self._irs_values)
 
     def _camera_callback_front(self, ros_data):
         if self._receiving_image_front is None:
