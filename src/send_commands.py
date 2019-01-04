@@ -5,9 +5,7 @@ import cv2
 
 if __name__ == "__main__":
     robs = [
-        robobo.HardwareRobobo(camera=True).connect(address="192.168.1.66"),
         robobo.HardwareRobobo(camera=True).connect(address="192.168.1.247"),
-        robobo.HardwareRobobo(camera=True).connect(address="192.168.1.62"),
         robobo.SimulationRobobo().connect(address='192.168.1.204', port=19999),
     ]
     
