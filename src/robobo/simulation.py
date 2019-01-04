@@ -54,6 +54,7 @@ class SimulationRobobo(Robobo):
         self._IrFrontRFloor = self._vrep_get_object_handle('Ir_Front_R_Floor{}'.format(self._value_number),
                                                                vrep.simx_opmode_blocking)
         self._TiltMotor = self._vrep_get_object_handle('Tilt_Motor{}'.format(self._value_number), vrep.simx_opmode_blocking)
+        self._PanMotor = self._vrep_get_object_handle('Pan_Motor{}'.format(self._value_number), vrep.simx_opmode_blocking)
         self._FrontalCamera = self._vrep_get_object_handle('Frontal_Camera{}'.format(self._value_number), vrep.simx_opmode_blocking)
 
         detectionStateIrFrontC, detectedPointIrFrontC, detectedObjectHandleIrFrontC, \
@@ -111,6 +112,9 @@ class SimulationRobobo(Robobo):
 
     def _vrep_set_joint_target_velocity(self, handle, speed, opmode):
         return _vrep_unwrap(vrep.simxSetJointTargetVelocity(self._clientID, handle, speed, opmode))
+
+    def _vrep_set_joint_target_position(self, handle, position, opmode=vrep.simx_opmode_oneshot):
+        return _vrep_unwrap(vrep.simxSetJointTargetPosition(self._clientID, handle, position, opmode))
 
     def spin(self):
         raise NotImplementedError("Not implemeted yet")
@@ -221,3 +225,29 @@ class SimulationRobobo(Robobo):
         im_cv2 = cv2.flip(im_cv2, 1)
 
         return im_cv2
+
+    def set_phone_pan(self, pan_position, pan_speed):
+        """
+        Command the robot to move the smartphone holder in the horizontal (pan) axis.
+
+        Arguments
+
+        pan_position: Angle to position the pan at.
+        pan_speed: Movement speed for the pan mechanism.
+        """
+        # tilt_position = np.pi / 4.0
+        self._vrep_set_joint_target_position(self._PanMotor, pan_position)
+        self._vrep_get_ping_time()
+
+    def set_phone_tilt(self, tilt_position, tilt_speed):
+        """
+        Command the robot to move the smartphone holder in the vertical (tilt) axis.
+
+        Arguments
+
+        tilt_position: Angle to position the tilt at.
+        tilt_speed: Movement speed for the tilt mechanism.
+        """
+        # tilt_position = np.pi / 4.0
+        self._vrep_set_joint_target_position(self._TiltMotor, tilt_position)
+        self._vrep_get_ping_time()

@@ -7,7 +7,7 @@ import rospy
 import cv2
 import numpy as np
 from std_msgs.msg import String, Int8, Int16, Int32
-from robobo_msgs.srv import MoveWheels, SetEmotion, Talk, SetLed
+from robobo_msgs.srv import MoveWheels, MovePanTilt, SetEmotion, Talk, SetLed
 from robobo_msgs.msg import IRs
 from sensor_msgs.msg import CompressedImage
 
@@ -17,6 +17,7 @@ class HardwareRoboboException(Exception):
 class HardwareRobobo(Robobo):
     # ROS Topics
     MOVE_WHEELS_TOPIC = 'robot/moveWheels'
+    PAN_TILT_TOPIC    = 'robot/movePanTilt'
     SET_EMOTION_TOPIC = 'robot/setEmotion'
     TALK_TOPIC        = 'robot/talk'
     SET_LED_TOPIC     = 'robot/setLed'
@@ -35,6 +36,7 @@ class HardwareRobobo(Robobo):
 
         # Service Proxys
         self._move_srv        = rospy.ServiceProxy(HardwareRobobo.MOVE_WHEELS_TOPIC, MoveWheels)
+        self._pan_tilt_srv    = rospy.ServiceProxy(HardwareRobobo.PAN_TILT_TOPIC,    MovePanTilt)
         self._emotion_srv     = rospy.ServiceProxy(HardwareRobobo.SET_EMOTION_TOPIC, SetEmotion)
         self._talk_srv        = rospy.ServiceProxy(HardwareRobobo.TALK_TOPIC,        Talk)
         self._leds_srv        = rospy.ServiceProxy(HardwareRobobo.SET_LED_TOPIC,     SetLed)
@@ -58,9 +60,18 @@ class HardwareRobobo(Robobo):
         self._set_env()
         self._emotion_srv(String(emotion))
 
-    def move(self, left, right, millis, blockid=0):
+    def move(self, left_speed, right_speed, millis, blockid=0):
+        """
+        Move the robot wheels for `millis` time
+
+        Arguments
+
+        left_speed: speed of the left wheel. Range: 0-100
+        right_speed: speed of the right wheel. Range: 0-100
+        millis: how many millisecond to move the robot
+        """
         self._set_env()
-        self._move_srv(Int8(left), Int8(right), Int32(millis), Int16(blockid))
+        self._move_srv(Int8(left_speed), Int8(right_speed), Int32(millis), Int16(blockid))
         time.sleep(millis/1000.0)
     
     def talk(self, message):
@@ -73,7 +84,7 @@ class HardwareRobobo(Robobo):
     
     def read_irs(self):
         """
-        returns sensor readings: [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        Returns sensor readings: [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
         """
         return self._irs_values
 
@@ -111,8 +122,35 @@ class HardwareRobobo(Robobo):
         image = self._receiving_image_front
         self._receiving_image_front = None
         
-
         return image
+
+    def set_phone_pan(self, pan_position, pan_speed, pan_blockid=1):
+        """
+        Command the robot to move the smartphone holder in the horizontal (pan) axis.
+        This function is asyncronous.
+
+        Arguments
+
+        pan_position: Angle to position the pan at. Range: 11-343.
+        pan_speed: Movement speed for the pan mechanism. Range: 0-100.
+        pan_blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic. Must be greater that 0 to move.
+        """
+        self._set_env()
+        self._pan_tilt_srv(Int16(pan_position), Int8(pan_speed), Int16(pan_blockid), Int16(0), Int8(0), Int16(0))
+
+    def set_phone_tilt(self, tilt_position, tilt_speed, tilt_blockid=1):
+        """
+        Command the robot to move the smartphone holder in the vertical (tilt) axis.
+        This function is asyncronous.
+
+        Arguments
+
+        tilt_position: Angle to position the tilt at. Range: 26-109.
+        tilt_speed: Movement speed for the tilt mechanism. Range: 0-100.
+        tilt_blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic. Must be greater that 0 to move.
+        """
+        self._set_env()
+        self._pan_tilt_srv(Int16(0), Int8(0), Int16(0), Int16(tilt_position), Int8(tilt_speed), Int16(tilt_blockid))
 
     def sleep(self, seconds):
         self._set_env()

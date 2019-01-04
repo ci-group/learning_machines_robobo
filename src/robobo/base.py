@@ -29,5 +29,30 @@ class Robobo:
     def get_image_front(self):
         raise NotImplementedError("Not implemented")
 
+    def set_phone_orientation(self, a, b, c, d, e, f):
+        raise NotImplementedError("Not implemented")
+
+    def set_phone_pan(self, pan_position, pan_speed):
+        """
+        Command the robot to move the smartphone holder in the horizontal (pan) axis.
+
+        Arguments
+
+        pan_position: Angle to position the pan at.
+        pan_speed: Movement speed for the pan mechanism.
+        """
+        raise NotImplementedError("Not implemented")
+
+    def set_phone_tilt(self, tilt_position, tilt_speed):
+        """
+        Command the robot to move the smartphone holder in the vertical (tilt) axis.
+
+        Arguments
+
+        tilt_position: Angle to position the tilt at.
+        tilt_speed: Movement speed for the tilt mechanism.
+        """
+        raise NotImplementedError("Not implemented")
+
     def sleep(self, seconds):
         time.sleep(seconds)
