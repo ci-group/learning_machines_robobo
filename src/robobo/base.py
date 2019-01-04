@@ -26,5 +26,8 @@ class Robobo:
     def set_irs_listener(self, listener):
         raise NotImplementedError("Not implemented")
 
+    def get_image_front(self):
+        raise NotImplementedError("Not implemented")
+
     def sleep(self, seconds):
         time.sleep(seconds)

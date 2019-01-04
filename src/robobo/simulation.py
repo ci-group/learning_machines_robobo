@@ -2,6 +2,8 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 from robobo.base import Robobo
 import time
 import vrep
+import cv2
+import numpy as np
 
 class VREPCommunicationError(Exception):
     pass
@@ -92,7 +94,8 @@ class SimulationRobobo(Robobo):
 
         resolution, image = self._vrep_get_vision_sensor_image(self._FrontalCamera, vrep.simx_opmode_streaming)
 
-        vrep.simxGetPingTime(self._clientID)
+        self._vrep_get_ping_time()
+        return self
 
     def _vrep_get_ping_time(self):
         return _vrep_unwrap(vrep.simxGetPingTime(self._clientID))[0]
@@ -103,7 +106,7 @@ class SimulationRobobo(Robobo):
     def _vrep_read_proximity_sensor(self, handle, opmode=vrep.simx_opmode_streaming):
         return _vrep_unwrap(vrep.simxReadProximitySensor(self._clientID, handle, opmode))
 
-    def _vrep_get_vision_sensor_image(self, camera_handle, opmode, a=0):
+    def _vrep_get_vision_sensor_image(self, camera_handle, opmode=vrep.simx_opmode_buffer, a=0):
         return _vrep_unwrap(vrep.simxGetVisionSensorImage(self._clientID, camera_handle, a, opmode))
 
     def _vrep_set_joint_target_velocity(self, handle, speed, opmode):
@@ -148,3 +151,20 @@ class SimulationRobobo(Robobo):
     
     def set_irs_listener(self, listener):
         raise NotImplementedError("Not implemeted yet")
+
+    def get_image_front(self):
+        return self._get_image(self._FrontalCamera)
+
+    def _get_image(self, camera):
+        self._vrep_get_ping_time()
+
+        # get image
+        resolution, image = self._vrep_get_vision_sensor_image(camera)
+
+        # reshape image
+        image = image[::-1]
+        im_cv2 = np.array(image, dtype=np.uint8)
+        im_cv2.resize([resolution[0], resolution[1], 3])
+        im_cv2 = cv2.flip(im_cv2, 1)
+
+        return im_cv2
