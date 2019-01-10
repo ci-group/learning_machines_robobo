@@ -8,18 +8,6 @@ import numpy as np
 class VREPCommunicationError(Exception):
     pass
 
-def _vrep_unwrap(result):
-    if type(result) is tuple:
-        ret_code = result[0]
-        result = result[1:]
-    else:
-        ret_code = result
-        result = None
-
-    if ret_code < 0:
-        raise VREPCommunicationError()
-    return result
-
 class SimulationRobobo(Robobo):
     def __init__(self, number=""):
         self._clientID = None
@@ -57,64 +45,62 @@ class SimulationRobobo(Robobo):
         self._PanMotor = self._vrep_get_object_handle('Pan_Motor{}'.format(self._value_number), vrep.simx_opmode_blocking)
         self._FrontalCamera = self._vrep_get_object_handle('Frontal_Camera{}'.format(self._value_number), vrep.simx_opmode_blocking)
 
-        detectionStateIrFrontC, detectedPointIrFrontC, detectedObjectHandleIrFrontC, \
-        detectedSurfaceNormalVectorIrFrontC = self._vrep_read_proximity_sensor(self._IrFrontC)
-        
-        detectionStateIrBackC, detectedPointIrIrBackC, detectedObjectHandleIrBackC, \
-        detectedSurfaceNormalVectorIrBackC = self._vrep_read_proximity_sensor(self._IrBackC)
-        
-        detectionStateIrFrontLL, detectedPointIrFrontLL, detectedObjectHandleIrFrontLL, \
-        detectedSurfaceNormalVectorIrFrontLL = self._vrep_read_proximity_sensor(self._IrFrontLL)
-        
-        detectionStateIrFrontRR, detectedPointIrFrontRR, detectedObjectHandleIrFrontRR, \
-        detectedSurfaceNormalVectorIrFrontRR = self._vrep_read_proximity_sensor(self._IrFrontRR)
-        
-        detectionStateIrBackL, detectedPointIrBackL, detectedObjectHandleIrBackL, \
-        detectedSurfaceNormalVectorIrBackL = self._vrep_read_proximity_sensor(self._IrBackL)
-        
-        detectionStateIrBackLFloor, detectedPointIrBackLFloor, detectedObjectHandleIrBackLFloor, \
-        detectedSurfaceNormalVectorIrBackLFloor = self._vrep_read_proximity_sensor(self._IrBackLFloor)
-        
-        detectionStateIrBackR, detectedPointIrBackR, detectedObjectHandleIrBackR, \
-        detectedSurfaceNormalVectorIrBackR = self._vrep_read_proximity_sensor(self._IrBackR)
-        
-        detectionStateIrBackRFloor, detectedPointIrBackRFloor, detectedObjectHandleIrBackRFloor, \
-        detectedSurfaceNormalVectorIrBackRFloor = self._vrep_read_proximity_sensor(self._IrBackRFloor)
-        
-        detectionStateIrFrontR, detectedPointIrFrontR, detectedObjectHandleIrFrontR, \
-        detectedSurfaceNormalVectorIrFrontR = self._vrep_read_proximity_sensor(self._IrFrontR)
-        
-        detectionStateIrFrontRFloor, detectedPointIrFrontRFloor, detectedObjectHandleIrFrontRFloor, \
-        detectedSurfaceNormalVectorIrFrontRFloor = self._vrep_read_proximity_sensor(self._IrFrontRFloor)
-        
-        detectionStateIrFrontL, detectedPointIrFrontL, detectedObjectHandleIrFrontL, \
-        detectedSurfaceNormalVectorIrFrontL = self._vrep_read_proximity_sensor(self._IrFrontL)
-        
-        detectionStateIrFrontLFloor, detectedPointIrFrontLFloor, detectedObjectHandleIrFrontLFloor, \
-        detectedSurfaceNormalVectorIrFrontLFloor = self._vrep_read_proximity_sensor(self._IrFrontLFloor)
+        # read a first value in streaming mode
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontC)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrBackC)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontLL)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontRR)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrBackL)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrBackLFloor)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrBackR)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrBackRFloor)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontR)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontRFloor)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontL)
+        self._vrep_read_proximity_sensor_ignore_error(self._IrFrontLFloor)
 
-        resolution, image = self._vrep_get_vision_sensor_image(self._FrontalCamera, vrep.simx_opmode_streaming)
+        # setup join positions
+        vrep.simxGetJointPosition(self._clientID, self._RightMotor, vrep.simx_opmode_buffer)
+        vrep.simxGetJointPosition(self._clientID, self._LeftMotor, vrep.simx_opmode_buffer)
+        vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_buffer)
+
+        # read a first value in buffer mode
+        self._vrep_get_vision_sensor_image_ignore_error(self._FrontalCamera, vrep.simx_opmode_streaming)
 
         self._vrep_get_ping_time()
         return self
 
     def _vrep_get_ping_time(self):
-        return _vrep_unwrap(vrep.simxGetPingTime(self._clientID))[0]
+        return vrep.unwrap_vrep(vrep.simxGetPingTime(self._clientID))
 
     def _vrep_get_object_handle(self, name, opmode):
-        return _vrep_unwrap(vrep.simxGetObjectHandle(self._clientID, name, opmode))[0]
+        return vrep.unwrap_vrep(vrep.simxGetObjectHandle(self._clientID, name, opmode))
 
     def _vrep_read_proximity_sensor(self, handle, opmode=vrep.simx_opmode_streaming):
-        return _vrep_unwrap(vrep.simxReadProximitySensor(self._clientID, handle, opmode))
+        return vrep.unwrap_vrep(vrep.simxReadProximitySensor(self._clientID, handle, opmode))
 
+    def _vrep_read_proximity_sensor_ignore_error(self, handle, opmode=vrep.simx_opmode_streaming):
+        try:
+            self._vrep_read_proximity_sensor(handle, opmode)
+        except vrep.error.VrepApiError as error:
+            if error.ret_code is not vrep.simx_return_novalue_flag:
+                raise
+        
     def _vrep_get_vision_sensor_image(self, camera_handle, opmode=vrep.simx_opmode_buffer, a=0):
-        return _vrep_unwrap(vrep.simxGetVisionSensorImage(self._clientID, camera_handle, a, opmode))
+        return vrep.unwrap_vrep(vrep.simxGetVisionSensorImage(self._clientID, camera_handle, a, opmode))
+
+    def _vrep_get_vision_sensor_image_ignore_error(self, camera_handle, opmode=vrep.simx_opmode_buffer, a=0):
+        try:
+            self._vrep_get_vision_sensor_image(camera_handle, opmode, a)
+        except vrep.error.VrepApiError as error:
+            if error.ret_code is not vrep.simx_return_novalue_flag:
+                raise
 
     def _vrep_set_joint_target_velocity(self, handle, speed, opmode):
-        return _vrep_unwrap(vrep.simxSetJointTargetVelocity(self._clientID, handle, speed, opmode))
+        return vrep.unwrap_vrep(vrep.simxSetJointTargetVelocity(self._clientID, handle, speed, opmode))
 
     def _vrep_set_joint_target_position(self, handle, position, opmode=vrep.simx_opmode_oneshot):
-        return _vrep_unwrap(vrep.simxSetJointTargetPosition(self._clientID, handle, position, opmode))
+        return vrep.unwrap_vrep(vrep.simxSetJointTargetPosition(self._clientID, handle, position, opmode))
 
     def spin(self):
         raise NotImplementedError("Not implemeted yet")
@@ -132,12 +118,14 @@ class SimulationRobobo(Robobo):
         self._vrep_get_ping_time()
 
         duration = millis / 1000.0
-        startTime = time.time()
-        while time.time() - startTime < duration:
-            rightMotorAngPos = _vrep_unwrap(vrep.simxGetJointPosition(self._clientID, self._RightMotor, vrep.simx_opmode_buffer))[0]
-            leftMotorAngPos  = _vrep_unwrap(vrep.simxGetJointPosition(self._clientID, self._LeftMotor, vrep.simx_opmode_buffer))[0]
-            RoboAbsPos       = _vrep_unwrap(vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_buffer))[0]
-            time.sleep(0.005)
+        # startTime = time.time()
+        # while time.time() - startTime < duration:
+        #     # rightMotorAngPos = vrep.unwrap_vrep(vrep.simxGetJointPosition(self._clientID, self._RightMotor, vrep.simx_opmode_blocking))
+        #     # leftMotorAngPos  = vrep.unwrap_vrep(vrep.simxGetJointPosition(self._clientID, self._LeftMotor, vrep.simx_opmode_blocking))
+        #     # RoboAbsPos       = vrep.unwrap_vrep(vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_blocking))
+        #     time.sleep(0.005)
+        print("sleeping for {}".format(duration))
+        time.sleep(duration)
         
         # Stop to move the wheels motor. Angular velocity.
         stopRightVelocity = stopLeftVelocity = 0
@@ -251,3 +239,23 @@ class SimulationRobobo(Robobo):
         # tilt_position = np.pi / 4.0
         self._vrep_set_joint_target_position(self._TiltMotor, tilt_position)
         self._vrep_get_ping_time()
+    
+    def pause_simulation(self):
+        vrep.unwrap_vrep(
+            vrep.simxPauseSimulation(self._clientID, vrep.simx_opmode_blocking)
+        )
+    
+    def play_simulation(self):
+        vrep.unwrap_vrep(
+            vrep.simxStartSimulation(self._clientID, vrep.simx_opmode_blocking)
+        )
+
+    def stop_world(self):
+        vrep.unwrap_vrep(
+            vrep.simxStopSimulation(self._clientID, vrep.simx_opmode_blocking)
+        )
+
+    def position(self):
+        return vrep.unwrap_vrep(
+            vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_blocking)
+        )

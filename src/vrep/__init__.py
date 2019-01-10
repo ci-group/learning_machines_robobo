@@ -4,6 +4,7 @@ import sys
 import os
 import ctypes as ct
 from .vrepConst import *
+from .error import *
 
 #load library
 libsimx = None
