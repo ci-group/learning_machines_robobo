@@ -3,24 +3,32 @@ from __future__ import print_function
 import time
 import robobo
 import cv2
+import sys
+import signal
+
+def terminate_program(signal_number, frame):
+    print("Ctrl-C received, terminating program")
+    sys.exit(1)
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, terminate_program)
+
     robs = [
-        # robobo.HardwareRobobo(camera=True).connect(address="192.168.1.66"),
-        robobo.SimulationRobobo().connect(address='192.168.1.204', port=19999),
+        robobo.HardwareRobobo(camera=True).connect(address="192.168.1.5"),
+        # robobo.SimulationRobobo().connect(address='192.168.1.10', port=19997),
     ]
 
-    robs[0].play_simulation()
-    # robs[0].pause_simulation()
+    # robs[1].play_simulation()
+    # robs[1].pause_simulation()
     
     # move and talk
     for i, rob in enumerate(robs):
         print('sending commands to robot {}'.format(i))
         rob.set_emotion('sad')
         
-        print("robobo is at {}".format(rob.position()))
+        # print("robobo is at {}".format(rob.position()))
         rob.move(10, 10, 2000)
-        print("robobo is at {}".format(rob.position()))
+        # print("robobo is at {}".format(rob.position()))
 
         ## Following code moves the phone stand
         # rob.set_phone_pan(343, 100)
@@ -43,11 +51,11 @@ if __name__ == "__main__":
     for i in range(10):
         for i, rob in enumerate(robs):
             print("ROB {} Irs: {}".format(i, rob.read_irs()))
-        time.sleep(1)
+        time.sleep(0.1)
 
     # move back
     for rob in robs:
         rob.move(-5, 5, 1000)
 
     # Stopping the simualtion resets the environment 
-    robs[0].stop_world()
+    # robs[1].stop_world()
