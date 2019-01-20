@@ -124,7 +124,7 @@ class SimulationRobobo(Robobo):
         #     # leftMotorAngPos  = vrep.unwrap_vrep(vrep.simxGetJointPosition(self._clientID, self._LeftMotor, vrep.simx_opmode_blocking))
         #     # RoboAbsPos       = vrep.unwrap_vrep(vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_blocking))
         #     time.sleep(0.005)
-        print("sleeping for {}".format(duration))
+        # print("sleeping for {}".format(duration))
         time.sleep(duration)
         
         # Stop to move the wheels motor. Angular velocity.
@@ -249,13 +249,22 @@ class SimulationRobobo(Robobo):
         vrep.unwrap_vrep(
             vrep.simxStartSimulation(self._clientID, vrep.simx_opmode_blocking)
         )
+        time.sleep(1)
 
     def stop_world(self):
         vrep.unwrap_vrep(
             vrep.simxStopSimulation(self._clientID, vrep.simx_opmode_blocking)
         )
+        time.sleep(2)
 
     def position(self):
         return vrep.unwrap_vrep(
             vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_blocking)
         )
+
+    def collected_food(self):
+        ints, floats, strings, buffer = vrep.unwrap_vrep(
+            vrep.simxCallScriptFunction(self._clientID, "Food", vrep.sim_scripttype_childscript, "remote_get_collected_food",
+                                        [],[],[],bytearray(),vrep.simx_opmode_blocking)
+        )
+        return ints[0]
