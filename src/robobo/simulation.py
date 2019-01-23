@@ -17,6 +17,7 @@ class SimulationRobobo(Robobo):
         vrep.simxFinish(-1)  # just in case, close all opened connections
         self._clientID = vrep.simxStart(address, port, True, True, 5000, 5)  # Connect to V-REP
         if self._clientID >= 0: #  and clientID_0 != -1:
+            self.wait_for_ping()
             print('Connected to remote API server: client id {}'.format(self._clientID))
         else:
             raise VREPCommunicationError('Failed connecting to remote API server')
@@ -75,9 +76,11 @@ class SimulationRobobo(Robobo):
         while time.time() - startTime < timeout_seconds:
             try:
                 self._vrep_get_ping_time()
+                # print("check success")
                 return True
             except vrep.VrepApiError as _e:
-                time.sleep(0.005)
+                # print("check failed")
+                time.sleep(0.05)
         
         print("{} seconds passed with ping not coming online, you may expericence problems with the connection".format(timeout_seconds))
         return False
