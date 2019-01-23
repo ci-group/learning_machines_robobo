@@ -70,6 +70,18 @@ class SimulationRobobo(Robobo):
         self._vrep_get_ping_time()
         return self
 
+    def wait_for_ping(self, timeout_seconds=20.0):
+        startTime = time.time()
+        while time.time() - startTime < timeout_seconds:
+            try:
+                self._vrep_get_ping_time()
+                return True
+            except vrep.VrepApiError as _e:
+                time.sleep(0.005)
+        
+        print("{} seconds passed with ping not coming online, you may expericence problems with the connection".format(timeout_seconds))
+        return False
+
     def _vrep_get_ping_time(self):
         return vrep.unwrap_vrep(vrep.simxGetPingTime(self._clientID))
 
@@ -249,13 +261,13 @@ class SimulationRobobo(Robobo):
         vrep.unwrap_vrep(
             vrep.simxStartSimulation(self._clientID, vrep.simx_opmode_blocking)
         )
-        time.sleep(1)
+        self.wait_for_ping()
 
     def stop_world(self):
         vrep.unwrap_vrep(
             vrep.simxStopSimulation(self._clientID, vrep.simx_opmode_blocking)
         )
-        time.sleep(2)
+        self.wait_for_ping()
 
     def position(self):
         return vrep.unwrap_vrep(
