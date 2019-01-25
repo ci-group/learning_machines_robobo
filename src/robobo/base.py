@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function, absolute_import, division, generators, nested_scopes
 import time
 
-class Robobo:
+class Robobo(object):
     def __init__(self):
         pass
 

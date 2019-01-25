@@ -14,7 +14,7 @@ class SimulationRobobo(Robobo):
         self._value_number = number
     
     def connect(self, address='127.0.0.1', port=19999):
-        vrep.simxFinish(-1)  # just in case, close all opened connections
+        # vrep.simxFinish(-1)  # just in case, close all opened connections
         self._clientID = vrep.simxStart(address, port, True, True, 5000, 5)  # Connect to V-REP
         if self._clientID >= 0: #  and clientID_0 != -1:
             self.wait_for_ping()

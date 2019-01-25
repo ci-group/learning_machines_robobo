@@ -5,6 +5,7 @@ import robobo
 import cv2
 import sys
 import signal
+import prey
 
 def terminate_program(signal_number, frame):
     print("Ctrl-C received, terminating program")
@@ -14,17 +15,27 @@ def main():
     signal.signal(signal.SIGINT, terminate_program)
 
     # rob = robobo.HardwareRobobo(camera=True).connect(address="192.168.1.5")
-    rob = robobo.SimulationRobobo().connect(address='192.168.1.10', port=19997)
+    rob = robobo.SimulationRobobo().connect(address='192.168.1.71', port=19997)
 
     rob.play_simulation()
+    prey_robot = robobo.SimulationRoboboPrey().connect(address='192.168.1.71', port=19989)
+
+
     # rob.pause_simulation()
     
     # move and talk
     # rob.set_emotion('sad')
-    
-    print("robobo is at {}".format(rob.position()))
-    rob.move(5, 5, 2000)
-    print("robobo is at {}".format(rob.position()))
+
+    # initialise class prey
+    prey_controller = prey.Prey(robot=prey_robot, level=2)
+    # start the prey
+    prey_controller.start()
+
+    for i in range(10):
+        print("robobo is at {}".format(rob.position()))
+        rob.move(5, 5, 2000)
+        print("robobo is at {}".format(rob.position()))
+        rob.sleep(1)
 
     # # Following code moves the phone stand
     # rob.set_phone_pan(343, 100)
@@ -48,9 +59,14 @@ def main():
     #     print("ROB Irs: {}".format(rob.read_irs()))
     #     time.sleep(0.1)
 
+    # stop the prey
+    prey_controller.stop()
+    prey_controller.join()
+
+
     # pause the simulation and read the collected food
-    rob.pause_simulation()
-    print("Robobo collected {} food".format(rob.collected_food()))
+    # rob.pause_simulation()
+    # print("Robobo collected {} food".format(rob.collected_food()))
 
     # Stopping the simualtion resets the environment 
     rob.stop_world()
