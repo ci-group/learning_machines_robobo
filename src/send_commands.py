@@ -18,6 +18,11 @@ def main():
     rob = robobo.SimulationRobobo().connect(address='192.168.1.71', port=19997)
 
     rob.play_simulation()
+
+    # ALWAYS connect first to the real robot, then start the simulation and only then connect to the prey
+    # if the order is not respected, an error is raised and I do not why
+    # if you use the provided scene, do not change the port number
+    # if you want to build your own scene, remember to modify the prey port number on vrep
     prey_robot = robobo.SimulationRoboboPrey().connect(address='192.168.1.71', port=19989)
 
 
@@ -27,8 +32,12 @@ def main():
     # rob.set_emotion('sad')
 
     # initialise class prey
-    prey_controller = prey.Prey(robot=prey_robot, level=2)
-    # start the prey
+    # needs to receive the robot to move
+    # there are 5 levels of difficulties. From 0 (super easy) to 4 (hard).
+    # you can select the one you want,using a parameter in the following constructor, default is 2
+    prey_controller = prey.Prey(robot=prey_robot)
+    # start the thread prey
+    # makes the prey move
     prey_controller.start()
 
     for i in range(10):
@@ -60,6 +69,7 @@ def main():
     #     time.sleep(0.1)
 
     # stop the prey
+    # if you want to stop the prey you have to use the two following commands
     prey_controller.stop()
     prey_controller.join()
 
