@@ -5,6 +5,7 @@ import robobo
 import cv2
 import sys
 import signal
+import prey
 
 def terminate_program(signal_number, frame):
     print("Ctrl-C received, terminating program")
@@ -14,17 +15,36 @@ def main():
     signal.signal(signal.SIGINT, terminate_program)
 
     # rob = robobo.HardwareRobobo(camera=True).connect(address="192.168.1.5")
-    rob = robobo.SimulationRobobo().connect(address='192.168.1.10', port=19997)
+    rob = robobo.SimulationRobobo().connect(address='192.168.1.71', port=19997)
 
     rob.play_simulation()
+
+    # ALWAYS connect first to the real robot, then start the simulation and only then connect to the prey
+    # if the order is not respected, an error is raised and I do not why
+    # if you use the provided scene, do not change the port number
+    # if you want to build your own scene, remember to modify the prey port number on vrep
+    prey_robot = robobo.SimulationRoboboPrey().connect(address='192.168.1.71', port=19989)
+
+
     # rob.pause_simulation()
     
     # move and talk
     # rob.set_emotion('sad')
-    
-    print("robobo is at {}".format(rob.position()))
-    rob.move(5, 5, 2000)
-    print("robobo is at {}".format(rob.position()))
+
+    # initialise class prey
+    # needs to receive the robot to move
+    # there are 5 levels of difficulties. From 0 (super easy) to 4 (hard).
+    # you can select the one you want,using a parameter in the following constructor, default is 2
+    prey_controller = prey.Prey(robot=prey_robot)
+    # start the thread prey
+    # makes the prey move
+    prey_controller.start()
+
+    for i in range(10):
+        print("robobo is at {}".format(rob.position()))
+        rob.move(5, 5, 2000)
+        print("robobo is at {}".format(rob.position()))
+        rob.sleep(1)
 
     # # Following code moves the phone stand
     # rob.set_phone_pan(343, 100)
@@ -48,9 +68,15 @@ def main():
     #     print("ROB Irs: {}".format(rob.read_irs()))
     #     time.sleep(0.1)
 
+    # stop the prey
+    # if you want to stop the prey you have to use the two following commands
+    prey_controller.stop()
+    prey_controller.join()
+
+
     # pause the simulation and read the collected food
-    rob.pause_simulation()
-    print("Robobo collected {} food".format(rob.collected_food()))
+    # rob.pause_simulation()
+    # print("Robobo collected {} food".format(rob.collected_food()))
 
     # Stopping the simualtion resets the environment 
     rob.stop_world()
