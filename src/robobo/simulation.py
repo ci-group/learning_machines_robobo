@@ -12,7 +12,7 @@ class SimulationRobobo(Robobo):
     def __init__(self, number=""):
         self._clientID = None
         self._value_number = number
-    
+
     def connect(self, address='127.0.0.1', port=19999):
         # vrep.simxFinish(-1)  # just in case, close all opened connections
         self._clientID = vrep.simxStart(address, port, True, True, 5000, 5)  # Connect to V-REP
@@ -34,6 +34,11 @@ class SimulationRobobo(Robobo):
                 time.sleep(0.05)
 
         return False
+
+    def disconnect(self):
+        vrep.unwrap_vrep(
+            vrep.simxFinish(self._clientID)
+        )
 
     def initialize_handles(self):
         self._RightMotor = self._vrep_get_object_handle('Right_Motor{}'.format(self._value_number), vrep.simx_opmode_blocking)
