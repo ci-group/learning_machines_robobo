@@ -10,8 +10,8 @@ Here are the instructions to have the simulation system running.
   - make sure you have the the version 3.5, other versions may not work properly
 
 - Download `Robobo_Scene.ttt` and `Robobo_Model.ttm` files and place them inside your VREP folder
-  - place Robobo_Scene.ttt file in VREP/scenes
-  - place Robobo_Scene.ttm file in VREP/models/robots/mobile
+  - place `Robobo_Scene.ttt` file in `VREP/scenes`
+  - place `Robobo_Model.ttm` file in `VREP/models/robots/mobile`
 
 - Download docker
   - Linux: download from your package manager
