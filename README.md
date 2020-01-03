@@ -53,6 +53,23 @@ Now you downloaded everything, you can start the environment
 
 - Change the script, experiment and HAVE FUN :D
 
+# Windows HOME + Docker Toolbox
+If you are having problems with Windows HOME, follow this guide it may fix your issues
+
+You need to change the file `start-docker.bat` changing from
+```bat
+SET project_folder=%~dp0
+
+docker run --rm -it -v %project_folder%:/root/projects cigroup/learning-machines bash
+```
+to
+```bat
+SET project_folder=/c/Users/YourUser/path/to/learning_machines_robobo
+
+docker run --rm -it -v %project_folder%:/root/projects cigroup/learning-machines bash
+```
+where your project is in the folder `C:\Users\YourUser\path\to\learning_machines_robobo`. Change this variable accordingly to your own username and path to the project folder. You cannot use folders outside `C:\Users\` and remember to change all backslasesh (`\`) to forward slashes (`/`).
+
 # Informations to run this project alternatevely
 
 ## Setup (with ros image)
