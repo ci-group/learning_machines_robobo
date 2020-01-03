@@ -20,8 +20,10 @@ Here are the instructions to have the simulation system running.
 
 - Download git + Editor
 
-- Download repository
-  - <pre>git clone <a href="https://github.com/portaloffreedom/learning_machines_robobo.git">https://github.com/portaloffreedom/learning_machines_robobo.git</a></pre>
+- Download [repository](https://github.com/portaloffreedom/learning_machines_robobo)
+  ```
+  git clone https://github.com/portaloffreedom/learning_machines_robobo.git
+  ```
 
 ## Running
 Now you downloaded everything, you can start the environment
@@ -31,12 +33,15 @@ Now you downloaded everything, you can start the environment
   - OsX/Windows: open docker app
 
 - Start docker container (this will open a terminal with python and all required libraries installed). This step could take a while, since first your computer will download the docker image from the internet, secondly will compile some stuff from your project folder.
-  - Linux/OsX, open a terminal in the <strong><span style="color: #000000;">learning_machines_robobo</span></strong><span style="color: #000000;"> project</span>&nbsp;folder and type:
-  
-    ```./start-docker.sh```
+  - Linux/OsX, open a terminal in the **learning_machines_robobo** project folder and type:
+    ```
+    ./start-docker.sh
+    ```
   - Windows, open CMD and change directory to the&nbsp;<strong>learning_machines_robobo</strong> project folder, and type:
-  
-    ```start-docker.bat```
+    ```
+    start-docker.bat
+    ```
+
 - Start VREP
   - open the program
   - open the scene file that you downloaded before: Robobo_Scene.ttt
@@ -49,7 +54,9 @@ Now you downloaded everything, you can start the environment
 
 - Run the script
   - inside the docker container running, type
-  ```./src/send_commands.py```
+  ```
+  ./src/send_commands.py
+  ```
 
 - Change the script, experiment and HAVE FUN :D
 
