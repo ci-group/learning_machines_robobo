@@ -29,7 +29,7 @@ Here are the instructions to have the simulation system running.
 ## Running
 Now you downloaded everything, you can start the environment
 
-- Start docker&nbsp;
+- Start docker
   - Linux/systemd: start docker daemon
   - OsX/Windows: open docker app
 
@@ -50,7 +50,7 @@ Now you downloaded everything, you can start the environment
   - start the simulation with the play button
   
 - Fix the script: inside the project folder, open the file `src/send_commands.py` and
-  - remove the line in which I create a connection to an hardware robot
+  - ~~remove the line in which I create a connection to an hardware robot~~
   - fix the line of the connection to the simulated robot to have your local machine ip (localhost or 127.0.0.1 will not work because of docker. Connect to your home network and use the IP that the router will give you)
 
 - Run the script
