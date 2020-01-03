@@ -5,8 +5,9 @@ Note, if you feel like not using this path but installing directly on your syste
 ## Download/Install requirements
 Here are the instructions to have the simulation system running.
 
-- Download VREP from <a href="http://www.coppeliarobotics.com/downloads.html">here</a>, V-REP PRO EDU V3.5.0 rev4
+- Download VREP from [here](http://coppeliarobotics.com/previousVersions), V-REP PRO EDU V3.5.0 rev4
   - extract folder anywhere, where you preferer
+  - make sure you have the the version 3.5, other versions may not work properly
 
 - Download `Robobo_Scene.ttt` and `Robobo_Model.ttm` files and place them inside your VREP folder
   - place Robobo_Scene.ttt file in VREP/scenes
