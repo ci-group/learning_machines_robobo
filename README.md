@@ -21,9 +21,9 @@ Here are the instructions to have the simulation system running.
 
 - Download git + Editor
 
-- Download [repository](https://github.com/portaloffreedom/learning_machines_robobo)
+- Download [repository](https://github.com/ci-group/learning_machines_robobo)
   ```
-  git clone https://github.com/portaloffreedom/learning_machines_robobo.git
+  git clone https://github.com/ci-group/learning_machines_robobo.git
   ```
 
 ## Running
