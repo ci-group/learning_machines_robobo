@@ -28,14 +28,15 @@ class VrepApiError(Exception):
         super(self.__class__, self).__init__(message)
 
 
-def unwrap_vrep(result):
+def unwrap_vrep(result, ignore_novalue_error=False):
     if type(result) is tuple:
         ret_code = result[0]
         result = result[1:]
         if len(result) == 1:
             result = result[0]
 
-        if ret_code > 0:
-            raise VrepApiError(ret_code)
+        if ret_code > 0 and \
+            not(ignore_novalue_error and ret_code == simx_return_novalue_flag):
+                raise VrepApiError(ret_code)
 
         return result

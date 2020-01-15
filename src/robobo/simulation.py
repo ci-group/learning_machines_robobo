@@ -148,9 +148,9 @@ class SimulationRobobo(Robobo):
 
         self._vrep_set_joint_target_velocity(self._LeftMotor, left, vrep.simx_opmode_oneshot)
         self._vrep_set_joint_target_velocity(self._RightMotor, right, vrep.simx_opmode_oneshot)
-        self.wait_for_ping()
+        # self.wait_for_ping() #get_sim_time is already waiting for ping
 
-        duration = millis / 1000.0
+        duration = millis #/ 1000.0
         # startTime = time.time()
         # while time.time() - startTime < duration:
         #     # rightMotorAngPos = vrep.unwrap_vrep(vrep.simxGetJointPosition(self._clientID, self._RightMotor, vrep.simx_opmode_blocking))
@@ -158,7 +158,11 @@ class SimulationRobobo(Robobo):
         #     # RoboAbsPos       = vrep.unwrap_vrep(vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_blocking))
         #     time.sleep(0.005)
         # print("sleeping for {}".format(duration))
-        time.sleep(duration)
+
+        # busy waiting
+        start_time = self.get_sim_time()
+        while self.get_sim_time() - start_time < duration:
+            pass
         
         # Stop to move the wheels motor. Angular velocity.
         stopRightVelocity = stopLeftVelocity = 0
@@ -289,6 +293,35 @@ class SimulationRobobo(Robobo):
             vrep.simxStopSimulation(self._clientID, vrep.simx_opmode_blocking)
         )
         self.wait_for_ping()
+
+    def check_simulation_state(self):
+        self.wait_for_ping()
+        return vrep.unwrap_vrep(
+            vrep.simxGetInMessageInfo(self._clientID, vrep.simx_headeroffset_server_state),
+            ignore_novalue_error=True
+        )
+
+    def is_simulation_stopped(self):
+        return not self.is_simulation_running()
+
+    def is_simulation_running(self):
+        info = self.check_simulation_state()
+        return info & 1
+
+    def wait_for_stop(self):
+        """
+        This function busy waits until the simulation is stopped
+        """
+        while self.is_simulation_running():
+            pass
+
+    def get_sim_time(self):
+        """
+        Gets the simulation time. Returns zero if the simulation is stopped.
+        :return: simulation time in milliseconds.
+        """
+        self.wait_for_ping()
+        return vrep.simxGetLastCmdTime(self._clientID)
 
     def position(self):
         return vrep.unwrap_vrep(
