@@ -89,6 +89,12 @@ class SimulationRobobo(Robobo):
 
         self.wait_for_ping()
 
+    def sleep(self, seconds):
+        duration = seconds * 1000
+        start_time = self.get_sim_time()
+        while self.get_sim_time() - start_time < duration:
+            pass
+
     def wait_for_ping(self, timeout_seconds=120.0):
         startTime = time.time()
         while time.time() - startTime < timeout_seconds:
