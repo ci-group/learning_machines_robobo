@@ -91,7 +91,7 @@ class HardwareRobobo(Robobo):
     def _irs_callback(self, ros_data):
         self._irs_values = [
             ros_data.BackR.range,
-            ros_data.BackR.range,
+            ros_data.BackC.range,
             ros_data.BackL.range,
             ros_data.FrontRR.range,
             ros_data.FrontR.range,
