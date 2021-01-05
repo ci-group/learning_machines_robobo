@@ -24,10 +24,16 @@ def main():
     rob.play_simulation()
 
     # Following code moves the robot
-    for i in range(10):
-            print("robobo is at {}".format(rob.position()))
-            rob.move(5, 5, 2000)
-   
+    for i in range(100):
+        print("robobo is at {}".format(rob.position()))
+        rob.move(5, 5, 2000)
+
+        sensors = np.log(np.array(rob.read_irs())) / 10
+        sensors = np.where(sensors == -np.inf, 0, sensors)  # remove the infinite
+        sensors = (sensors - -0.65) / 0.65
+
+        print(sensors)
+
     print("robobo is at {}".format(rob.position()))
     rob.sleep(1)
 
@@ -57,7 +63,7 @@ def main():
 
     # pause the simulation and read the collected food
     rob.pause_simulation()
-    
+
     # Stopping the simualtion resets the environment
     rob.stop_world()
 
