@@ -20,6 +20,7 @@ class Direction:
 
 class Environment:
     MAX_ITERATIONS = 10_000
+    MAX_SIMULATION_ITERATIONS = 500
     LEARNING_RATE = .1
     DISCOUNT_FACTOR = .95
     EPSILON_LOW = .6
@@ -27,7 +28,8 @@ class Environment:
 
     action_space = [0, 1, 2, 3, 4]
     collision_boundary = .1
-    collision_counter, iteration_counter = 0, 0
+    collision_counter, iteration_counter, epsilon_counter = 0, 0, 0
+    epsilon_increase = int((MAX_ITERATIONS // (EPSILON_HIGH - EPSILON_LOW) * 100) / 10_000)
 
     def __init__(self):
         signal.signal(signal.SIGINT, self.terminate_program)
@@ -36,20 +38,24 @@ class Environment:
         self.discrete_os_win_size = []
 
     def start_environment(self):
-        self.rob.play_simulation()
+        for i in range(1, self.MAX_ITERATIONS):
+            print(f"Starting simulation nr. {i}")
 
-        while self.valid_environment():
-            curr_state = self.handle_state()
-            print(f"\nIteration: {self.iteration_counter}. Current state: {curr_state} and its values: {np.round(self.q_table[curr_state], 2)}")
-            if random.random() < (1 - self.EPSILON_LOW):
-                best_action = random.choice(self.action_space)
+            self.rob.play_simulation()
+            while self.valid_environment():
+                curr_state = self.handle_state()
+                if random.random() < (1 - self.EPSILON_LOW):
+                    best_action = random.choice(self.action_space)
+                else:
+                    best_action = np.argmax(self.q_table[curr_state])
+
+                self.update_q_table(best_action, curr_state)
+                self.change_epsilon()
+                self.iteration_counter += 1
             else:
-                best_action = np.argmax(self.q_table[curr_state])
-                print(f"In this state, best_action is: {best_action}")
-
-            self.update_q_table(best_action, curr_state)
-        else:
-            self.rob.stop_world()
+                print(f"Environment is not valid anymore, starting new environment")
+                self.iteration_counter = 0
+                self.rob.stop_world()
 
     @staticmethod
     def terminate_program():
@@ -59,23 +65,19 @@ class Environment:
     def valid_environment(self):
         if self.collision_counter > 100:
             return False
-        if self.iteration_counter < self.MAX_ITERATIONS:
-            self.change_epsilon()
-            self.iteration_counter += 1
-        else:
+        if self.iteration_counter >= self.MAX_SIMULATION_ITERATIONS:
             return False
 
         return True
 
     def change_epsilon(self):
-        eps_diff = self.EPSILON_HIGH - self.EPSILON_LOW  # 0.99 - 0.6 = 0.39
-        increase_e_by_steps = self.MAX_ITERATIONS / eps_diff * 10  # 256 steps
-
-        print(f"epsilon modulus is {self.iteration_counter % increase_e_by_steps}")
-
-        if self.iteration_counter % increase_e_by_steps == 0:
-            self.EPSILON_LOW += 0.01
-            print(f"%%%%%%%%%%%%%%%%%%%%%%Increasing epsilon to {self.EPSILON_LOW} %%%%%%%%%%%%%%")
+        if self.epsilon_counter == self.epsilon_increase:
+            if self.EPSILON_LOW < self.EPSILON_HIGH:
+                self.EPSILON_LOW += 0.01
+                print(f"Increasing epsilon to {self.EPSILON_LOW}")
+                self.epsilon_counter = 0
+        else:
+            self.epsilon_counter += 1
 
     def initialize_q_table(self):
         # Initialize Q-table for states * action pairs with default values (0).
@@ -163,7 +165,6 @@ class Environment:
 
         if collision:
             self.collision_counter += 1
-            print(f"Collision counter is now: {self.collision_counter}")
             return True
         else:
             self.collision_counter = 0
@@ -171,18 +172,14 @@ class Environment:
 
     def update_q_table(self, best_action, curr_state):
         new_state, reward = self.handle_action(best_action)
-        print(f"After moving we are now in state {new_state} and we received reward: {reward} from action {best_action}")
         max_future_q = np.amax(self.q_table[new_state])
         current_q = self.q_table[curr_state][best_action]
-
-        print(f"Current Q-value is {current_q}, max future Q value is: {max_future_q}")
 
         # Calculate the new Q-value with the common formula
         new_q = (1 - self.LEARNING_RATE) * current_q + self.LEARNING_RATE * (
                 reward + self.DISCOUNT_FACTOR * max_future_q)
 
         self.q_table[curr_state][best_action] = new_q  # And update the value
-        print(f"Curr state {curr_state}- best action {best_action} updated new Q value: {new_q}")
 
 
 def main():
