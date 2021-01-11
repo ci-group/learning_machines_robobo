@@ -26,7 +26,7 @@ def main():
     # Following code moves the robot
     for i in range(10):
             print("robobo is at {}".format(rob.position()))
-            rob.move(5, 5, 2000)
+            rob.move(10, 10, 2000)
    
     print("robobo is at {}".format(rob.position()))
     rob.sleep(1)

@@ -54,3 +54,4 @@ CATKIN_IGNORE
 
 # vscode
 /.vscode/
+src/test_pictures.png
