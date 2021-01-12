@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 class NN(torch.nn.Module):
     def __init__(self, num_input, num_hidden, num_output):
@@ -7,6 +8,8 @@ class NN(torch.nn.Module):
         self.linear2 = torch.nn.Linear(num_hidden, num_output)
 
     def forward(self, x):
+        x = np.array(x, dtype=np.float32)
+        x = torch.tensor(x,)
         h = torch.tanh(self.linear1(x))
         y = torch.tanh(self.linear2(h))
         return y
@@ -28,7 +31,7 @@ total length: (x+y+1)*h+y
 
 class Controller:
     def __init__(self, gene):
-        x = 6
+        x = 8
         h = 10
         y = 2
         self.nn = NN(x, h, y)
@@ -51,6 +54,7 @@ class Controller:
         return left, right
 
 if __name__ == '__main__':
-    gene = [0.1] * 60 + [0.2] * 10 + [0.3] * 20 + [0.4] * 2
+    gene = [0.1] * 80 + [0.2] * 10 + [0.3] * 20 + [0.4] * 2
     c = Controller(gene)
+    print(c.act([0] * 8))
     # print(c.nn.linear2.bias)
