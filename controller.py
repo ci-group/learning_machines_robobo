@@ -7,9 +7,8 @@ class NN(torch.nn.Module):
         self.linear2 = torch.nn.Linear(num_hidden, num_output)
 
     def forward(self, x):
-        h = self.linear1(x)
-        a = torch.tanh(h)
-        y = self.linear2(a)
+        h = torch.tanh(self.linear1(x))
+        y = torch.tanh(self.linear2(h))
         return y
 
 """
@@ -28,11 +27,10 @@ total length: (x+y+1)*h+y
 
 
 class Controller:
-    def __init__(self, gene=None):
+    def __init__(self, gene):
         x = 6
         h = 10
         y = 2
-        self.gene = gene
         self.nn = NN(x, h, y)
         state_dict = self.nn.state_dict()
         w1 = [[gene[x * i + j] for j in range(x)] for i in range(h)]
@@ -45,6 +43,12 @@ class Controller:
         state_dict['linear2.bias'] = torch.tensor(b2)
         self.nn.load_state_dict(state_dict, strict=False)
 
+    def act(self, inputs):
+        assert len(inputs) == self.nn.linear1.weight.shape[1]
+        outputs = self.nn.forward(inputs)
+        left = outputs[0] * 10
+        right = outputs[1] * 10
+        return left, right
 
 if __name__ == '__main__':
     gene = [0.1] * 60 + [0.2] * 10 + [0.3] * 20 + [0.4] * 2
