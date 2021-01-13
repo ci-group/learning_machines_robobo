@@ -26,8 +26,10 @@ def main():
     # Following code moves the robot
     for i in range(10):
             print("robobo is at {}".format(rob.position()))
-            rob.move(5, 5, 2000)
-   
+            rob.move(75 + 10*i, 75 + 10*i, 200)
+
+    rob.stop_world()
+    return
     print("robobo is at {}".format(rob.position()))
     rob.sleep(1)
 
@@ -52,7 +54,8 @@ def main():
 
     # IR reading
     for i in range(1000000):
-        print("ROB Irs: {}".format(np.log(np.array(rob.read_irs()))/10))
+        # print("ROB Irs: {}".format(np.log(np.array(rob.read_irs()))/10))
+        print("ROB Irs: {}".format(np.array(rob.read_irs()) / 10))
         time.sleep(0.1)
 
     # pause the simulation and read the collected food
