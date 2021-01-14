@@ -22,8 +22,7 @@ class SimulationRobobo(Robobo):
         else:
             raise VREPCommunicationError('Failed connecting to remote API server')
 
-        get_handles_timeout = 120
-
+        get_handles_timeout = 120.0
         startTime = time.time()
         while time.time() - startTime < get_handles_timeout:
             try:
