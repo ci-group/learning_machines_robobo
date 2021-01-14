@@ -1,0 +1,4 @@
+std_msgs/String id
+std_msgs/String color
+---
+std_msgs/Int8 error
