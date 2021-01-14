@@ -49,8 +49,6 @@ class Controller:
     def act(self, inputs):
         assert len(inputs) == self.nn.linear1.weight.shape[1]
         inputs = [inputs[i] * 5 if inputs[i] is not False else 1 for i in range(len(inputs))]
-
-        print(inputs)
         outputs = self.nn.forward(inputs)
         left = outputs[0] * 50
         right = outputs[1] * 50
