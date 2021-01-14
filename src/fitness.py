@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # from _future_ import print_function
 
+from __future__ import unicode_literals, print_function, absolute_import, division, generators, nested_scopes
+from controller import *
+
+
 import time
 import numpy as np
 import pandas
@@ -10,7 +14,6 @@ import sys
 import signal
 import prey
 import csv
-
 coef1 = 10
 coef2 = 50
 
@@ -20,20 +23,19 @@ def terminate_program(signal_number, frame):
     sys.exit(1)
 
 
-def main():
+def fitness(controller):
     signal.signal(signal.SIGINT, terminate_program)
 
     # rob = robobo.HardwareRobobo(camera=True).connect(address="192.168.2.28")
-    rob = robobo.SimulationRobobo().connect(address='192.168.2.28', port=19997)
+    rob = robobo.SimulationRobobo().connect(address='127.0.0.1', port=19997)
 
     rob.play_simulation()
 
     # Following code moves the robot
-
-    file = open('output.csv', 'w+', newline='')
-    writer = csv.writer(file)
-    writer.writerow(
-        ['time', 'x', 'y', 'z', 'sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5', 'sensor6', 'sensor7', 'sensor8'])
+    with open('output.csv', 'w+', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            ['time', 'x', 'y', 'z', 'sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5', 'sensor6', 'sensor7', 'sensor8'])
 
     rob.play_simulation()
 
@@ -52,18 +54,20 @@ def main():
             irs[3], irs[4], irs[5],
             irs[6], irs[7]))
         # writer.writerow(time() + rob.position() + np.array(rob.read_irs()))
+        left, right = controller.act(irs)
         rob.move(5, 5, 2000)
 
-    dataframe = pandas.read_csv(
-        'C:/Users/Sammy/Downloads/learning_machines_robobo-master/learning_machines_robobo-master/src/output.csv')
+    dataframe = pandas.read_csv('output.csv', sep=',')
     xval = dataframe.x.copy()[1:]
     yval = dataframe.y.copy()[1:]
     zval = dataframe.z.copy()[1:]
 
     dataframe["Euclid"] = 0
-    dataframe["Euclid"] = np.sqrt((dataframe.x[0:(len(dataframe.x) - 1)] - np.array(xval)) * 2 + (
-                dataframe.y[0:(len(dataframe.y) - 1)] - np.array(yval)) * 2 + (dataframe.z[0:(len(dataframe.z) - 1)] -
-                                                                             np.array(zval)) * 2 )
+    dataframe["Euclid"] = np.sqrt(
+        (dataframe.x[0:(len(dataframe.x) - 1)] - np.array(xval)) * 2 +
+        (dataframe.y[0:(len(dataframe.y) - 1)] - np.array(yval)) * 2 +
+        (dataframe.z[0:(len(dataframe.z) - 1)] - np.array(zval)) * 2
+    )
     dataframe["Euclidean"] = 0
     dataframe["Euclidean"][1:] = dataframe.Euclid[0:(len(dataframe.Euclid) - 1)].cumsum()
     dataframe["Rel_Diff"] = 'False'
@@ -117,5 +121,7 @@ def main():
     rob.stop_world()
 
 
-if __name__ == "_main_":
-    main()
+if __name__ == "__main__":
+    gene = [0.1] * 80 + [0.2] * 10 + [0.3] * 20 + [0.4] * 2
+    c = Controller(gene)
+    fitness(c)
