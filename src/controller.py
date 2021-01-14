@@ -32,7 +32,7 @@ total length: (x+y+1)*h+y
 class Controller:
     def __init__(self, gene):
         x = 8
-        h = 10
+        h = 2
         y = 2
         self.nn = NN(x, h, y)
         state_dict = self.nn.state_dict()
@@ -48,9 +48,12 @@ class Controller:
 
     def act(self, inputs):
         assert len(inputs) == self.nn.linear1.weight.shape[1]
+        inputs = [inputs[i] * 5 if inputs[i] is not False else 1 for i in range(len(inputs))]
+
+        print(inputs)
         outputs = self.nn.forward(inputs)
-        left = outputs[0] * 10
-        right = outputs[1] * 10
+        left = outputs[0] * 50
+        right = outputs[1] * 50
         return left, right
 
 if __name__ == '__main__':
