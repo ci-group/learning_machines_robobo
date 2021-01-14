@@ -32,30 +32,30 @@ def fitness(controller):
     rob.play_simulation()
 
     # Following code moves the robot
-    with open('output.csv', 'w+', newline='') as file:
+    with open('output.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(
             ['time', 'x', 'y', 'z', 'sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5', 'sensor6', 'sensor7', 'sensor8'])
 
-    rob.play_simulation()
+        rob.play_simulation()
 
-    end = rob.get_sim_time() + 60 * 1000
-    now = rob.get_sim_time()
-
-    while now < end:
-        position = rob.position()
-        irs = np.array(rob.read_irs())
-
+        end = rob.get_sim_time() + 60 * 1000
         now = rob.get_sim_time()
 
-        file.write("{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
-            now, position[0], position[1],
-            position[2], irs[0], irs[1], irs[2],
-            irs[3], irs[4], irs[5],
-            irs[6], irs[7]))
-        # writer.writerow(time() + rob.position() + np.array(rob.read_irs()))
-        left, right = controller.act(irs)
-        rob.move(5, 5, 2000)
+        while now < end:
+            position = rob.position()
+            irs = np.array(rob.read_irs())
+
+            now = rob.get_sim_time()
+
+            file.write("{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
+                now, position[0], position[1],
+                position[2], irs[0], irs[1], irs[2],
+                irs[3], irs[4], irs[5],
+                irs[6], irs[7]))
+            # writer.writerow(time() + rob.position() + np.array(rob.read_irs()))
+            left, right = controller.act(irs)
+            rob.move(left, right, 2000)
 
     dataframe = pandas.read_csv('output.csv', sep=',')
     xval = dataframe.x.copy()[1:]
@@ -91,11 +91,11 @@ def fitness(controller):
     round(a.diff()[0:20], 6)
     fitness = coef1 * dataframe.Euclidean[len(dataframe.Euclidean) - 1] + (coef2 / (counter + 1))
     # Following code moves the phone stand
-    rob.set_phone_pan(343, 100)
-    rob.set_phone_tilt(109, 100)
-    # time.sleep(1)
-    rob.set_phone_pan(11, 100)
-    rob.set_phone_tilt(26, 100)
+    # rob.set_phone_pan(343, 100)
+    # rob.set_phone_tilt(109, 100)
+    # # time.sleep(1)
+    # rob.set_phone_pan(11, 100)
+    # rob.set_phone_tilt(26, 100)
 
     # Following code makes the robot talk and be emotional
     # rob.set_emotion('happy')
@@ -110,15 +110,16 @@ def fitness(controller):
     time.sleep(0.1)
 
     # IR reading
-    for i in range(100):
-        print("ROB Irs: {}".format(np.log(np.array(rob.read_irs())) / 10))
-        time.sleep(0.1)
+    # for i in range(100):
+    #     print("ROB Irs: {}".format(np.log(np.array(rob.read_irs())) / 10))
+    #     time.sleep(0.1)
 
     # pause the simulation and read the collected food
     rob.pause_simulation()
 
     # Stopping the simualtion resets the environment
     rob.stop_world()
+    return fitness
 
 
 if __name__ == "__main__":
