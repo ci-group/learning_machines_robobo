@@ -49,8 +49,8 @@ class Controller:
     def act(self, inputs):
         assert len(inputs) == self.nn.linear1.weight.shape[1]
         outputs = self.nn.forward(inputs)
-        left = outputs[0] * 100
-        right = outputs[1] * 100
+        left = outputs[0] * 10
+        right = outputs[1] * 10
         return left, right
 
 if __name__ == '__main__':
