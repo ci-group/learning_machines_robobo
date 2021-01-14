@@ -64,9 +64,9 @@ def fitness(controller):
 
     dataframe["Euclid"] = 0
     dataframe["Euclid"] = np.sqrt(
-        (dataframe.x[0:(len(dataframe.x) - 1)] - np.array(xval)) * 2 +
-        (dataframe.y[0:(len(dataframe.y) - 1)] - np.array(yval)) * 2 +
-        (dataframe.z[0:(len(dataframe.z) - 1)] - np.array(zval)) * 2
+        (dataframe.x[0:(len(dataframe.x) - 1)] - np.array(xval)) ** 2 +
+        (dataframe.y[0:(len(dataframe.y) - 1)] - np.array(yval)) ** 2 +
+        (dataframe.z[0:(len(dataframe.z) - 1)] - np.array(zval)) ** 2
     )
     dataframe["Euclidean"] = 0
     dataframe["Euclidean"][1:] = dataframe.Euclid[0:(len(dataframe.Euclid) - 1)].cumsum()
