@@ -31,11 +31,11 @@ def seed_everything(seed):
     np.random.seed(seed)
 seed_everything(seed)
 
-NUMBER_OF_GENERATIONS = 100
+NUMBER_OF_GENERATIONS = 20
 NUMBER_OF_INPUTS = 8
 NUMBER_OF_OUTPUTS = 2
-NUMBER_OF_HIDDEN_Neurons_1 = 10
-NUMBER_OF_HIDDEN_Neurons_2  = 10
+NUMBER_OF_HIDDEN_Neurons_1 = 2
+NUMBER_OF_HIDDEN_Neurons_2  = 2
 NUMBER_OF_WEIGHTS =(NUMBER_OF_INPUTS + 1) * NUMBER_OF_HIDDEN_Neurons_1+ (NUMBER_OF_HIDDEN_Neurons_1 + 1) *NUMBER_OF_HIDDEN_Neurons_2 +  (NUMBER_OF_HIDDEN_Neurons_2 + 1) * NUMBER_OF_OUTPUTS
 NUMBER_OF_SIGMAS = NUMBER_OF_WEIGHTS
 
@@ -44,29 +44,117 @@ LAMBDA = 30  # how many children per generation
 LOWER = NUMBER_OF_WEIGHTS*[-1]
 UPPER = NUMBER_OF_WEIGHTS*[1]
 
+rob2 = robobo.SimulationRobobo(number = '#2').connect(address='192.168.178.206', port=19997)
+rob = robobo.SimulationRobobo(number = '#0').connect(address='192.168.178.206', port=19998)
 
-rob = robobo.SimulationRobobo(number = '#0').connect(address='192.168.178.206', port=19997)
+
 
 
 
 
 def fitness(c,weights):
     fitnessScore = 0
+    number_of_collisions = 0
     controller = c(weights)
     while(rob.is_simulation_running()):
         pass
     rob.play_simulation()
-    start = time.time()
-    while(time.time() - start < 60):
+    start = rob.get_sim_time()
+    prior_irs = 'None'
+    min2_irs = 'None'
+    min3_irs = 'None'
+    min4_irs = 'None'
+    while(rob.get_sim_time() - start < 60*1000):
         current_location_x, current_location_y, current_location_z = rob.position()
         x,y =controller.act(rob.read_irs())
-        rob.move(float(x),float(y), 0)
+        rob.move(float(x),float(y), 500)
+        
+        if not prior_irs == 'None':
+            irs = rob.read_irs()
+            if 'None' not in [min2_irs, min3_irs, min4_irs]:
+                rel_diff_j = 0
+                rel_diff_j_minus1 = 0
+                rel_diff_j_minus2 = 0
+                rel_diff_j_minus3 = 0
+                for i in range(NUMBER_OF_INPUTS):
+                    if not (irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j+= 0.2*np.abs(irs[i]-prior_irs[i])
+                    if not (min2_irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j_minus1+= 0.2*np.abs(prior_irs[i]-min2_irs[i] )
+                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j_minus2+= 0.2*np.abs(min3_irs[i]-min2_irs[i] )
+                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j_minus3+= 0.2*np.abs(min3_irs[i]-min4_irs[i] )
+                if ((rel_diff_j_minus3 > 0.03) and (rel_diff_j_minus1 < 0.01) and rel_diff_j < 0.001):
+                    number_of_collisions+=1
+            min4_irs = min3_irs
+            min3_irs = min2_irs
+            min2_irs = prior_irs
+            prior_irs = irs
+                    
+                        
+        else: prior_irs = rob.read_irs()
+        
+            
         
         new_location_x, new_location_y, new_location_z = rob.position()
-        fitnessScore+=np.abs(new_location_x - current_location_x)+np.abs(new_location_y - current_location_y)
+        fitnessScore+=np.sqrt((new_location_x - current_location_x)**2+(new_location_y - current_location_y)**2)
     
     rob.stop_world()
-    return [fitnessScore]
+    
+    
+    
+    while(rob2.is_simulation_running()):
+        pass
+    rob2.play_simulation()
+    start = rob2.get_sim_time()
+    prior_irs = 'None'
+    min2_irs = 'None'
+    min3_irs = 'None'
+    min4_irs = 'None'
+    while(rob2.get_sim_time() - start < 60*1000):
+        current_location_x, current_location_y, current_location_z = rob2.position()
+        x,y =controller.act(rob2.read_irs())
+        rob2.move(float(x),float(y), 2000)
+        
+        if not prior_irs == 'None':
+            irs = rob2.read_irs()
+            if 'None' not in [min2_irs, min3_irs, min4_irs]:
+                rel_diff_j = 0
+                rel_diff_j_minus1 = 0
+                rel_diff_j_minus2 = 0
+                rel_diff_j_minus3 = 0
+                for i in range(NUMBER_OF_INPUTS):
+                    if not (irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j+= 0.2*np.abs(irs[i]-prior_irs[i])
+                    if not (min2_irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j_minus1+= 0.2*np.abs(prior_irs[i]-min2_irs[i] )
+                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j_minus2+= 0.2*np.abs(min3_irs[i]-min2_irs[i] )
+                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+                        rel_diff_j_minus3+= 0.2*np.abs(min3_irs[i]-min4_irs[i] )
+                if ((rel_diff_j_minus3 > 0.03) and (rel_diff_j_minus1 < 0.01) and rel_diff_j < 0.001):
+                    number_of_collisions+=1
+            min4_irs = min3_irs
+            min3_irs = min2_irs
+            min2_irs = prior_irs
+            prior_irs = irs
+                    
+                        
+        else: prior_irs = rob2.read_irs()
+        
+            
+        
+        new_location_x, new_location_y, new_location_z = rob2.position()
+        fitnessScore+=np.sqrt((new_location_x - current_location_x)**2+(new_location_y - current_location_y)**2)
+    
+    rob2.stop_world()
+    check = False
+    if number_of_collisions > 0 and not check:
+        check = True
+        print('reached')
+        
+    return [10*fitnessScore+ 50/number_of_collisions]
 # initialize fitness and set fitness weight to positive value (we want to maximize)
 creator.create("FitnessMax", base.Fitness, weights=[1.0])
 # the goal ('fitness') function to be maximized
