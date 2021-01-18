@@ -71,25 +71,33 @@ def fitness(c,weights):
         
         if not prior_irs == 'None':
             irs = rob.read_irs()
-            if 'None' not in [min2_irs, min3_irs, min4_irs]:
-                rel_diff_j = 0
-                rel_diff_j_minus1 = 0
-                rel_diff_j_minus2 = 0
-                rel_diff_j_minus3 = 0
-                for i in range(NUMBER_OF_INPUTS):
-                    if not (irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j+= 0.2*np.abs(irs[i]-prior_irs[i])
-                    if not (min2_irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j_minus1+= 0.2*np.abs(prior_irs[i]-min2_irs[i] )
-                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j_minus2+= 0.2*np.abs(min3_irs[i]-min2_irs[i] )
-                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j_minus3+= 0.2*np.abs(min3_irs[i]-min4_irs[i] )
-                if ((rel_diff_j_minus3 > 0.03) and (rel_diff_j_minus1 < 0.01) and rel_diff_j < 0.001):
-                    number_of_collisions+=1
-            min4_irs = min3_irs
-            min3_irs = min2_irs
-            min2_irs = prior_irs
+            # if 'None' not in [min2_irs, min3_irs, min4_irs]:
+            #     rel_diff_j = 0
+            #     rel_diff_j_minus1 = 0
+            #     rel_diff_j_minus2 = 0
+            #     rel_diff_j_minus3 = 0
+            #     for i in range(NUMBER_OF_INPUTS):
+            #         if not (irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j+= 0.2*np.abs(irs[i]-prior_irs[i])
+            #         if not (min2_irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j_minus1+= 0.2*np.abs(prior_irs[i]-min2_irs[i] )
+            #         if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j_minus2+= 0.2*np.abs(min3_irs[i]-min2_irs[i] )
+            #         if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j_minus3+= 0.2*np.abs(min3_irs[i]-min4_irs[i] )
+            #     if ((rel_diff_j_minus3 > 0.03) and (rel_diff_j_minus1 < 0.01) and rel_diff_j < 0.001):
+            #         number_of_collisions+=1
+            # min4_irs = min3_irs
+            # min3_irs = min2_irs
+            # min2_irs = prior_irs
+
+            distances = []
+            for x in irs:
+                if x is False:
+                    distances.append(1)
+                else:
+                    distances.append(x)
+            fitnessScore += np.min(distances)
             prior_irs = irs
                     
                         
@@ -119,25 +127,32 @@ def fitness(c,weights):
         
         if not prior_irs == 'None':
             irs = rob2.read_irs()
-            if 'None' not in [min2_irs, min3_irs, min4_irs]:
-                rel_diff_j = 0
-                rel_diff_j_minus1 = 0
-                rel_diff_j_minus2 = 0
-                rel_diff_j_minus3 = 0
-                for i in range(NUMBER_OF_INPUTS):
-                    if not (irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j+= 0.2*np.abs(irs[i]-prior_irs[i])
-                    if not (min2_irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j_minus1+= 0.2*np.abs(prior_irs[i]-min2_irs[i] )
-                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j_minus2+= 0.2*np.abs(min3_irs[i]-min2_irs[i] )
-                    if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
-                        rel_diff_j_minus3+= 0.2*np.abs(min3_irs[i]-min4_irs[i] )
-                if ((rel_diff_j_minus3 > 0.03) and (rel_diff_j_minus1 < 0.01) and rel_diff_j < 0.001):
-                    number_of_collisions+=1
-            min4_irs = min3_irs
-            min3_irs = min2_irs
-            min2_irs = prior_irs
+            # if 'None' not in [min2_irs, min3_irs, min4_irs]:
+            #     rel_diff_j = 0
+            #     rel_diff_j_minus1 = 0
+            #     rel_diff_j_minus2 = 0
+            #     rel_diff_j_minus3 = 0
+            #     for i in range(NUMBER_OF_INPUTS):
+            #         if not (irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j+= 0.2*np.abs(irs[i]-prior_irs[i])
+            #         if not (min2_irs[i] or prior_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j_minus1+= 0.2*np.abs(prior_irs[i]-min2_irs[i] )
+            #         if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j_minus2+= 0.2*np.abs(min3_irs[i]-min2_irs[i] )
+            #         if not (min2_irs[i] or min3_irs[i]): #if any of the 2 dont measure anything
+            #             rel_diff_j_minus3+= 0.2*np.abs(min3_irs[i]-min4_irs[i] )
+            #     if ((rel_diff_j_minus3 > 0.03) and (rel_diff_j_minus1 < 0.01) and rel_diff_j < 0.001):
+            #         number_of_collisions+=1
+            # min4_irs = min3_irs
+            # min3_irs = min2_irs
+            # min2_irs = prior_irs
+            distances = []
+            for x in irs:
+                if x is False:
+                    distances.append(1)
+                else:
+                    distances.append(x)
+            fitnessScore += np.min(distances)
             prior_irs = irs
                     
                         
@@ -153,8 +168,9 @@ def fitness(c,weights):
     if number_of_collisions > 0 and not check:
         check = True
         print('reached')
-        
-    return [10*fitnessScore+ 50/number_of_collisions]
+
+    print('Fitness:', fitnessScore)
+    return [10*fitnessScore]
 # initialize fitness and set fitness weight to positive value (we want to maximize)
 creator.create("FitnessMax", base.Fitness, weights=[1.0])
 # the goal ('fitness') function to be maximized
