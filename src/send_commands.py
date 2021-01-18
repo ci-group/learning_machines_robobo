@@ -19,10 +19,14 @@ def main():
     signal.signal(signal.SIGINT, terminate_program)
 
     # rob = robobo.HardwareRobobo(camera=True).connect(address="192.168.1.7")
-    rob = robobo.SimulationRobobo().connect(address='127.0.0.1', port=19997)
+    rob = robobo.SimulationRobobo(number='').connect(address='127.0.0.1', port=19997)
 
     rob.play_simulation()
 
+    rob.set_phone_tilt(0.8, 50)
+    image = rob.get_image_front()
+    cv2.imwrite("test_pictures.png",image)
+    exit()
     # Following code moves the robot
     for i in range(10):
             print("robobo is at {}".format(rob.position()))
@@ -35,7 +39,6 @@ def main():
 
     # Following code moves the phone stand
     rob.set_phone_pan(343, 100)
-    rob.set_phone_tilt(109, 100)
     time.sleep(1)
     rob.set_phone_pan(11, 100)
     rob.set_phone_tilt(26, 100)
