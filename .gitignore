@@ -55,3 +55,20 @@ CATKIN_IGNORE
 # vscode
 /.vscode/
 src/test_pictures.png
+
+# PyCharm
+*.pyc
+*.idea
+learning_machines_robobo-1/src/__pycache__/controller.cpython-38.pyc
+learning_machines_robobo-1/src/ea_validate.py
+learning_machines_robobo-1/src/fittestseed111mixedFull.csv
+learning_machines_robobo-1/src/logbookseed111.csv
+learning_machines_robobo-1/src/prey/__pycache__/__init__.cpython-38.pyc
+learning_machines_robobo-1/src/prey/__pycache__/prey_controller.cpython-38.pyc
+learning_machines_robobo-1/src/robobo/__pycache__/__init__.cpython-38.pyc
+learning_machines_robobo-1/src/robobo/__pycache__/base.cpython-38.pyc
+learning_machines_robobo-1/src/robobo/__pycache__/simulation.cpython-38.pyc
+learning_machines_robobo-1/src/robobo/__pycache__/simulation_prey.cpython-38.pyc
+learning_machines_robobo-1/src/vrep/__pycache__/__init__.cpython-38.pyc
+learning_machines_robobo-1/src/vrep/__pycache__/error.cpython-38.pyc
+learning_machines_robobo-1/src/vrep/__pycache__/vrepConst.cpython-38.pyc
