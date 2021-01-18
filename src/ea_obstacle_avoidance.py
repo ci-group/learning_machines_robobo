@@ -44,8 +44,11 @@ LAMBDA = 30  # how many children per generation
 LOWER = NUMBER_OF_WEIGHTS*[-1]
 UPPER = NUMBER_OF_WEIGHTS*[1]
 
-rob2 = robobo.SimulationRobobo(number = '#0').connect(address='192.168.178.206', port=19997)
-rob = robobo.SimulationRobobo(number = '#0').connect(address='192.168.178.206', port=19998)
+with open('IP.txt', 'r') as f:
+    ip = f.readlines()[0]
+
+rob2 = robobo.SimulationRobobo(number = '#0').connect(address=ip, port=19997)
+rob = robobo.SimulationRobobo(number = '#0').connect(address=ip, port=19998)
 
 
 
