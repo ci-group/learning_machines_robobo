@@ -72,3 +72,4 @@ learning_machines_robobo-1/src/robobo/__pycache__/simulation_prey.cpython-38.pyc
 learning_machines_robobo-1/src/vrep/__pycache__/__init__.cpython-38.pyc
 learning_machines_robobo-1/src/vrep/__pycache__/error.cpython-38.pyc
 learning_machines_robobo-1/src/vrep/__pycache__/vrepConst.cpython-38.pyc
+*.pyc
