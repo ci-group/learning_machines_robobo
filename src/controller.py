@@ -30,10 +30,7 @@ total length: (x+y+1)*h+y
 
 
 class Controller:
-    def __init__(self, gene):
-        x = 8
-        h = 2
-        y = 2
+    def __init__(self, gene,x=8, h=2, y=2):
         self.nn = NN(x, h, y)
         state_dict = self.nn.state_dict()
         w1 = [[gene[x * i + j] for j in range(x)] for i in range(h)]
