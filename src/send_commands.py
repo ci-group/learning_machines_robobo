@@ -9,7 +9,7 @@ import cv2
 import sys
 import signal
 import prey
-
+import blob_detection
 
 def terminate_program(signal_number, frame):
     print("Ctrl-C received, terminating program")
@@ -25,6 +25,7 @@ def main():
 
     rob.set_phone_tilt(0.8, 50)
     image = rob.get_image_front()
+    print(blob_detection.detect(image))
     cv2.imwrite("test_pictures.png",image)
     exit()
     # Following code moves the robot
