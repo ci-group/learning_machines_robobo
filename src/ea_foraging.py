@@ -70,14 +70,14 @@ def fitness(c, weights):
             detection_x, detection_y = detect(rob.get_image_front())
 
             if detection_x is False:
-                detection_x, detection_y = 64, 0
+                detection_x, detection_y = 0.5, -1
             else:
                 detection_x, detection_y = detection_x / 128, detection_y / 128
             inputs = sensors + [detection_x, detection_y]
             x, y = controller.act(inputs)
             rob.move(float(x), float(y), 500)
 
-            fitness_score += rob.collected_food()
+        fitness_score += rob.collected_food()
 
         rob.stop_world()
 
