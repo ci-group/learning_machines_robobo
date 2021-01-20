@@ -59,30 +59,31 @@ def fitness(c, weights):
     rob.set_phone_tilt(0.8, 50)
     fitness_score = 0
     controller = c(weights, 7, 2, 2)
-    while (rob.is_simulation_running()):
-        pass
-    rob.play_simulation()
-    start = rob.get_sim_time()
-    while (rob.get_sim_time() - start < 60 * 1000):
-        sensors = rob.read_irs()[3:] # front sensors, length 5
-        sensors = [sensors[i] * 5 if sensors[i] is not False else 1 for i in range(len(sensors))]
-        detection_x, detection_y = detect(rob.get_image_front())
+    for i in range(5):
+        while (rob.is_simulation_running()):
+            pass
+        rob.play_simulation()
+        start = rob.get_sim_time()
+        while (rob.get_sim_time() - start < 60 * 1000):
+            sensors = rob.read_irs()[3:] # front sensors, length 5
+            sensors = [sensors[i] * 5 if sensors[i] is not False else 1 for i in range(len(sensors))]
+            detection_x, detection_y = detect(rob.get_image_front())
 
-        if detection_x is False:
-            detection_x, detection_y = -1, -1
-        else:
-            detection_x, detection_y = detection_x / 128, detection_y / 128
-        inputs = sensors + [detection_x, detection_y]
-        print(inputs)
-        x, y = controller.act(inputs)
-        rob.move(float(x), float(y), 500)
+            if detection_x is False:
+                detection_x, detection_y = 0, 0
+            else:
+                detection_x, detection_y = detection_x / 128, detection_y / 128
+            inputs = sensors + [detection_x, detection_y]
+            x, y = controller.act(inputs)
+            rob.move(float(x), float(y), 500)
 
-        fitness_score += rob.collected_food()
+            fitness_score += rob.collected_food()
 
-    rob.stop_world()
+        rob.stop_world()
 
     print('working')
-    return fitness_score
+    print(fitness_score)
+    return [fitness_score]
 
 
 # initialize fitness and set fitness weight to positive value (we want to maximize)
