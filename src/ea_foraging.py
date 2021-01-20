@@ -70,7 +70,7 @@ def fitness(c, weights):
             detection_x, detection_y = detect(rob.get_image_front())
 
             if detection_x is False:
-                detection_x, detection_y = 0, 0
+                detection_x, detection_y = 64, 0
             else:
                 detection_x, detection_y = detection_x / 128, detection_y / 128
             inputs = sensors + [detection_x, detection_y]
