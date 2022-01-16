@@ -19,7 +19,7 @@ def main():
     signal.signal(signal.SIGINT, terminate_program)
 
     # rob = robobo.HardwareRobobo(camera=True).connect(address="192.168.1.7")
-    rob = robobo.SimulationRobobo().connect(address='192.168.1.6', port=19997)
+    rob = robobo.SimulationRobobo().connect(address='145.108.83.244', port=19997)
 
     rob.play_simulation()
 
@@ -52,7 +52,7 @@ def main():
     time.sleep(0.1)
 
     # IR reading
-    for i in range(1000000):
+    for i in range(100):
         print("ROB Irs: {}".format(np.log(np.array(rob.read_irs()))/10))
         time.sleep(0.1)
 
