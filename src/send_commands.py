@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from __future__ import print_function
 
 import time
@@ -52,7 +52,7 @@ def main():
     time.sleep(0.1)
 
     # IR reading
-    for i in range(1000000):
+    for i in range(10000):
         print("ROB Irs: {}".format(np.log(np.array(rob.read_irs()))/10))
         time.sleep(0.1)
 
