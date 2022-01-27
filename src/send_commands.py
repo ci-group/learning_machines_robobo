@@ -19,7 +19,7 @@ def main():
     signal.signal(signal.SIGINT, terminate_program)
 
     # rob = robobo.HardwareRobobo(camera=True).connect(address="192.168.1.7")
-    rob = robobo.SimulationRobobo().connect(address='192.168.1.6', port=19997)
+    rob = robobo.SimulationRobobo().connect(address='127.0.0.1', port=19997)
 
     rob.play_simulation()
 
@@ -27,6 +27,8 @@ def main():
     for i in range(10):
             print("robobo is at {}".format(rob.position()))
             rob.move(5, 5, 2000)
+            print("ROB Irs: {}".format(np.log(np.array(rob.read_irs()))/10))
+            #print("Base sensor detection: ", rob.base_detects_food())
    
     print("robobo is at {}".format(rob.position()))
     rob.sleep(1)

@@ -65,6 +65,11 @@ class SimulationRobobo(Robobo):
         self._PanMotor = self._vrep_get_object_handle('Pan_Motor{}'.format(self._value_number), vrep.simx_opmode_blocking)
         self._FrontalCamera = self._vrep_get_object_handle('Frontal_Camera{}'.format(self._value_number), vrep.simx_opmode_blocking)
 
+        try:
+            self._base = self._vrep_get_object_handle("Base_Proximity_sensor", vrep.simx_opmode_blocking)
+        except vrep.VrepApiError as _e:
+            self._base = None
+
         # read a first value in streaming mode
         self._vrep_read_proximity_sensor_ignore_error(self._IrFrontC)
         self._vrep_read_proximity_sensor_ignore_error(self._IrBackC)
@@ -78,11 +83,15 @@ class SimulationRobobo(Robobo):
         self._vrep_read_proximity_sensor_ignore_error(self._IrFrontRFloor)
         self._vrep_read_proximity_sensor_ignore_error(self._IrFrontL)
         self._vrep_read_proximity_sensor_ignore_error(self._IrFrontLFloor)
+        if self._base is not None:
+            self._vrep_read_proximity_sensor_ignore_error(self._base)
 
         # setup join positions
         vrep.simxGetJointPosition(self._clientID, self._RightMotor, vrep.simx_opmode_buffer)
         vrep.simxGetJointPosition(self._clientID, self._LeftMotor, vrep.simx_opmode_buffer)
         vrep.simxGetObjectPosition(self._clientID, self._Robobo, -1, vrep.simx_opmode_buffer)
+        if self._base is not None:
+            vrep.simxGetObjectPosition(self._clientID, self._base, -1, vrep.simx_opmode_buffer)
 
         # read a first value in buffer mode
         self._vrep_get_vision_sensor_image_ignore_error(self._FrontalCamera, vrep.simx_opmode_streaming)
@@ -340,3 +349,13 @@ class SimulationRobobo(Robobo):
                                         [],[],[],bytearray(),vrep.simx_opmode_blocking)
         )
         return ints[0]
+
+    def base_position(self):
+        return vrep.unwrap_vrep(
+            vrep.simxGetObjectPosition(self._clientID, self._base, -1, vrep.simx_opmode_blocking)
+        )
+    
+    def base_detects_food(self):
+        detection, _detection_point, _detected_handle, _detected_normal \
+            = self._vrep_read_proximity_sensor(self._base, vrep.simx_opmode_buffer)
+        return bool(detection)
