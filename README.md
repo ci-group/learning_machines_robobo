@@ -49,10 +49,6 @@ Now you downloaded everything, you can start the environment
   - enable Real Time button (optional)
   - start the simulation with the play button
   
-- Fix the script: inside the project folder, open the file `src/send_commands.py` and
-  - ~~remove the line in which I create a connection to an hardware robot~~
-  - fix the line of the connection to the simulated robot to have your local machine ip (localhost or 127.0.0.1 will not work because of docker. Connect to your home network and use the IP that the router will give you)
-
 - Run the script
   - inside the docker container running, type
   ```
@@ -68,13 +64,13 @@ You need to change the file `start-docker.bat` changing from
 ```bat
 SET project_folder=%~dp0
 
-docker run --rm -it -v %project_folder%:/root/projects cigroup/learning-machines bash
+docker run --rm -it -v %project_folder%:/root/projects --net=host cigroup/learning-machines bash
 ```
 to
 ```bat
 SET project_folder=/c/Users/YourUser/path/to/learning_machines_robobo
 
-docker run --rm -it -v %project_folder%:/root/projects cigroup/learning-machines bash
+docker run --rm -it -v %project_folder%:/root/projects --net=host cigroup/learning-machines bash
 ```
 where your project is in the folder `C:\Users\YourUser\path\to\learning_machines_robobo`. Change this variable accordingly to your own username and path to the project folder. You cannot use folders outside `C:\Users\` and remember to change all backslasesh (`\`) to forward slashes (`/`).
 
@@ -82,7 +78,7 @@ where your project is in the folder `C:\Users\YourUser\path\to\learning_machines
 
 ## Setup (with ros image)
 
-- start docker with `docker run --rm -it -v "${PROJECT_FOLDER}:/root/projects/" cigroup/learning-machines bash`
+- start docker with `docker run --rm -it -v "${PROJECT_FOLDER}:/root/projects/" --net=host cigroup/learning-machines bash`
 - change folder to `/root/projects/` (inside docker)
 - run `catkin_make install` (only run for the first setup, it's not needed even across different docker containers)
 - run `source devel/setup.bash`
