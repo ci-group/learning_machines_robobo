@@ -13,7 +13,13 @@ class SimulationRobobo(Robobo):
         self._clientID = None
         self._value_number = number
 
-    def connect(self, address='127.0.0.1', port=19999):
+    def connect(self, address="127.0.0.1", port=19999, realtime=False):
+        """Connect to VREP simulator.
+        params:
+            address: IP address on which to communicate with VREP.
+            port: port on which to communicate with VREP.
+            realtime: whether to run simulator in real time mode (defaults to running faster).
+        """
         # vrep.simxFinish(-1)  # just in case, close all opened connections
         self._clientID = vrep.simxStart(address, port, True, True, 5000, 5)  # Connect to V-REP
         if self._clientID >= 0: #  and clientID_0 != -1:
@@ -28,6 +34,10 @@ class SimulationRobobo(Robobo):
         while time.time() - startTime < get_handles_timeout:
             try:
                 self.initialize_handles()
+                print(f"setting realtime={realtime}")
+                vrep.simxSetBooleanParameter(
+                    self._clientID, 25, realtime, vrep.simx_opmode_oneshot
+                )
                 return self
             except vrep.VrepApiError as _e:
                 print("Handle initialization failed, retrying.")
@@ -351,11 +361,22 @@ class SimulationRobobo(Robobo):
         return ints[0]
 
     def base_position(self):
+        """Get the position of the green target zone (for task3)."""
         return vrep.unwrap_vrep(
             vrep.simxGetObjectPosition(self._clientID, self._base, -1, vrep.simx_opmode_blocking)
         )
     
     def base_detects_food(self):
+        """Check whether the red block is in the green target zone (for task 3)."""
         detection, _detection_point, _detected_handle, _detected_normal \
             = self._vrep_read_proximity_sensor(self._base, vrep.simx_opmode_buffer)
         return bool(detection)
+
+    def puck_position(self):
+        """Return position of the red block for task3."""
+        puck_handle = self._vrep_get_object_handle(
+            "Food".format(self._value_number), vrep.simx_opmode_blocking
+        )
+        return vrep.unwrap_vrep(
+            vrep.simxGetObjectPosition(self._clientID, puck_handle, -1, vrep.simx_opmode_blocking)
+        )
