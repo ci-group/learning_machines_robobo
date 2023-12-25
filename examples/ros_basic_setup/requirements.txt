@@ -1,0 +1,2 @@
+# Yes, this is an old version of numpy. This is the newset from for python 3.8
+numpy~=1.24
