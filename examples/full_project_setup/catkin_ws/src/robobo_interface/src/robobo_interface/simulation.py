@@ -1,3 +1,4 @@
+import sys
 import time
 
 import cv2
@@ -11,21 +12,33 @@ from .base import (
     Acceleration,
     Orientation,
     WheelPosition,
+    SoundEmotion,
 )
 from coppelia_sim import sim, simConst
 
-from typing import List, Optional
+from typing import List, Optional, Callable
 from numpy.typing import NDArray
 
 
 class SimulationRobobo(IRobobo):
+    """The simulation robot.
+
+    A few functions take blockid. When they do, they are not blocking.
+    However, the simulator does not work with ids, and, therefore, this argument is always ignored.
+    """
+
     def __init__(self):
         sim.simxFinish(-1)  # just in case, close all opened connections
+        # 0.0.0.0 to connect to the current computer.
         self.clientID = sim.simxStart("0.0.0.0", 19999, True, True, 5000, 5)
         if self.clientID != -1:
             print("Connected to remote API server")
         else:
-            print("Failed connecting to remote API server")
+            print(
+                """Failed connecting to remote API server:
+                Cannot find one hosted on port 19999"""
+            )
+            sys.exit(1)
 
         self.init_handles()
 
@@ -33,7 +46,6 @@ class SimulationRobobo(IRobobo):
         """Show the emotion of the robot on the screen
 
         Arguments
-
         emotion: Emotion - What emotion to show.
         """
         inputIntegers = []
@@ -53,15 +65,19 @@ class SimulationRobobo(IRobobo):
         )
 
     def move(
-        self, left_speed: int, right_speed: int, millis: int, blockid: int = 0
+        self,
+        left_speed: int,
+        right_speed: int,
+        millis: int,
+        blockid: Optional[int] = None,
     ) -> None:
         """Move the robot wheels for `millis` time
 
         Arguments
-
         left_speed: speed of the left wheel. Range: 0-100
         right_speed: speed of the right wheel. Range: 0-100
         millis: how many millisecond to move the robot
+        blockid: ignored, but implied unblocked.
         """
         inputIntegers = [left_speed, right_speed]
         inputFloats = [millis * 1000.0]
@@ -102,12 +118,21 @@ class SimulationRobobo(IRobobo):
 
     def talk(self, message: str) -> None:
         """Let the robot speak.
+        For the simultion, this is just printing.
 
         Arguments
-
         message: str - what to say
         """
         print(f"The robot says: {message}")
+
+    def play_emotion_sound(self, emotion: SoundEmotion) -> None:
+        """Let the robot make an emotion sound
+        For the simultion, this is just printing.
+
+        Arguments:
+        emotion: SoundEmotion - The sound to make.
+        """
+        print(f"The robot makes sound: {emotion.value}")
 
     def set_led(self, selector: LedId, color: LedColor) -> None:
         """Set the led of the robot
@@ -133,8 +158,8 @@ class SimulationRobobo(IRobobo):
         )
 
     def read_irs(self) -> List[Optional[float]]:
-        """
-        Returns sensor readings: [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        """Returns sensor readings:
+        [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
         """
         inputIntegers = []
         inputFloats = []
@@ -169,18 +194,15 @@ class SimulationRobobo(IRobobo):
         return im_cv2
 
     def set_phone_pan(
-        self, pan_position: int, pan_speed: int, pan_blockid: int = 1
+        self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
     ) -> None:
-        """
-        Command the robot to move the smartphone holder in the horizontal (pan) axis.
+        """Command the robot to move the smartphone holder in the horizontal (pan) axis.
         This function is asyncronous.
 
         Arguments
-
         pan_position: Angle to position the pan at. Range: 11-343.
         pan_speed: Movement speed for the pan mechanism. Range: 0-100.
-        pan_blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
-            Must be greater that 0 to move.
+        blockid: ignored, but implied unblocked.
         """
         inputIntegers = [pan_position, pan_speed]
         inputFloats = []
@@ -197,6 +219,18 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+
+    def set_pan_exact(self, pan_position: int = 121) -> None:
+        """Command the robot to move the smartphone holder in the horizontal (pan) axis.
+        This version tests a bunch to make sure it actually ends up where you think it ends up in the hardware implementation
+        Still not perfect for the hardware, and quite slow, but this function might be usefull for calibration / resetting.
+
+        Always blocks.
+
+        Arguments:
+        pan: int -> value to move to. Range: 11-343. Defaults to panning to center.
+        """
+        self.set_phone_pan_blocking(pan_position, 100)
 
     def read_phone_pan(self) -> int:
         """Get the current pan of the phone. Range: 0-100"""
@@ -218,18 +252,15 @@ class SimulationRobobo(IRobobo):
         return int(array[1][0])
 
     def set_phone_tilt(
-        self, tilt_position: int, tilt_speed: int, tilt_blockid: int = 1
+        self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
     ) -> None:
-        """
-        Command the robot to move the smartphone holder in the vertical (tilt) axis.
+        """Command the robot to move the smartphone holder in the vertical (tilt) axis.
         This function is asyncronous.
 
         Arguments
-
         tilt_position: Angle to position the tilt at. Range: 26-109.
         tilt_speed: Movement speed for the tilt mechanism. Range: 0-100.
-        tilt_blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
-            Must be greater that 0 to move.
+        blockid: ignored, but implied unblocked.
         """
         inputIntegers = [tilt_position, tilt_speed]
         inputFloats = []
@@ -323,21 +354,43 @@ class SimulationRobobo(IRobobo):
         )
         return WheelPosition(*array[1])
 
-    def sleep(seconds: int) -> None:
+    def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """
         time.sleep(secs=seconds)
 
-    def block(self):
+    def perform_blocking(self, f: Callable[[int], None]) -> None:
+        """Perform a function in a blocking manner.
+        Which is to say, only return once the action is completed.
+        Usefull for all functions that take a blockid argument.
+
+        To call this with a function, use partually applied versions. Pass all arguments
+        except the blockid, which will be provided by this function.
+        example:
+        `rob.perform_blocking(functools.partial(rob.move, 10, 100, 250))`
+
+        Arguments:
+        f: Callable[[int], None]. Some function to call.
+        """
+        f(0)
+        self.block()
+
+    def is_blocked(self, blockid: int) -> bool:
+        """See if the robot is currently "blocked", which is to say, performing an action
+
+        Arguments:
+        blockid: the id to check
+        """
         res = sim.simxGetIntegerSignal(
             self.clientID, "Bloqueado", sim.simx_opmode_blocking
         )
-        while res[1]:
-            time.sleep(0.1)
-            res = sim.simxGetIntegerSignal(
-                self.clientID, "Bloqueado", sim.simx_opmode_blocking
-            )
+        return bool(res[1])
+
+    def block(self):
+        """Block untill (only return once) all blocking actions are completed"""
+        while self.is_blocked(0):
+            self.sleep(0.02)
 
     def init_handles(self) -> None:
         self._right_motor = sim.simxGetObjectHandle(
