@@ -28,6 +28,9 @@ EOT
 # Set up the envoirement to actually run the code
 COPY ./run.bash ./run.bash
 COPY ./setup.bash ./setup.bash
-RUN chmod -R +x /root/catkin_ws/
+RUN chmod -R u+x /root/catkin_ws/
 
+# RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
+# RUN echo 'source /root/catkin_ws/devel/setup.bash' >> /root/.bashrc
+# RUN echo 'source /root/catkin_ws/setup.bash' >> /root/.bashrc
 ENTRYPOINT ["./run.bash"]

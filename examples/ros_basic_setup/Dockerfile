@@ -21,7 +21,7 @@ RUN <<EOT bash
 EOT
 # Chmod (permit execution of) everything in the catkin_ws. This is not *recommended*,
 # But it doesn't matter as long as you don't have any malware in there.
-RUN chmod -R +x /root/catkin_ws/src
+RUN chmod -R u+x /root/catkin_ws/src
 
 # Source the things to bashrc to not have to do that manually, and have the initial bash shell set up properly
 RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
