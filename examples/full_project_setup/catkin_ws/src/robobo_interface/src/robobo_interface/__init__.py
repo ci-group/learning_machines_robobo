@@ -1,5 +1,4 @@
-from .base import (
-    IRobobo,
+from .datatypes import (
     Emotion,
     SoundEmotion,
     LedColor,
@@ -8,6 +7,7 @@ from .base import (
     Orientation,
     WheelPosition,
 )
+from .base import IRobobo
 from .hardware import HardwareRobobo
 from .simulation import SimulationRobobo
 

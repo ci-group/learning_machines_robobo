@@ -18,8 +18,8 @@ from robobo_msgs.srv import (
 )
 from robobo_msgs.msg import IRs, Wheels
 
-from .base import (
-    IRobobo,
+from robobo_interface.base import IRobobo
+from robobo_interface.datatypes import (
     Emotion,
     LedColor,
     LedId,
@@ -30,7 +30,7 @@ from .base import (
 )
 from robobo_interface.utils import LockedSet
 
-from typing import Callable, List, Optional, Set
+from typing import Callable, List, Optional
 from numpy.typing import NDArray
 
 # https://github.com/mintforpeople/robobo-programming/wiki/Robobo-Services#robotmovewheels
