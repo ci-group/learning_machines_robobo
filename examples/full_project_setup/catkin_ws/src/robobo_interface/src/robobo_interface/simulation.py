@@ -68,7 +68,7 @@ class SimulationRobobo(IRobobo):
         blockid: ignored, but implied unblocked.
         """
         inputIntegers = [left_speed, right_speed]
-        inputFloats = [millis * 1000.0]
+        inputFloats = [millis / 1000.0]
         inputStrings = []
         inputBuffer = bytearray()
         sim.simxCallScriptFunction(
@@ -164,12 +164,13 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
-        return list(array[1])
+        return list(array[0])
 
     def get_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array"""
-        resolution, image = sim.simxReadVisionSensor(
-            self.clientID, self._frontal_camera, simConst.simx_opmode_buffer
+        print(self._frontal_camera)
+        resolution, image = sim.simxGetVisionSensorImage(
+            self.clientID, self._frontal_camera, 0, simConst.simx_opmode_buffer
         )
         # reshape image
         image = image[::-1]
@@ -237,7 +238,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
-        return int(array[1][0])
+        return int(array[0][0])
 
     def set_phone_tilt(
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
@@ -283,7 +284,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
-        return int(array[1][0])
+        return int(array[0][0])
 
     def read_accel(self) -> Acceleration:
         """Get the acceleration of the robot"""
@@ -302,7 +303,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
-        return Acceleration(*array[2])
+        return Acceleration(*array[1])
 
     def read_orientation(self) -> Orientation:
         """Get the orientation of the robot"""
@@ -321,7 +322,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
-        return Orientation(*array[2])
+        return Orientation(*array[1])
 
     def read_wheels(self) -> WheelPosition:
         """Get the wheel orientation and speed of the robot"""
@@ -340,7 +341,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
-        return WheelPosition(*array[1])
+        return WheelPosition(*array[0])
 
     def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
@@ -373,7 +374,7 @@ class SimulationRobobo(IRobobo):
         res = sim.simxGetIntegerSignal(
             self.clientID, "Bloqueado", sim.simx_opmode_blocking
         )
-        return bool(res[1])
+        return bool(res)
 
     def block(self):
         """Block untill (only return once) all blocking actions are completed"""

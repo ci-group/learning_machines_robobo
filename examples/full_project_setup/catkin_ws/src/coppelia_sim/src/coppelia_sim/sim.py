@@ -5,6 +5,7 @@ import os
 import ctypes as ct
 
 from .simConst import *
+from .error import simx_function
 
 # load library
 try:
@@ -143,6 +144,7 @@ c_CallScriptFunction        = ct.CFUNCTYPE(ct.c_int32,ct.c_int32,ct.POINTER(ct.c
 
 
 # API functions
+@simx_function
 def simxGetJointPosition(clientID, jointHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -154,6 +156,7 @@ def simxGetJointPosition(clientID, jointHandle, operationMode):
     )
 
 
+@simx_function
 def simxSetJointPosition(clientID, jointHandle, position, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -162,6 +165,7 @@ def simxSetJointPosition(clientID, jointHandle, position, operationMode):
     return c_SetJointPosition(clientID, jointHandle, position, operationMode)
 
 
+@simx_function
 def simxGetJointMatrix(clientID, jointHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -174,6 +178,7 @@ def simxGetJointMatrix(clientID, jointHandle, operationMode):
     return ret, arr
 
 
+@simx_function
 def simxSetSphericalJointMatrix(clientID, jointHandle, matrix, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -182,6 +187,7 @@ def simxSetSphericalJointMatrix(clientID, jointHandle, matrix, operationMode):
     return c_SetSphericalJointMatrix(clientID, jointHandle, matrix, operationMode)
 
 
+@simx_function
 def simxSetJointTargetVelocity(clientID, jointHandle, targetVelocity, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -192,6 +198,7 @@ def simxSetJointTargetVelocity(clientID, jointHandle, targetVelocity, operationM
     )
 
 
+@simx_function
 def simxSetJointTargetPosition(clientID, jointHandle, targetPosition, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -202,6 +209,7 @@ def simxSetJointTargetPosition(clientID, jointHandle, targetPosition, operationM
     )
 
 
+@simx_function
 def simxJointGetForce(clientID, jointHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -213,6 +221,7 @@ def simxJointGetForce(clientID, jointHandle, operationMode):
     )
 
 
+@simx_function
 def simxGetJointForce(clientID, jointHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -224,6 +233,7 @@ def simxGetJointForce(clientID, jointHandle, operationMode):
     )
 
 
+@simx_function
 def simxGetJointMaxForce(clientID, jointHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -235,6 +245,7 @@ def simxGetJointMaxForce(clientID, jointHandle, operationMode):
     )
 
 
+@simx_function
 def simxSetJointForce(clientID, jointHandle, force, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -242,6 +253,7 @@ def simxSetJointForce(clientID, jointHandle, force, operationMode):
     return c_SetJointMaxForce(clientID, jointHandle, force, operationMode)
 
 
+@simx_function
 def simxSetJointMaxForce(clientID, jointHandle, force, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -249,6 +261,7 @@ def simxSetJointMaxForce(clientID, jointHandle, force, operationMode):
     return c_SetJointMaxForce(clientID, jointHandle, force, operationMode)
 
 
+@simx_function
 def simxReadForceSensor(clientID, forceSensorHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -277,6 +290,7 @@ def simxReadForceSensor(clientID, forceSensorHandle, operationMode):
     return ret, state.value, arr1, arr2
 
 
+@simx_function
 def simxBreakForceSensor(clientID, forceSensorHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -284,6 +298,7 @@ def simxBreakForceSensor(clientID, forceSensorHandle, operationMode):
     return c_BreakForceSensor(clientID, forceSensorHandle, operationMode)
 
 
+@simx_function
 def simxReadVisionSensor(clientID, sensorHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -315,6 +330,7 @@ def simxReadVisionSensor(clientID, sensorHandle, operationMode):
     return ret, bool(detectionState.value != 0), auxValues2
 
 
+@simx_function
 def simxGetObjectHandle(clientID, objectName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -328,6 +344,7 @@ def simxGetObjectHandle(clientID, objectName, operationMode):
     )
 
 
+@simx_function
 def simxGetVisionSensorImage(clientID, sensorHandle, options, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -353,6 +370,7 @@ def simxGetVisionSensorImage(clientID, sensorHandle, options, operationMode):
     return ret, reso, image
 
 
+@simx_function
 def simxSetVisionSensorImage(clientID, sensorHandle, image, options, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -364,6 +382,7 @@ def simxSetVisionSensorImage(clientID, sensorHandle, image, options, operationMo
     )
 
 
+@simx_function
 def simxGetVisionSensorDepthBuffer(clientID, sensorHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -384,6 +403,7 @@ def simxGetVisionSensorDepthBuffer(clientID, sensorHandle, operationMode):
     return ret, reso, buffer
 
 
+@simx_function
 def simxGetObjectChild(clientID, parentObjectHandle, childIndex, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -401,6 +421,7 @@ def simxGetObjectChild(clientID, parentObjectHandle, childIndex, operationMode):
     )
 
 
+@simx_function
 def simxGetObjectParent(clientID, childObjectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -415,6 +436,7 @@ def simxGetObjectParent(clientID, childObjectHandle, operationMode):
     )
 
 
+@simx_function
 def simxReadProximitySensor(clientID, sensorHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -442,6 +464,7 @@ def simxReadProximitySensor(clientID, sensorHandle, operationMode):
     return ret, bool(detectionState.value != 0), arr1, detectedObjectHandle.value, arr2
 
 
+@simx_function
 def simxLoadModel(clientID, modelPathAndName, options, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -457,6 +480,7 @@ def simxLoadModel(clientID, modelPathAndName, options, operationMode):
     )
 
 
+@simx_function
 def simxLoadUI(clientID, uiPathAndName, options, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -485,6 +509,7 @@ def simxLoadUI(clientID, uiPathAndName, options, operationMode):
     return ret, handles
 
 
+@simx_function
 def simxLoadScene(clientID, scenePathAndName, options, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -495,6 +520,7 @@ def simxLoadScene(clientID, scenePathAndName, options, operationMode):
     return c_LoadScene(clientID, scenePathAndName, options, operationMode)
 
 
+@simx_function
 def simxStartSimulation(clientID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -503,6 +529,7 @@ def simxStartSimulation(clientID, operationMode):
     return c_StartSimulation(clientID, operationMode)
 
 
+@simx_function
 def simxPauseSimulation(clientID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -511,6 +538,7 @@ def simxPauseSimulation(clientID, operationMode):
     return c_PauseSimulation(clientID, operationMode)
 
 
+@simx_function
 def simxStopSimulation(clientID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -519,6 +547,7 @@ def simxStopSimulation(clientID, operationMode):
     return c_StopSimulation(clientID, operationMode)
 
 
+@simx_function
 def simxGetUIHandle(clientID, uiName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -533,6 +562,7 @@ def simxGetUIHandle(clientID, uiName, operationMode):
     )
 
 
+@simx_function
 def simxGetUISlider(clientID, uiHandle, uiButtonID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -547,6 +577,7 @@ def simxGetUISlider(clientID, uiHandle, uiButtonID, operationMode):
     )
 
 
+@simx_function
 def simxSetUISlider(clientID, uiHandle, uiButtonID, position, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -555,6 +586,7 @@ def simxSetUISlider(clientID, uiHandle, uiButtonID, position, operationMode):
     return c_SetUISlider(clientID, uiHandle, uiButtonID, position, operationMode)
 
 
+@simx_function
 def simxGetUIEventButton(clientID, uiHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -571,6 +603,7 @@ def simxGetUIEventButton(clientID, uiHandle, operationMode):
     return ret, uiEventButtonID.value, arr
 
 
+@simx_function
 def simxGetUIButtonProperty(clientID, uiHandle, uiButtonID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -585,6 +618,7 @@ def simxGetUIButtonProperty(clientID, uiHandle, uiButtonID, operationMode):
     )
 
 
+@simx_function
 def simxSetUIButtonProperty(clientID, uiHandle, uiButtonID, prop, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -593,6 +627,7 @@ def simxSetUIButtonProperty(clientID, uiHandle, uiButtonID, prop, operationMode)
     return c_SetUIButtonProperty(clientID, uiHandle, uiButtonID, prop, operationMode)
 
 
+@simx_function
 def simxAddStatusbarMessage(clientID, message, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -603,6 +638,7 @@ def simxAddStatusbarMessage(clientID, message, operationMode):
     return c_AddStatusbarMessage(clientID, message, operationMode)
 
 
+@simx_function
 def simxAuxiliaryConsoleOpen(
     clientID,
     title,
@@ -654,6 +690,7 @@ def simxAuxiliaryConsoleOpen(
     )
 
 
+@simx_function
 def simxAuxiliaryConsoleClose(clientID, consoleHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -662,6 +699,7 @@ def simxAuxiliaryConsoleClose(clientID, consoleHandle, operationMode):
     return c_AuxiliaryConsoleClose(clientID, consoleHandle, operationMode)
 
 
+@simx_function
 def simxAuxiliaryConsolePrint(clientID, consoleHandle, txt, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -672,6 +710,7 @@ def simxAuxiliaryConsolePrint(clientID, consoleHandle, txt, operationMode):
     return c_AuxiliaryConsolePrint(clientID, consoleHandle, txt, operationMode)
 
 
+@simx_function
 def simxAuxiliaryConsoleShow(clientID, consoleHandle, showState, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -680,6 +719,7 @@ def simxAuxiliaryConsoleShow(clientID, consoleHandle, showState, operationMode):
     return c_AuxiliaryConsoleShow(clientID, consoleHandle, showState, operationMode)
 
 
+@simx_function
 def simxGetObjectOrientation(
     clientID, objectHandle, relativeToObjectHandle, operationMode
 ):
@@ -696,6 +736,7 @@ def simxGetObjectOrientation(
     return ret, arr
 
 
+@simx_function
 def simxGetObjectQuaternion(
     clientID, objectHandle, relativeToObjectHandle, operationMode
 ):
@@ -712,6 +753,7 @@ def simxGetObjectQuaternion(
     return ret, arr
 
 
+@simx_function
 def simxGetObjectPosition(
     clientID, objectHandle, relativeToObjectHandle, operationMode
 ):
@@ -728,6 +770,7 @@ def simxGetObjectPosition(
     return ret, arr
 
 
+@simx_function
 def simxSetObjectOrientation(
     clientID, objectHandle, relativeToObjectHandle, eulerAngles, operationMode
 ):
@@ -741,6 +784,7 @@ def simxSetObjectOrientation(
     )
 
 
+@simx_function
 def simxSetObjectQuaternion(
     clientID, objectHandle, relativeToObjectHandle, quaternion, operationMode
 ):
@@ -754,6 +798,7 @@ def simxSetObjectQuaternion(
     )
 
 
+@simx_function
 def simxSetObjectPosition(
     clientID, objectHandle, relativeToObjectHandle, position, operationMode
 ):
@@ -767,6 +812,7 @@ def simxSetObjectPosition(
     )
 
 
+@simx_function
 def simxSetObjectParent(
     clientID, objectHandle, parentObject, keepInPlace, operationMode
 ):
@@ -779,6 +825,7 @@ def simxSetObjectParent(
     )
 
 
+@simx_function
 def simxSetUIButtonLabel(
     clientID, uiHandle, uiButtonID, upStateLabel, downStateLabel, operationMode
 ):
@@ -796,6 +843,7 @@ def simxSetUIButtonLabel(
     )
 
 
+@simx_function
 def simxGetLastErrors(clientID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -825,6 +873,7 @@ def simxGetLastErrors(clientID, operationMode):
     return ret, errors
 
 
+@simx_function
 def simxGetArrayParameter(clientID, paramIdentifier, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -837,6 +886,7 @@ def simxGetArrayParameter(clientID, paramIdentifier, operationMode):
     return ret, arr
 
 
+@simx_function
 def simxSetArrayParameter(clientID, paramIdentifier, paramValues, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -846,6 +896,7 @@ def simxSetArrayParameter(clientID, paramIdentifier, paramValues, operationMode)
     return c_SetArrayParameter(clientID, paramIdentifier, c_paramValues, operationMode)
 
 
+@simx_function
 def simxGetBooleanParameter(clientID, paramIdentifier, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -857,6 +908,7 @@ def simxGetBooleanParameter(clientID, paramIdentifier, operationMode):
     ), bool(paramValue.value != 0)
 
 
+@simx_function
 def simxSetBooleanParameter(clientID, paramIdentifier, paramValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -865,6 +917,7 @@ def simxSetBooleanParameter(clientID, paramIdentifier, paramValue, operationMode
     return c_SetBooleanParameter(clientID, paramIdentifier, paramValue, operationMode)
 
 
+@simx_function
 def simxGetIntegerParameter(clientID, paramIdentifier, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -879,6 +932,7 @@ def simxGetIntegerParameter(clientID, paramIdentifier, operationMode):
     )
 
 
+@simx_function
 def simxSetIntegerParameter(clientID, paramIdentifier, paramValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -887,6 +941,7 @@ def simxSetIntegerParameter(clientID, paramIdentifier, paramValue, operationMode
     return c_SetIntegerParameter(clientID, paramIdentifier, paramValue, operationMode)
 
 
+@simx_function
 def simxGetFloatingParameter(clientID, paramIdentifier, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -901,6 +956,7 @@ def simxGetFloatingParameter(clientID, paramIdentifier, operationMode):
     )
 
 
+@simx_function
 def simxSetFloatingParameter(clientID, paramIdentifier, paramValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -909,6 +965,7 @@ def simxSetFloatingParameter(clientID, paramIdentifier, paramValue, operationMod
     return c_SetFloatingParameter(clientID, paramIdentifier, paramValue, operationMode)
 
 
+@simx_function
 def simxGetStringParameter(clientID, paramIdentifier, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -934,6 +991,7 @@ def simxGetStringParameter(clientID, paramIdentifier, operationMode):
     return ret, a
 
 
+@simx_function
 def simxGetCollisionHandle(clientID, collisionObjectName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -950,6 +1008,7 @@ def simxGetCollisionHandle(clientID, collisionObjectName, operationMode):
     )
 
 
+@simx_function
 def simxGetCollectionHandle(clientID, collectionName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -966,6 +1025,7 @@ def simxGetCollectionHandle(clientID, collectionName, operationMode):
     )
 
 
+@simx_function
 def simxGetDistanceHandle(clientID, distanceObjectName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -982,6 +1042,7 @@ def simxGetDistanceHandle(clientID, distanceObjectName, operationMode):
     )
 
 
+@simx_function
 def simxReadCollision(clientID, collisionObjectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -992,6 +1053,7 @@ def simxReadCollision(clientID, collisionObjectHandle, operationMode):
     ), bool(collisionState.value != 0)
 
 
+@simx_function
 def simxReadDistance(clientID, distanceObjectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1006,6 +1068,7 @@ def simxReadDistance(clientID, distanceObjectHandle, operationMode):
     )
 
 
+@simx_function
 def simxRemoveObject(clientID, objectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1014,6 +1077,7 @@ def simxRemoveObject(clientID, objectHandle, operationMode):
     return c_RemoveObject(clientID, objectHandle, operationMode)
 
 
+@simx_function
 def simxRemoveModel(clientID, objectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1022,6 +1086,7 @@ def simxRemoveModel(clientID, objectHandle, operationMode):
     return c_RemoveModel(clientID, objectHandle, operationMode)
 
 
+@simx_function
 def simxRemoveUI(clientID, uiHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1030,6 +1095,7 @@ def simxRemoveUI(clientID, uiHandle, operationMode):
     return c_RemoveUI(clientID, uiHandle, operationMode)
 
 
+@simx_function
 def simxCloseScene(clientID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1038,6 +1104,7 @@ def simxCloseScene(clientID, operationMode):
     return c_CloseScene(clientID, operationMode)
 
 
+@simx_function
 def simxGetObjects(clientID, objectType, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1061,6 +1128,7 @@ def simxGetObjects(clientID, objectType, operationMode):
     return ret, handles
 
 
+@simx_function
 def simxDisplayDialog(
     clientID,
     titleText,
@@ -1110,6 +1178,7 @@ def simxDisplayDialog(
     )
 
 
+@simx_function
 def simxEndDialog(clientID, dialogHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1118,6 +1187,7 @@ def simxEndDialog(clientID, dialogHandle, operationMode):
     return c_EndDialog(clientID, dialogHandle, operationMode)
 
 
+@simx_function
 def simxGetDialogInput(clientID, dialogHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1142,6 +1212,7 @@ def simxGetDialogInput(clientID, dialogHandle, operationMode):
     return ret, a
 
 
+@simx_function
 def simxGetDialogResult(clientID, dialogHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1153,6 +1224,7 @@ def simxGetDialogResult(clientID, dialogHandle, operationMode):
     )
 
 
+@simx_function
 def simxCopyPasteObjects(clientID, objectHandles, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1180,6 +1252,7 @@ def simxCopyPasteObjects(clientID, objectHandles, operationMode):
     return ret, newobj
 
 
+@simx_function
 def simxGetObjectSelection(clientID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1198,6 +1271,7 @@ def simxGetObjectSelection(clientID, operationMode):
     return ret, newobj
 
 
+@simx_function
 def simxSetObjectSelection(clientID, objectHandles, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1209,6 +1283,7 @@ def simxSetObjectSelection(clientID, objectHandles, operationMode):
     )
 
 
+@simx_function
 def simxClearFloatSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1219,6 +1294,7 @@ def simxClearFloatSignal(clientID, signalName, operationMode):
     return c_ClearFloatSignal(clientID, signalName, operationMode)
 
 
+@simx_function
 def simxClearIntegerSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1229,6 +1305,7 @@ def simxClearIntegerSignal(clientID, signalName, operationMode):
     return c_ClearIntegerSignal(clientID, signalName, operationMode)
 
 
+@simx_function
 def simxClearStringSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1239,6 +1316,7 @@ def simxClearStringSignal(clientID, signalName, operationMode):
     return c_ClearStringSignal(clientID, signalName, operationMode)
 
 
+@simx_function
 def simxGetFloatSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1253,6 +1331,7 @@ def simxGetFloatSignal(clientID, signalName, operationMode):
     )
 
 
+@simx_function
 def simxGetIntegerSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1267,6 +1346,7 @@ def simxGetIntegerSignal(clientID, signalName, operationMode):
     )
 
 
+@simx_function
 def simxGetStringSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1294,6 +1374,7 @@ def simxGetStringSignal(clientID, signalName, operationMode):
     return ret, a
 
 
+@simx_function
 def simxGetAndClearStringSignal(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1321,6 +1402,7 @@ def simxGetAndClearStringSignal(clientID, signalName, operationMode):
     return ret, a
 
 
+@simx_function
 def simxReadStringStream(clientID, signalName, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1348,6 +1430,7 @@ def simxReadStringStream(clientID, signalName, operationMode):
     return ret, a
 
 
+@simx_function
 def simxSetFloatSignal(clientID, signalName, signalValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1358,6 +1441,7 @@ def simxSetFloatSignal(clientID, signalName, signalValue, operationMode):
     return c_SetFloatSignal(clientID, signalName, signalValue, operationMode)
 
 
+@simx_function
 def simxSetIntegerSignal(clientID, signalName, signalValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1368,6 +1452,7 @@ def simxSetIntegerSignal(clientID, signalName, signalValue, operationMode):
     return c_SetIntegerSignal(clientID, signalName, signalValue, operationMode)
 
 
+@simx_function
 def simxSetStringSignal(clientID, signalName, signalValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1394,6 +1479,7 @@ def simxSetStringSignal(clientID, signalName, signalValue, operationMode):
     )
 
 
+@simx_function
 def simxAppendStringSignal(clientID, signalName, signalValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1420,6 +1506,7 @@ def simxAppendStringSignal(clientID, signalName, signalValue, operationMode):
     )
 
 
+@simx_function
 def simxWriteStringStream(clientID, signalName, signalValue, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1446,6 +1533,7 @@ def simxWriteStringStream(clientID, signalName, signalValue, operationMode):
     )
 
 
+@simx_function
 def simxGetObjectFloatParameter(clientID, objectHandle, parameterID, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1460,6 +1548,7 @@ def simxGetObjectFloatParameter(clientID, objectHandle, parameterID, operationMo
     )
 
 
+@simx_function
 def simxSetObjectFloatParameter(
     clientID, objectHandle, parameterID, parameterValue, operationMode
 ):
@@ -1498,6 +1587,7 @@ def simxSetObjectIntParameter(
     )
 
 
+@simx_function
 def simxGetModelProperty(clientID, objectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1509,6 +1599,7 @@ def simxGetModelProperty(clientID, objectHandle, operationMode):
     )
 
 
+@simx_function
 def simxSetModelProperty(clientID, objectHandle, prop, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1517,6 +1608,7 @@ def simxSetModelProperty(clientID, objectHandle, prop, operationMode):
     return c_SetModelProperty(clientID, objectHandle, prop, operationMode)
 
 
+@simx_function
 def simxStart(
     connectionAddress,
     connectionPort,
@@ -1541,6 +1633,7 @@ def simxStart(
     )
 
 
+@simx_function
 def simxFinish(clientID):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1549,6 +1642,7 @@ def simxFinish(clientID):
     return c_Finish(clientID)
 
 
+@simx_function
 def simxGetPingTime(clientID):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1557,6 +1651,7 @@ def simxGetPingTime(clientID):
     return c_GetPingTime(clientID, ct.byref(pingTime)), pingTime.value
 
 
+@simx_function
 def simxGetLastCmdTime(clientID):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1565,6 +1660,7 @@ def simxGetLastCmdTime(clientID):
     return c_GetLastCmdTime(clientID)
 
 
+@simx_function
 def simxSynchronousTrigger(clientID):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1573,6 +1669,7 @@ def simxSynchronousTrigger(clientID):
     return c_SynchronousTrigger(clientID)
 
 
+@simx_function
 def simxSynchronous(clientID, enable):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1581,6 +1678,7 @@ def simxSynchronous(clientID, enable):
     return c_Synchronous(clientID, enable)
 
 
+@simx_function
 def simxPauseCommunication(clientID, enable):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1589,6 +1687,7 @@ def simxPauseCommunication(clientID, enable):
     return c_PauseCommunication(clientID, enable)
 
 
+@simx_function
 def simxGetInMessageInfo(clientID, infoType):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1597,6 +1696,7 @@ def simxGetInMessageInfo(clientID, infoType):
     return c_GetInMessageInfo(clientID, infoType, ct.byref(info)), info.value
 
 
+@simx_function
 def simxGetOutMessageInfo(clientID, infoType):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1605,6 +1705,7 @@ def simxGetOutMessageInfo(clientID, infoType):
     return c_GetOutMessageInfo(clientID, infoType, ct.byref(info)), info.value
 
 
+@simx_function
 def simxGetConnectionId(clientID):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1613,6 +1714,7 @@ def simxGetConnectionId(clientID):
     return c_GetConnectionId(clientID)
 
 
+@simx_function
 def simxCreateBuffer(bufferSize):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1621,6 +1723,7 @@ def simxCreateBuffer(bufferSize):
     return c_CreateBuffer(bufferSize)
 
 
+@simx_function
 def simxReleaseBuffer(buffer):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1629,6 +1732,7 @@ def simxReleaseBuffer(buffer):
     return c_ReleaseBuffer(buffer)
 
 
+@simx_function
 def simxTransferFile(
     clientID, filePathAndName, fileName_serverSide, timeOut, operationMode
 ):
@@ -1643,6 +1747,7 @@ def simxTransferFile(
     )
 
 
+@simx_function
 def simxEraseFile(clientID, fileName_serverSide, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1653,6 +1758,7 @@ def simxEraseFile(clientID, fileName_serverSide, operationMode):
     return c_EraseFile(clientID, fileName_serverSide, operationMode)
 
 
+@simx_function
 def simxCreateDummy(clientID, size, color, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1669,6 +1775,7 @@ def simxCreateDummy(clientID, size, color, operationMode):
     )
 
 
+@simx_function
 def simxQuery(clientID, signalName, signalValue, retSignalName, timeOutInMs):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1717,6 +1824,7 @@ def simxQuery(clientID, signalName, signalValue, retSignalName, timeOutInMs):
     return ret, a
 
 
+@simx_function
 def simxGetObjectGroupData(clientID, objectType, dataType, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
@@ -1775,6 +1883,7 @@ def simxGetObjectGroupData(clientID, objectType, dataType, operationMode):
     return ret, handles, intData, floatData, stringData
 
 
+@simx_function
 def simxCallScriptFunction(
     clientID,
     scriptDescription,
@@ -1891,6 +2000,7 @@ def simxCallScriptFunction(
     return ret, intDataOut, floatDataOut, stringDataOut, bufferOut
 
 
+@simx_function
 def simxGetObjectVelocity(clientID, objectHandle, operationMode):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual
