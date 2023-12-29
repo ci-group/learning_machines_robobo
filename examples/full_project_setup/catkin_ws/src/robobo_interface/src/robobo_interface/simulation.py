@@ -4,8 +4,8 @@ import time
 import cv2
 import numpy
 
-from .base import (
-    IRobobo,
+from robobo_interface.base import IRobobo
+from robobo_interface.datatypes import (
     Emotion,
     LedColor,
     LedId,
@@ -44,25 +44,13 @@ class SimulationRobobo(IRobobo):
 
     def set_emotion(self, emotion: Emotion) -> None:
         """Show the emotion of the robot on the screen
+        For the hardware, that means printing... for now.
+        The one that was in the example from mintforpeople does not work.
 
         Arguments
         emotion: Emotion - What emotion to show.
         """
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = [emotion.value]
-        inputBuffer = bytearray()
-        sim.simxCallScriptFunction(
-            self.clientID,
-            "Screen",
-            sim.sim_scripttype_childscript,
-            "setEmotionTo",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
-            sim.simx_opmode_blocking,
-        )
+        print(f"The robot shows {emotion.value} on its screen")
 
     def move(
         self,
@@ -358,7 +346,7 @@ class SimulationRobobo(IRobobo):
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """
-        time.sleep(secs=seconds)
+        time.sleep(seconds)
 
     def perform_blocking(self, f: Callable[[int], None]) -> None:
         """Perform a function in a blocking manner.
