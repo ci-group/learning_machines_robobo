@@ -1651,7 +1651,6 @@ def simxGetPingTime(clientID):
     return c_GetPingTime(clientID, ct.byref(pingTime)), pingTime.value
 
 
-@simx_function
 def simxGetLastCmdTime(clientID):
     """
     Please have a look at the function description/documentation in the CoppeliaSim user manual

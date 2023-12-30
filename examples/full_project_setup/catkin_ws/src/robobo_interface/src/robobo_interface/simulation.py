@@ -14,7 +14,7 @@ from robobo_interface.datatypes import (
     WheelPosition,
     SoundEmotion,
 )
-from coppelia_sim import sim, simConst
+from coppelia_sim import sim, simConst, ping
 
 from typing import List, Optional, Callable
 from numpy.typing import NDArray
@@ -22,6 +22,9 @@ from numpy.typing import NDArray
 
 class SimulationRobobo(IRobobo):
     """The simulation robot.
+
+    The simulation needs to be running for the init to be callable
+    (as, otherwise, the api server is not running)
 
     A few functions take blockid. When they do, they are not blocking.
     However, the simulator does not work with ids, and, therefore, this argument is always ignored.
@@ -32,15 +35,20 @@ class SimulationRobobo(IRobobo):
         # 0.0.0.0 to connect to the current computer.
         self.clientID = sim.simxStart("0.0.0.0", 19999, True, True, 5000, 5)
         if self.clientID != -1:
+            ping.ping(self.clientID)
             print("Connected to remote API server")
         else:
             print(
                 """Failed connecting to remote API server:
-                Cannot find one hosted on port 19999"""
+                Cannot find one hosted on port 19999
+                Is the simulation running / playing?"""
             )
             sys.exit(1)
 
         self.init_handles()
+
+    def __del__(self):
+        sim.simxFinish(self.clientID)
 
     def set_emotion(self, emotion: Emotion) -> None:
         """Show the emotion of the robot on the screen
@@ -103,6 +111,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
 
     def talk(self, message: str) -> None:
         """Let the robot speak.
@@ -164,11 +173,16 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
         return list(array[0])
 
     def get_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array"""
-        print(self._frontal_camera)
+        raise NotImplementedError("Currently not functional")
+
+        # We don't need to call handleVisionSensor because the camera is implicitly handled
+        # https://coppeliarobotics.com/helpFiles/en/explicitHandling.htm
+        ping.ping(self.clientID)
         resolution, image = sim.simxGetVisionSensorImage(
             self.clientID, self._frontal_camera, 0, simConst.simx_opmode_buffer
         )
@@ -238,6 +252,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
         return int(array[0][0])
 
     def set_phone_tilt(
@@ -284,6 +299,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
         return int(array[0][0])
 
     def read_accel(self) -> Acceleration:
@@ -303,6 +319,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
         return Acceleration(*array[1])
 
     def read_orientation(self) -> Orientation:
@@ -322,6 +339,7 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
         return Orientation(*array[1])
 
     def read_wheels(self) -> WheelPosition:
@@ -341,13 +359,17 @@ class SimulationRobobo(IRobobo):
             inputBuffer,
             sim.simx_opmode_blocking,
         )
+        ping.ping(self.clientID)
         return WheelPosition(*array[0])
 
     def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """
-        time.sleep(seconds)
+        duration = seconds * 1000
+        start_time = self.get_sim_time()
+        while self.get_sim_time() - start_time < duration:
+            time.sleep(0.02)
 
     def perform_blocking(self, f: Callable[[int], None]) -> None:
         """Perform a function in a blocking manner.
@@ -380,6 +402,56 @@ class SimulationRobobo(IRobobo):
         """Block untill (only return once) all blocking actions are completed"""
         while self.is_blocked(0):
             self.sleep(0.02)
+        ping.ping(self.clientID)
+
+    def play_simulation(self):
+        """Start the simulation
+
+        Notice that this can only be called after `pause` and `stop`,
+        Calling at the start does not work, as then the API is not initialised jet.
+        To start the simulation when CoppeliaSim is started imediately, view the docs here:
+        https://www.coppeliarobotics.com/helpFiles/en/commandLine.htm
+        """
+        sim.simxStartSimulation(self.clientID, simConst.simx_opmode_blocking)
+        ping.ping(self.clientID)
+
+    def pause_simulation(self):
+        """Pause the simulation"""
+        sim.simxPauseSimulation(self.clientID, simConst.simx_opmode_blocking)
+        ping.ping(self.clientID)
+
+    def stop_simulation(self):
+        """Stop the simulation"""
+        sim.simxStopSimulation(self.clientID, simConst.simx_opmode_blocking)
+        ping.ping(self.clientID)
+
+    def is_running(self) -> bool:
+        """Return wether the simulation is currently running"""
+        return not self.get_sim_time() == 0
+
+    def get_sim_time(self) -> int:
+        """Get simulation time (in ms), or 0 if the simulation is not running"""
+        ping.ping(self.clientID)
+        return sim.simxGetLastCmdTime(self.clientID)
+
+    def nr_food_collected(self) -> int:
+        """Return the amount of food currently collected.
+
+        Trivially doesn't work when the simulation does not have any food.
+        """
+        ping.ping(self.clientID)
+        array = sim.simxCallScriptFunction(
+            self.clientID,
+            "Food",
+            simConst.sim_scripttype_childscript,
+            "remote_get_collected_food",
+            [],
+            [],
+            [],
+            bytearray(),
+            simConst.simx_opmode_blocking,
+        )
+        return array[0][0]
 
     def init_handles(self) -> None:
         self._right_motor = sim.simxGetObjectHandle(
@@ -393,40 +465,28 @@ class SimulationRobobo(IRobobo):
         )
 
         self._ir_back_c = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Back_C", simConst.simx_opmode_blocking
+            self.clientID, "IR_Back_C", simConst.simx_opmode_blocking
         )
         self._ir_front_c = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_C", simConst.simx_opmode_blocking
+            self.clientID, "IR_Front_C", simConst.simx_opmode_blocking
         )
         self._ir_front_ll = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_LL", simConst.simx_opmode_blocking
+            self.clientID, "IR_Front_LL", simConst.simx_opmode_blocking
         )
         self._ir_front_rr = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_RR", simConst.simx_opmode_blocking
+            self.clientID, "IR_Front_RR", simConst.simx_opmode_blocking
         )
         self._ir_back_l = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Back_L", simConst.simx_opmode_blocking
-        )
-        self._ir_back_l_floor = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Back_L_Floor", simConst.simx_opmode_blocking
+            self.clientID, "IR_Back_L", simConst.simx_opmode_blocking
         )
         self._ir_back_r = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Back_R", simConst.simx_opmode_blocking
-        )
-        self._ir_back_r_floor = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Back_R_Floor", simConst.simx_opmode_blocking
+            self.clientID, "IR_Back_R", simConst.simx_opmode_blocking
         )
         self._ir_front_l = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_L", simConst.simx_opmode_blocking
-        )
-        self._ir_front_l_floor = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_L_Floor", simConst.simx_opmode_blocking
+            self.clientID, "IR_Front_L", simConst.simx_opmode_blocking
         )
         self._ir_front_r = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_R", simConst.simx_opmode_blocking
-        )
-        self._ir_front_r_floor = sim.simxGetObjectHandle(
-            self.clientID, "Ir_Front_R_Floor", simConst.simx_opmode_blocking
+            self.clientID, "IR_Front_R", simConst.simx_opmode_blocking
         )
         self._tilt_motor = sim.simxGetObjectHandle(
             self.clientID, "Tilt_Motor", simConst.simx_opmode_blocking
@@ -436,5 +496,5 @@ class SimulationRobobo(IRobobo):
         )
 
         self._frontal_camera = sim.simxGetObjectHandle(
-            self.clientID, "Frontal_Camera", simConst.simx_opmode_blocking
+            self.clientID, "Smartphone_camera", simConst.simx_opmode_blocking
         )

@@ -17,12 +17,12 @@ def test_move_and_wheel_reset(rob: IRobobo):
 
 
 def test_sensors(rob: IRobobo):
-    # print("IRS data: ", rob.read_irs())
-    print("Image data: ", rob.get_image_front())
-    # print("Phone pan: ", rob.read_phone_pan())
-    # print("Phone tilt: ", rob.read_phone_tilt())
-    # print("Current acceleration: ", rob.read_accel())
-    # print("Current orientation: ", rob.read_orientation())
+    print("IRS data: ", rob.read_irs())
+    # print("Image data: ", rob.get_image_front())
+    print("Phone pan: ", rob.read_phone_pan())
+    print("Phone tilt: ", rob.read_phone_tilt())
+    print("Current acceleration: ", rob.read_accel())
+    print("Current orientation: ", rob.read_orientation())
 
 
 def test_phone_movement(rob: IRobobo):
@@ -35,7 +35,7 @@ def test_phone_movement(rob: IRobobo):
 
 
 def dance(rob: IRobobo):
-    # test_emotions(rob)
+    test_emotions(rob)
     test_sensors(rob)
-    # test_move_and_wheel_reset(rob)
-    # test_phone_movement(rob)
+    test_move_and_wheel_reset(rob)
+    test_phone_movement(rob)

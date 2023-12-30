@@ -28,7 +28,10 @@ def error_code_to_message(ret: int) -> str:
 
 
 class CoppeliaSimApiError(Exception):
+    ret_code: int
+
     def __init__(self, ret_code: int):
+        self.ret_code = ret_code
         super().__init__(error_code_to_message(ret_code))
 
 
