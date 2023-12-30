@@ -67,6 +67,17 @@ There are three things you need to know `docker build`, `Dockerfile` and `docker
 
 The Dockerfile is the thing that specifies what's inside the little computer. It specifies what to install, what configuration to set up, and all that.
 
+The first thing we need to say about this, is that Docker does not like windows `\r\n` (CRLF) line endings, and wants Dockerfiles to have `\n` (LF) line endings instead.
+
+For this, clone the repository with `--config core.autocrlf=input`, and, if you're on windows, convert files by running this in PowerShell:
+```sh
+(Get-Content ".\Dockerfile") -join "`n" | Set-Content ".\Dockerfile"
+```
+
+Alternatively, good code editors usually have a way to switch between CRLF and LF when editing files. In VSCode and Pycharm, it's on the bottom right.
+
+Alternatively alternatively, in `scripts`, there is a tool that does this, called `convert_line_endings.py`
+
 Here is a small example, that installs ubuntu as a base, and then installs git on unbuntu:
 ```Dockerfile
 # We base ourselves on Unbuntu. This is the base OS we are installing.

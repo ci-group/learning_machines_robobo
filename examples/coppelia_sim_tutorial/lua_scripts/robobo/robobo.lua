@@ -1,4 +1,6 @@
 function sysCall_init()
-    -- do some initialization here
-    simRemoteApi.start(19999)
+    status, info, serverVersion, clientVersion, clientIp = simRemoteApi.status(19999) 
+    if status == -1 then
+        simRemoteApi.start(19999)
+    end
 end

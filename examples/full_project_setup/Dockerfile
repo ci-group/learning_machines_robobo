@@ -19,6 +19,8 @@ WORKDIR /root/catkin_ws
 # The EOT creates a small inline bash script to execute. This is to allow setup.bash to run in the same shell,
 # which exports some global variables catkin_make needs to find the python packages.
 # (By default, Docker runs all RUN commands in seperately created shells)
+# Note: This fails on Windows \r\n line endings. Make sure your files have Unix \n line endings.
+# See more about this in the Docker Tutorial
 COPY ./catkin_ws .
 RUN <<EOT bash
     source /opt/ros/noetic/setup.bash
@@ -28,6 +30,8 @@ EOT
 # Set up the envoirement to actually run the code
 COPY ./run.bash ./run.bash
 COPY ./setup.bash ./setup.bash
+COPY ./scripts/convert_line_endings.py ./convert_line_endings.py
+RUN python3 ./convert_line_endings.py "*.bash" "**/*.py"
 RUN chmod -R u+x /root/catkin_ws/
 
 # RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
