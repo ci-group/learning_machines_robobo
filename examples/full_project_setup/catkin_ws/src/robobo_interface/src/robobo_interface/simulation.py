@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 
@@ -32,18 +33,22 @@ class SimulationRobobo(IRobobo):
 
     def __init__(self):
         sim.simxFinish(-1)  # just in case, close all opened connections
-        # 0.0.0.0 to connect to the current computer.
-        self.clientID = sim.simxStart("0.0.0.0", 19999, True, True, 5000, 5)
-        if self.clientID != -1:
-            ping.ping(self.clientID)
-            print("Connected to remote API server")
-        else:
+        # 0.0.0.0 to connect to the current computer on Linux, with `--net=host`
+        # This doesn't work on Windows or MacOS. There, the variable needs to be specified.
+        ip_adress = os.getenv('COPPELIA_SIM_IP', "0.0.0.0")
+        self.clientID = sim.simxStart(ip_adress, 19999, True, True, 5000, 5)
+        if self.clientID == -1:
             print(
                 """Failed connecting to remote API server:
                 Cannot find one hosted on port 19999
-                Is the simulation running / playing?"""
+                Is the simulation running / playing?
+                If not on Linux: Did you specify the IP adress of your computer in setup.bash?
+                """
             )
             sys.exit(1)
+
+        ping.ping(self.clientID)
+        print("Connected to remote API server")
 
         self.init_handles()
 
