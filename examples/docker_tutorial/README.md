@@ -21,11 +21,15 @@ The main reason we use it is ROS noetic, which is a mess to install, and doesn't
 
 The first thing that's important is installing it. What we are going to need is the [Docker engine](https://docs.docker.com/engine/install/), which can only be direcly installed on Linux. This is not an accident, Docker is Linux-based, and depends on it. Luckily enough, there exists the [Docker Desktop](https://docs.docker.com/desktop/), which is a software suite that will install the Docker engine for you on any operating system. It also comes with a ton more stuff, like a gui and Docker-compose, but we won't touch those here. We only care about the engine and the CLI.
 
+During the installation process, you can use all default settings, and you can click "continue without logging in," as you don't need an account, either.
+
 #### Installing Docker Desktop on Windows.
 
 To install Docker Deskop on Windows, first things first, you're going to need to install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux), for which you need to [enable hardware virtualisation](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization) in your BIOS and Windows Control Panel. The supported versions are Windows 10 Home and Pro (22H2 or higher) and Windows 11 Home and Pro (21H2 or higher)
 
 The full official installation guide can be found [at the Docker docs](https://docs.docker.com/desktop/install/windows-install/).
+
+There is also this thing called a "Hyper-V backend" with Windows containers. We don't want that: we want the WSL2 backend, as we're running Linux containers.
 
 #### Installing Docker Desktop on MacOS
 
@@ -43,6 +47,8 @@ If you are on an OS that is too old, or too niche, you have to install something
 
 To use docker, type the command `docker` in the commandline. This is the only command we will use for this course. This should display a bunch of commandline options. If it doesn't, go back the the installation instructions.
 
+This entire docker desktop thing you installed, you don't need any of its GUI elements. We only care about the commandline executables.
+
 If that command works, we need to make sure that the Docker Deamon (`docker.service` & `containerd.service`) is running before we can do anything else. This is something you need to do whenever you want to run any docker command.
 
 On linux, you can start the docker daemon by running:
@@ -50,7 +56,7 @@ On linux, you can start the docker daemon by running:
 systemctl start docker
 ```
 
-If you instead installed Docker Desktop, you should just open the gui of Docker desktop. We are not *using* this gui, but having it open makes sure everything is running.
+If you instead installed Docker Desktop, you should just open the gui of Docker desktop. We are not *using* this gui, but opening it (and then closing it,) makes sure it is running.
 
 If you want to, you can, at this point, go trough the [Getting Started Guide](https://docs.docker.com/get-started/). You don't have to, but this is the easiest place to go trough if you, at any point, feel like you're stuck on Docker and want to learn how it works.
 
@@ -83,7 +89,9 @@ Create a file called `Dockerfile` (no extension), and paste this code in. Then, 
 docker build --tag my_first_container .
 ```
 
-This will create this small computer under the name (tag) `my_first_container`, from the current directory, which is what the period stands for. 
+This will create this small computer under the name (tag) `my_first_container`, from the current directory, which is what the period stands for.
+
+If you installed Docker Desktop, it will once again ask you to log in after building a container. Again, you can ignore this.
 
 We can then run the container with:
 ```sh
@@ -108,13 +116,13 @@ When we now build this new container with `docker build --tag my_first_container
 
 ---
 
-Let's now say we want to view (`head`) this README in there instead of installing git. let's do:
+Let's now say we want to view (`head`) this README in there instead of installing git and printing hello world. let's do:
 
 ```Dockerfile
 # We base ourselves on Unbuntu. This is the base OS we are installing.
 FROM ubuntu:20.04
 
-# Specify what to run, in this case the `echo` command with as argument `Hello world`
+# Specify what to run, in this case the `head` command (print the first few lines of a file to the terminal) with as argument `./README.md`
 CMD ["head", "./REAMDE.md"]
 ```
 
@@ -131,12 +139,12 @@ WORKDIR /root/workdir
 # Copy over the file from your own machine to the container
 COPY ./README.md ./README.md
 
-# Specify what to run, in this case the `echo` command with as argument `Hello world`
+# Specify what to run, in this case the `head` command (print the first few lines of a file to the terminal) with as argument `./README.md`
 CMD ["head", "./README.md"]
 ```
 Again, you build this new container with with `docker build --tag my_first_container .` and then run with `docker run my_first_container`.
 
-You now know almost everything you need to know. There is one more thing that might end up fooling you: debugging.
+You now know almost everything you need to know. There are two more things that might end up fooling you. The first: debugging.
 
 ---
 
@@ -164,3 +172,23 @@ This will run the container in interactive mode with `-it` (Technically, it stan
 Now, you are spawned inside a bash shell in your container. You can `apt-get install`, you can `cat`, `ls` and `cd` around the place, and do anything else you might want to do for troubleshooting.
 
 This is a general pattern for debugging docker containers. You remove everything that breaks, you build, and then run in interactive mode to troubleshoot what is going on.
+
+---
+
+The last thing that still needs to be explained is how to pass commandline arguments from your shell to the docker container. This is quite complicated, but, luckily enough, you only need to understand the oversimplified version: instead of `CMD`, we are going to be using `ENTRYPOINT`.
+
+```Dockerfile
+# We base ourselves on Unbuntu. This is the base OS we are installing.
+FROM ubuntu:20.04
+
+# Specify what to run, in this case the `echo` command. What we are echoing is going to depend on what we pass trough the commandline.
+ENTRYPOINT ["echo"]
+```
+
+You can build this again as usual with  `docker build --tag my_first_container .` After that, you can run it with:
+
+```sh
+docker run my_first_container "Hello World"
+```
+
+As you can see, all arguments after the container name are passed to the entrypoint before running.
