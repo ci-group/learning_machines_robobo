@@ -4,4 +4,4 @@
 param($p1)
 
 docker build --tag learning_machines .
-docker run -p 45100:45100 -p 45101:45101 learning_machines $PSBoundParameters["p1"]
+docker run -t -p 45100:45100 -p 45101:45101 learning_machines $PSBoundParameters["p1"]
