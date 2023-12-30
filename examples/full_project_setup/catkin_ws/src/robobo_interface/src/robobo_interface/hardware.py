@@ -115,7 +115,7 @@ class HardwareRobobo(IRobobo):
         """
         self._enable_camera: bool = camera
 
-        rospy.init_node("learning_machines_robobo_controler")
+        rospy.init_node("learning_machines_robobo_controler", xmlrpc_port=45100, tcpros_port=45101)
         rospy.loginfo("Starting the Learning Machines robobo controller node")
 
         # Service Proxys
