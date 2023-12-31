@@ -183,21 +183,28 @@ class SimulationRobobo(IRobobo):
 
     def get_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array"""
-        raise NotImplementedError("Currently not functional")
-
-        # We don't need to call handleVisionSensor because the camera is implicitly handled
-        # https://coppeliarobotics.com/helpFiles/en/explicitHandling.htm
         ping.ping(self.clientID)
-        resolution, image = sim.simxGetVisionSensorImage(
-            self.clientID, self._frontal_camera, 0, simConst.simx_opmode_buffer
+        inputIntegers = []
+        inputFloats = []
+        inputStrings = []
+        inputBuffer = bytearray()
+        ints, floats, strings, buffer = sim.simxCallScriptFunction(
+            self.clientID,
+            "Smartphone_Respondable",
+            sim.sim_scripttype_childscript,
+            "getCameraImage",
+            inputIntegers,
+            inputFloats,
+            inputStrings,
+            inputBuffer,
+            sim.simx_opmode_blocking,
         )
+        
         # reshape image
-        image = image[::-1]
+        image = buffer[::-1]
         im_cv2 = numpy.array(image, dtype=numpy.uint8)
-        im_cv2.resize([resolution[0], resolution[1], 3])
+        im_cv2.resize([ints[0], ints[1], 3])
         im_cv2 = cv2.flip(im_cv2, 1)
-
-        self.block()
 
         return im_cv2
 

@@ -3,6 +3,7 @@ function sysCall_init()
     aceleracion = {} -- Definicion del vector donde se guarda la orientacion del smartphone
     orientacion = {} -- Definicion del vector donde se guarda la orientacion del smartphone
     smartphone = sim.getObjectHandle("Smartphone_Respondable")
+    smartphone_camera = sim.getObjectHandle("Smartphone_camera")
     pos_anterior = sim.getObjectPosition(smartphone, -1)
     pos_antant = sim.getObjectPosition(smartphone, -1)
 end
@@ -25,4 +26,11 @@ readAccelerationSensor = function(inIntegers, inFloats, inStrings, inBuffer)
     pos_antant = pos_anterior
     pos_anterior = pos
     return {}, aceleracion, {}, ""
+end
+
+getCameraImage = function(inIntegers,inFloats,inStrings,inBuffer)
+    -- We don't need to call handleVisionSensor because the camera is implicitly handled
+    -- https://coppeliarobotics.com/helpFiles/en/explicitHandling.htm
+    image, resX, resY = sim.getVisionSensorCharImage(smartphone_camera)
+    return {resX, resY}, {}, {}, image
 end
