@@ -1,4 +1,11 @@
-from robobo_interface import IRobobo, Emotion, LedId, LedColor, SoundEmotion
+from robobo_interface import (
+    IRobobo,
+    Emotion,
+    LedId,
+    LedColor,
+    SoundEmotion,
+    SimulationRobobo,
+)
 
 
 def test_emotions(rob: IRobobo):
@@ -18,7 +25,7 @@ def test_move_and_wheel_reset(rob: IRobobo):
 
 def test_sensors(rob: IRobobo):
     print("IRS data: ", rob.read_irs())
-    # print("Image data: ", rob.get_image_front())
+    print("Image data: ", rob.get_image_front())
     print("Phone pan: ", rob.read_phone_pan())
     print("Phone tilt: ", rob.read_phone_tilt())
     print("Current acceleration: ", rob.read_accel())
@@ -34,8 +41,21 @@ def test_phone_movement(rob: IRobobo):
     print("Phone tilt: ", rob.read_phone_tilt())
 
 
+def test_sim(rob: SimulationRobobo):
+    print(rob.nr_food_collected())
+    print(rob.get_sim_time())
+    print(rob.is_running())
+    rob.stop_simulation()
+    print(rob.get_sim_time())
+    print(rob.is_running())
+    rob.play_simulation()
+
+
 def dance(rob: IRobobo):
     test_emotions(rob)
     test_sensors(rob)
     test_move_and_wheel_reset(rob)
+    if isinstance(rob, SimulationRobobo):
+        test_sim(rob)
+
     test_phone_movement(rob)

@@ -29,28 +29,32 @@ class SimulationRobobo(IRobobo):
 
     A few functions take blockid. When they do, they are not blocking.
     However, the simulator does not work with ids, and, therefore, this argument is always ignored.
+
+    Since the behavior of non-blocking functions is different from Simulation to Hardware,
+    it is recommended to only use the `_blocking` functions of the robot,
+    which are inherited from the IRobobo in the format of a template method.
     """
 
     def __init__(self):
         sim.simxFinish(-1)  # just in case, close all opened connections
         # 0.0.0.0 to connect to the current computer on Linux, with `--net=host`
         # This doesn't work on Windows or MacOS. There, the variable needs to be specified.
-        ip_adress = os.getenv('COPPELIA_SIM_IP', "0.0.0.0")
+        ip_adress = os.getenv("COPPELIA_SIM_IP", "0.0.0.0")
         self.clientID = sim.simxStart(ip_adress, 19999, True, True, 5000, 5)
         if self.clientID == -1:
             print(
                 """Failed connecting to remote API server:
                 Cannot find one hosted on port 19999
                 Is the simulation running / playing?
-                If not on Linux: Did you specify the IP adress of your computer in setup.bash?
+
+                If not on Linux with --net=host:
+                Did you specify the IP adress of your computer in setup.bash?
                 """
             )
             sys.exit(1)
 
         ping.ping(self.clientID)
         print("Connected to remote API server")
-
-        self.init_handles()
 
     def __del__(self):
         sim.simxFinish(self.clientID)
@@ -80,19 +84,15 @@ class SimulationRobobo(IRobobo):
         millis: how many millisecond to move the robot
         blockid: ignored, but implied unblocked.
         """
-        inputIntegers = [left_speed, right_speed]
-        inputFloats = [millis / 1000.0]
-        inputStrings = []
-        inputBuffer = bytearray()
         sim.simxCallScriptFunction(
             self.clientID,
             "Left_Motor",
             sim.sim_scripttype_childscript,
             "moveWheelsByTime",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [left_speed, right_speed],
+            [millis / 1000.0],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
 
@@ -101,19 +101,15 @@ class SimulationRobobo(IRobobo):
         After calling this topic both encoders (topic /robot/wheels) will start again
         in position 0.
         """
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
         sim.simxCallScriptFunction(
             self.clientID,
             "Left_Motor",
             sim.sim_scripttype_childscript,
             "resetWheelEncoders",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
@@ -143,19 +139,15 @@ class SimulationRobobo(IRobobo):
         selector: LedId
         color: LedColor
         """
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = [selector.value, color.value]
-        inputBuffer = bytearray()
         sim.simxCallScriptFunction(
             self.clientID,
             "Back_L",
             sim.sim_scripttype_childscript,
             "setLEDColor",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [selector.value, color.value],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
 
@@ -163,43 +155,35 @@ class SimulationRobobo(IRobobo):
         """Returns sensor readings:
         [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
         """
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        array = sim.simxCallScriptFunction(
+        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "IR_Back_C",
             sim.sim_scripttype_childscript,
             "readAllIRSensor",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
-        return list(array[0])
+        return list(ints)
 
     def get_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array"""
         ping.ping(self.clientID)
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        ints, floats, strings, buffer = sim.simxCallScriptFunction(
+        ints, _floats, _strings, buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Smartphone_Respondable",
             sim.sim_scripttype_childscript,
             "getCameraImage",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
-        
+
         # reshape image
         image = buffer[::-1]
         im_cv2 = numpy.array(image, dtype=numpy.uint8)
@@ -219,19 +203,15 @@ class SimulationRobobo(IRobobo):
         pan_speed: Movement speed for the pan mechanism. Range: 0-100.
         blockid: ignored, but implied unblocked.
         """
-        inputIntegers = [pan_position, pan_speed]
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
         sim.simxCallScriptFunction(
             self.clientID,
             "Pan_Motor",
             sim.sim_scripttype_childscript,
             "movePanTo",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [pan_position, pan_speed],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
 
@@ -249,23 +229,19 @@ class SimulationRobobo(IRobobo):
 
     def read_phone_pan(self) -> int:
         """Get the current pan of the phone. Range: 0-100"""
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        array = sim.simxCallScriptFunction(
+        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Pan_Motor",
             sim.sim_scripttype_childscript,
             "readPanPosition",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
-        return int(array[0][0])
+        return int(ints[0])
 
     def set_phone_tilt(
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
@@ -278,101 +254,81 @@ class SimulationRobobo(IRobobo):
         tilt_speed: Movement speed for the tilt mechanism. Range: 0-100.
         blockid: ignored, but implied unblocked.
         """
-        inputIntegers = [tilt_position, tilt_speed]
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
         sim.simxCallScriptFunction(
             self.clientID,
             "Tilt_Motor",
             sim.sim_scripttype_childscript,
             "moveTiltTo",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [tilt_position, tilt_speed],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
 
     def read_phone_tilt(self) -> int:
         """Get the current tilt of the phone. Range: 26-109"""
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        array = sim.simxCallScriptFunction(
+        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Tilt_Motor",
             sim.sim_scripttype_childscript,
             "readTiltPosition",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
-        return int(array[0][0])
+        return int(ints[0])
 
     def read_accel(self) -> Acceleration:
         """Get the acceleration of the robot"""
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        array = sim.simxCallScriptFunction(
+        _ints, floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Smartphone_Respondable",
             sim.sim_scripttype_childscript,
             "readAccelerationSensor",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
-        return Acceleration(*array[1])
+        return Acceleration(*floats)
 
     def read_orientation(self) -> Orientation:
         """Get the orientation of the robot"""
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        array = sim.simxCallScriptFunction(
+        _ints, floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Smartphone_Respondable",
             sim.sim_scripttype_childscript,
             "readOrientationSensor",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
-        return Orientation(*array[1])
+        return Orientation(*floats)
 
     def read_wheels(self) -> WheelPosition:
         """Get the wheel orientation and speed of the robot"""
-        inputIntegers = []
-        inputFloats = []
-        inputStrings = []
-        inputBuffer = bytearray()
-        array = sim.simxCallScriptFunction(
+        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Left_Motor",
             sim.sim_scripttype_childscript,
             "readWheels",
-            inputIntegers,
-            inputFloats,
-            inputStrings,
-            inputBuffer,
+            [],
+            [],
+            [],
+            bytearray(),
             sim.simx_opmode_blocking,
         )
         ping.ping(self.clientID)
-        return WheelPosition(*array[0])
+        return WheelPosition(*ints)
 
     def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
@@ -396,6 +352,7 @@ class SimulationRobobo(IRobobo):
         Arguments:
         f: Callable[[int], None]. Some function to call.
         """
+        # CoppeliaSim ignores blockids - 0 is just there to make the types check out.
         f(0)
         self.block()
 
@@ -413,7 +370,7 @@ class SimulationRobobo(IRobobo):
     def block(self):
         """Block untill (only return once) all blocking actions are completed"""
         while self.is_blocked(0):
-            self.sleep(0.02)
+            time.sleep(0.02)
         ping.ping(self.clientID)
 
     def play_simulation(self):
@@ -452,7 +409,7 @@ class SimulationRobobo(IRobobo):
         Trivially doesn't work when the simulation does not have any food.
         """
         ping.ping(self.clientID)
-        array = sim.simxCallScriptFunction(
+        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
             self.clientID,
             "Food",
             simConst.sim_scripttype_childscript,
@@ -463,50 +420,4 @@ class SimulationRobobo(IRobobo):
             bytearray(),
             simConst.simx_opmode_blocking,
         )
-        return array[0][0]
-
-    def init_handles(self) -> None:
-        self._right_motor = sim.simxGetObjectHandle(
-            self.clientID, "Right_Motor", simConst.simx_opmode_blocking
-        )
-        self._left_motor = sim.simxGetObjectHandle(
-            self.clientID, "Left_Motor", simConst.simx_opmode_blocking
-        )
-        self._robobo = sim.simxGetObjectHandle(
-            self.clientID, "Robobo", simConst.simx_opmode_blocking
-        )
-
-        self._ir_back_c = sim.simxGetObjectHandle(
-            self.clientID, "IR_Back_C", simConst.simx_opmode_blocking
-        )
-        self._ir_front_c = sim.simxGetObjectHandle(
-            self.clientID, "IR_Front_C", simConst.simx_opmode_blocking
-        )
-        self._ir_front_ll = sim.simxGetObjectHandle(
-            self.clientID, "IR_Front_LL", simConst.simx_opmode_blocking
-        )
-        self._ir_front_rr = sim.simxGetObjectHandle(
-            self.clientID, "IR_Front_RR", simConst.simx_opmode_blocking
-        )
-        self._ir_back_l = sim.simxGetObjectHandle(
-            self.clientID, "IR_Back_L", simConst.simx_opmode_blocking
-        )
-        self._ir_back_r = sim.simxGetObjectHandle(
-            self.clientID, "IR_Back_R", simConst.simx_opmode_blocking
-        )
-        self._ir_front_l = sim.simxGetObjectHandle(
-            self.clientID, "IR_Front_L", simConst.simx_opmode_blocking
-        )
-        self._ir_front_r = sim.simxGetObjectHandle(
-            self.clientID, "IR_Front_R", simConst.simx_opmode_blocking
-        )
-        self._tilt_motor = sim.simxGetObjectHandle(
-            self.clientID, "Tilt_Motor", simConst.simx_opmode_blocking
-        )
-        self._pan_motor = sim.simxGetObjectHandle(
-            self.clientID, "Pan_Motor", simConst.simx_opmode_blocking
-        )
-
-        self._frontal_camera = sim.simxGetObjectHandle(
-            self.clientID, "Smartphone_camera", simConst.simx_opmode_blocking
-        )
+        return ints[0]
