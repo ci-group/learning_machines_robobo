@@ -5,7 +5,7 @@ import rospy
 import cv2
 import numpy
 from std_msgs.msg import String, Int8, Int16, Int32
-from geometry_msgs.msg import Accel, Quaternion
+from geometry_msgs.msg import Accel
 from sensor_msgs.msg import CompressedImage
 from robobo_msgs.srv import (
     MoveWheels,
@@ -16,7 +16,7 @@ from robobo_msgs.srv import (
     SetLed,
     ResetWheels,
 )
-from robobo_msgs.msg import IRs, Wheels
+from robobo_msgs.msg import IRs, Wheels, OrientationEuler
 
 from robobo_interface.base import IRobobo
 from robobo_interface.datatypes import (
@@ -72,8 +72,8 @@ TILT_TOPIC = "robot/tilt"
 # https://github.com/mintforpeople/robobo-programming/wiki/Robobo-Topics#robotaccel
 ACCEL_TOPIC = "robot/accel"
 
-# https://github.com/mintforpeople/robobo-programming/wiki/Robobo-Topics#robotorientation
-ORIENTATION_TOPIC = "robot/orientation"
+# https://github.com/mintforpeople/robobo-programming/wiki/Robobo-Topics#robotorientation_euler
+ORIENTATION_TOPIC = "robot/orientation_euler"
 
 # https://github.com/mintforpeople/robobo-programming/wiki/Robobo-Topics#robotwheels
 WHEEL_TOPIC = "robot/wheels"
@@ -115,7 +115,9 @@ class HardwareRobobo(IRobobo):
         """
         self._enable_camera: bool = camera
 
-        rospy.init_node("learning_machines_robobo_controler", xmlrpc_port=45100, tcpros_port=45101)
+        rospy.init_node(
+            "learning_machines_robobo_controler", xmlrpc_port=45100, tcpros_port=45101
+        )
         rospy.loginfo("Starting the Learning Machines robobo controller node")
 
         # Service Proxys
@@ -156,7 +158,7 @@ class HardwareRobobo(IRobobo):
 
         self._orient = Orientation()
         self._orientsub = rospy.Subscriber(
-            ORIENTATION_TOPIC, Quaternion, self._orient_callback
+            ORIENTATION_TOPIC, OrientationEuler, self._orient_callback
         )
 
         self._wheelpos = WheelPosition()
@@ -424,12 +426,11 @@ class HardwareRobobo(IRobobo):
             z=ros_data.linear.z,
         )
 
-    def _orient_callback(self, ros_data: Quaternion) -> None:
+    def _orient_callback(self, ros_data: OrientationEuler) -> None:
         self._orient = Orientation(
-            x=ros_data.x,
-            y=ros_data.y,
-            z=ros_data.z,
-            w=ros_data.w,
+            yaw=ros_data.yaw.data,
+            pitch=ros_data.pitch.data,
+            roll=ros_data.roll.data,
         )
 
     def _wheelpos_callback(self, ros_data: Wheels) -> None:
