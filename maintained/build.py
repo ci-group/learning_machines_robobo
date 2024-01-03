@@ -45,7 +45,7 @@ BASE = Path(__file__).parent.resolve(strict=True)
 def remove_existing_in(directory: Path) -> None:
     to_del: List[Path] = []
     for file in directory.iterdir():
-        if file.name == "README.md":
+        if file.name in ["README.md", "CoppeliaSim"]:
             continue
 
         if input(f"\n{file} exists. Should it be removed? [y/N]") in ["y", "yes", "Y"]:
@@ -159,6 +159,14 @@ def main() -> None:
             "learning_machines_prey",
             "robobo_interface",
             "robobo_msgs",
+        ],
+        models=["robobo.ttm", "robobo-pusher.ttm"],
+        scenes=[
+            "arena_approach.ttt",
+            "arena_obstacles.ttt",
+            "arena_push_easy.ttt",
+            "arena_push_hard.ttt",
+            "Robobo_Scene.ttt",
         ],
         dockerfile="full.dockerfile",
         requirements=True,

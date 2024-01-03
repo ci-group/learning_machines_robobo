@@ -48,7 +48,7 @@ class SimulationRobobo(IRobobo):
                 Is the simulation running / playing?
 
                 If not on Linux with --net=host:
-                Did you specify the IP adress of your computer in setup.bash?
+                Did you specify the IP adress of your computer in scripts/setup.bash?
                 """
             )
             sys.exit(1)
