@@ -1,0 +1,8 @@
+# Commands the robot to start/stop a module
+#
+# Module name; posible values: tag, object-detection, lane-detection 
+# State: true on, false off
+std_msgs/String moduleName
+std_msgs/Bool moduleState
+---
+std_msgs/Int8 error

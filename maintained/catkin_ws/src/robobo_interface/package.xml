@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>robobo_interface</name>
+  <version>0.0.1</version>
+  <description>The robobo interface package for this course</description>
+  <maintainer email="your@email.here">Your Name</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>coppella_sim</exec_depend>
+  <exec_depend>robobo_msgs</exec_depend>
+  <export>
+  </export>
+</package>
