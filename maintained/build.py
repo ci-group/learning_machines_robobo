@@ -148,10 +148,12 @@ def main() -> None:
         FULL_PROJECT_SETUP,
         scripts=[
             "convert_line_endings.py",
-            "run.ps1",
-            "run.sh",
             "entrypoint.bash",
             "setup.bash",
+            "run.sh",
+            "run.ps1",
+            "start_coppelia_sim.sh",
+            "start_coppelia_sim.ps1",
         ],
         caktin_packages=[
             "coppelia_sim",

@@ -2,29 +2,38 @@ import functools
 
 from coppelia_sim import simConst
 
-from typing import Callable, Tuple
+from typing import Callable, List, Tuple
 
 
 # Sadly, python3.8 does not have match statements jet.
 def error_code_to_message(ret: int) -> str:
     if ret == simConst.simx_return_ok:
         raise ValueError("Error return code is of type OK, cannot be treated as error.")
-    elif ret == simConst.simx_return_novalue_flag:  # 1
-        return "There is no command reply in the input buffer."
-    elif ret == simConst.simx_return_timeout_flag:  # 2
-        return "The function timed out (probably the network is down or too slow)"
-    elif ret == simConst.simx_return_illegal_opmode_flag:  # 4
-        return "The specified operation mode is not supported for the given function"
-    elif ret == simConst.simx_return_remote_error_flag:  # 8
-        return "The function caused an error on the server side (e.g. an invalid handle was specified)"
-    elif ret == simConst.simx_return_split_progress_flag:  # 16
-        return "The communication thread is still processing previous split command of the same type"
-    elif ret == simConst.simx_return_local_error_flag:  # 32
-        return "The function caused an error on the client side"
-    elif ret == simConst.simx_return_initialize_error_flag:  # 64
-        return "simxStart was not yet called"
-    else:
-        return f"Unknown error code {ret}"
+
+    errors: List[str] = []
+    if ret & simConst.simx_return_novalue_flag:  # 1
+        errors.append("There is no command reply in the input buffer.")
+    if ret & simConst.simx_return_timeout_flag:  # 2
+        errors.append(
+            "The function timed out (probably the network is down or too slow)"
+        )
+    if ret & simConst.simx_return_illegal_opmode_flag:  # 4
+        errors.append(
+            "The specified operation mode is not supported for the given function"
+        )
+    if ret & simConst.simx_return_remote_error_flag:  # 8
+        errors.append(
+            "The function caused an error on the server side (e.g. an invalid handle was specified)"
+        )
+    if ret & simConst.simx_return_split_progress_flag:  # 16
+        errors.append(
+            "The communication thread is still processing previous split command of the same type"
+        )
+    if ret & simConst.simx_return_local_error_flag:  # 32
+        errors.append("The function caused an error on the client side")
+    if ret & simConst.simx_return_initialize_error_flag:  # 64
+        errors.append("simxStart was not yet called")
+    return "\n and ".join(errors)
 
 
 class CoppeliaSimApiError(Exception):
