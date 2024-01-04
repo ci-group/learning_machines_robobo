@@ -23,7 +23,7 @@ def error_code_to_message(ret: int) -> str:
         )
     if ret & simConst.simx_return_remote_error_flag:  # 8
         errors.append(
-            "The function caused an error on the server side (e.g. an invalid handle was specified)"
+            "The function caused an error on the server side (e.g. an invalid handle was specified, or the simulation is not runnining while the function requires it to be)"
         )
     if ret & simConst.simx_return_split_progress_flag:  # 16
         errors.append(

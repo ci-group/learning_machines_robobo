@@ -1,7 +1,9 @@
+local sim = require("sim")
+
 function sysCall_init()
     -- do some initialization here
-    motorI = sim.getObjectHandle("Left_Motor")
-    motorD = sim.getObjectHandle("Right_Motor")
+    motorI = sim.getObject("../Left_Motor")
+    motorD = sim.getObject("../Right_Motor")
     d = 0
     pos_inicial_I = 0
     pos_inicial_D = 0
@@ -47,7 +49,8 @@ moveWheelsByTime = function(velocidad, tiempo, inString, inBuffer) -- "velocidad
             motorI,
             (
                 (0.000001646 * (vI ^ 3) - 0.00285 * (vI ^ 2) + 6.649 * vI + 51.14)
-                + (-0.0002912 * (vI ^ 3) + 0.04647 * (vI ^ 2) - 1.339 * vI - 12.25) / d
+                + (-0.0002912 * (vI ^ 3) + 0.04647 * (vI ^ 2) - 1.339 * vI - 12.25)
+                    / d
             )
                 * math.pi
                 / 180
@@ -82,7 +85,8 @@ moveWheelsByTime = function(velocidad, tiempo, inString, inBuffer) -- "velocidad
             motorD,
             (
                 (0.000001646 * (vD ^ 3) - 0.00285 * (vD ^ 2) + 6.649 * vD + 51.14)
-                + (-0.0002912 * (vD ^ 3) + 0.04647 * (vD ^ 2) - 1.339 * vD - 12.25) / d
+                + (-0.0002912 * (vD ^ 3) + 0.04647 * (vD ^ 2) - 1.339 * vD - 12.25)
+                    / d
             )
                 * math.pi
                 / 180
@@ -174,7 +178,8 @@ moveWheelsByDegrees = function(parametros, inFloats, rueda, inBuffer) -- "parame
             motorI,
             (
                 (0.000001646 * (vI ^ 3) - 0.00285 * (vI ^ 2) + 6.649 * vI + 51.14)
-                + (-0.0002912 * (vI ^ 3) + 0.04647 * (vI ^ 2) - 1.339 * vI - 12.25) / d
+                + (-0.0002912 * (vI ^ 3) + 0.04647 * (vI ^ 2) - 1.339 * vI - 12.25)
+                    / d
             )
                 * math.pi
                 / 180
@@ -209,7 +214,8 @@ moveWheelsByDegrees = function(parametros, inFloats, rueda, inBuffer) -- "parame
             motorD,
             (
                 (0.000001646 * (vD ^ 3) - 0.00285 * (vD ^ 2) + 6.649 * vD + 51.14)
-                + (-0.0002912 * (vD ^ 3) + 0.04647 * (vD ^ 2) - 1.339 * vD - 12.25) / d
+                + (-0.0002912 * (vD ^ 3) + 0.04647 * (vD ^ 2) - 1.339 * vD - 12.25)
+                    / d
             )
                 * math.pi
                 / 180

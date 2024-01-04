@@ -1,3 +1,5 @@
+local sim = require("sim")
+
 function sysCall_init() end
 
 function sysCall_trigger(inData)

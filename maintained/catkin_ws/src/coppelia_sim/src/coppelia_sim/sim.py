@@ -9,9 +9,7 @@ from .error import simx_function
 
 # load library
 try:
-    if platform.system() == "cli":
-        file_extension = ".dll"
-    elif platform.system() == "Windows":
+    if platform.system() in ["cli", "Windows"]:
         file_extension = ".dll"
     elif platform.system() == "Darwin":
         file_extension = ".dylib"

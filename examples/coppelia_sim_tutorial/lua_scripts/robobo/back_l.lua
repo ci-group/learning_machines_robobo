@@ -1,12 +1,14 @@
+local sim = require("sim")
+
 function sysCall_init()
     -- do some initialization here
-    Back_L = sim.getObjectHandle("Back_L")
-    Back_R = sim.getObjectHandle("Back_R")
-    Front_C = sim.getObjectHandle("Front_C")
-    Front_L = sim.getObjectHandle("Front_L")
-    Front_LL = sim.getObjectHandle("Front_LL")
-    Front_R = sim.getObjectHandle("Front_R")
-    Front_RR = sim.getObjectHandle("Front_RR")
+    Back_L = sim.getObject("../Back_L")
+    Back_R = sim.getObject("../Back_R")
+    Front_C = sim.getObject("../Front_C")
+    Front_L = sim.getObject("../Front_L")
+    Front_LL = sim.getObject("../Front_LL")
+    Front_R = sim.getObject("../Front_R")
+    Front_RR = sim.getObject("../Front_RR")
 end
 
 function sysCall_cleanup()

@@ -1,6 +1,8 @@
+local sim = require("sim")
+
 function sysCall_init()
     -- se ejecuta una vez al inicio de la simulacion
-    motor = sim.getObjectHandle("Pan_Motor")
+    motor = sim.getObject(".")
     v = 0
 end
 
