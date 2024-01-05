@@ -128,7 +128,12 @@ def main() -> None:
         dockerfile="ros_tutorial.dockerfile",
     )
 
-    make_tutorial(COPPELIA_SIM_TUTORIAL, lua=True)
+    make_tutorial(
+        COPPELIA_SIM_TUTORIAL,
+        scripts=["start_coppelia_sim.sh", "start_coppelia_sim.ps1"],
+        scenes=["Robobo_Scene.ttt"],
+        lua=True,
+    )
 
     make_tutorial(
         ROS_BASIC_SETUP,

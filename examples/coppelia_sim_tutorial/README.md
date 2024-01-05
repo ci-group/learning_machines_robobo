@@ -4,13 +4,18 @@ For this course, we use CoppeliaSim to simulate the robot. This is not the easie
 
 First, download the edu version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads). Click "edu" and then select your operating system. For linux, it says "Ubuntu," but the package ships with most of its dependencies, so it will run on any distro. (Tested Debian, Arch and Fedora) On Arch, to get a fully smooth experience, you the only dependency you might want to install is [icu60](https://aur.archlinux.org/packages/icu60). On windows, use the zip package without installer. On mac, everything should be fine by default.
 
-After it is all downloaded, you will find yourself with a zipfile. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so you should extract this to a location where you think you'll have access to it from the commandline. Personally, I extracted it to `./CoppeliaSim` in the projects' working directory, so next to `catkin_ws`. All example commands presume you did this, too.
+One thing to note when running on Linux is that there have previously been unexpected issues with the program when running on Wayland. Exactly why this is the case, we don't know. But, on Debian KDE with Wayland it doesn't start at all, and on Fedora Gnome with Wayland it randomly crashes every now and then. If you experience weird issues, consider switching to X11.
+
+After it is all downloaded, you will find yourself with a zipfile. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so you should extract this to a location where you think you'll have access to it from the commandline. You should extract this to `./CoppeliaSim` such that the commands below work. This exact path is required because some startup scripts later on rely on it being in this location.
 
 By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the commandline):
 
 ```sh
 # This one should usually work.
 ./CoppeliaSim/coppeliaSim
+
+# Or, on windows:
+./CoppeliaSim/coppeliaSim.exe
 
 # You might need to instead run the shell script that launches this executable.
 # This fixes some unexplained issues sometimes:
@@ -27,11 +32,18 @@ If you want to make sure you installed things correctly, the first thing to run 
 ./CoppeliaSim/libLoadErrorCheck.sh
 ```
 
-For this course, we are accessing this simulator from python code, meaning we need to open a TCP port to connect to. For this, we use port 19999. This is specified on a script on the robot itself, which starts the 
+For this course, we are accessing this simulator from python code, meaning we need to open a TCP port to connect to. For this, we start CoppeliaSim with the `-gREMOTEAPISERVERSERVICE_19999_FALSE_TRUE` flag. You don't have to remember this, you'll find `./scripts/start_coppelia_sim.sh` (and `".ps1`), which starts the program with this flag, too.
 
-If you want to not have to press the play button and such yourself, you can do this by installing the ZMQ plugin to CoppeliaSim from the [github](https://github.com/CoppeliaRobotics/zmqRemoteApi), to then interact with the simulator trough code like [described in the docs](https://www.coppeliarobotics.com/helpFiles/en/zmqRemoteApiOverview.htm), however, this requires compling C++ code with cmake (I cannot find any binaries), which might be a bridge too far if you're on Windows.
+This script also takes one argument, the scene to load. So, to load CoppeliaSim with a scene, for example the `./scenes/Robobo_Scene.ttt`, you can simply run `./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt`. This will open everything for you, ready to use.
+
+If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory around, from this example directory to the `full_project_set` example to your own project directory to make sure it's available everywhere.
+
+You can now open it, and click and move around a bit. It's admittedly a rather akward UI, but you'll need to be somewhat familiar with it.
+
+One thing you'll notice is little text/script icons next to some nodes in the Scene, mostly on the Robobo. These are lua scripts that are running on the CoppeliaSim side. Double-click the script symbol to open them.
 
 ### Lua scripts
 
-Wait? We are learning an entirely new programming language? Well, yes. But, don't worry. Lua is a language that is designed specifically to be easy to pick up. You'll come across it more often if you end up doing profesional software developlement. It's a programming language designed to write config files and small add-ons in. I usually call it "sentient json" for that reason. It's famously easy to interface with from C, and quite fast. For example, it's the configuration / modding language of choise for games like World of Warcraft, Roblox and Factorio, and development tools ranging from Neovim to Redis to MediaWiki (the backend of Wikipedia and WikiData). Most people who write it are just making config files, and don't really know the langauge either. Just... bluff your way trough this one. Just [read the wikipedia page](https://en.wikipedia.org/wiki/Lua_(programming_language)#Features), and copy that when you need a loop, if-statement of similar. The standard library is effectively nonexistant, and the syntax is extremly minimal, without support for classes or overloading or any other non-essential feature, so everything the language has to offer is in those few examples.
- 
+Wait? We are learning an entirely new programming language? Well, yes. But, don't worry. Lua is a language that is designed specifically to be easy to pick up. You'll come across it more often if you end up doing profesional software developlement. It's a programming language designed to write config files and small add-ons in. I usually call it "sentient json" for that reason. It's famously easy to interface with from C, and quite fast. For example, it's the configuration / modding language of choise for games like World of Warcraft, Roblox and Factorio, and development tools ranging from Neovim to Redis to MediaWiki (the backend of Wikipedia and WikiData). Most people who write it are just making config files, and don't really know the langauge either. Just... bluff your way trough this one. Just [read the wikipedia page](<https://en.wikipedia.org/wiki/Lua_(programming_language)#Features>), and copy that when you need a loop, if-statement of similar. The standard library is effectively nonexistant, and the syntax is extremly minimal, without support for classes or overloading or any other non-essential feature, so everything the language has to offer is in those few examples.
+
+Technically, CoppeliaSim also supports python scripts. However, this is only since recently, and we didn't get that working in time for the course. You can try to play around with that, if you want. However, I encourage you to use Lua, as that is what the Robobo itself uses, meaning you can peak that code whenever you need to see how to get something workinng.
