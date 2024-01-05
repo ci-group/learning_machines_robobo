@@ -23,10 +23,8 @@ WORKDIR /root/catkin_ws
 # which exports some global variables catkin_make needs to find the python packages.
 # (By default, Docker runs all RUN commands in seperately created shells)
 COPY ./catkin_ws .
-RUN <<EOT bash
-    source /opt/ros/noetic/setup.bash
-    catkin_make
-EOT
+RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
+
 # Chmod (permit execution of) everything in the catkin_ws. This is not *recommended*,
 # But it doesn't matter as long as you don't have any malware in there.
 RUN chmod -R u+x /root/catkin_ws/src

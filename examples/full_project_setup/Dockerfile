@@ -27,10 +27,7 @@ WORKDIR /root/catkin_ws
 # Note: This fails on Windows \r\n line endings. Make sure your files have Unix \n line endings.
 # See more about this in the Docker Tutorial
 COPY ./catkin_ws .
-RUN <<EOT bash
-    source /opt/ros/noetic/setup.bash
-    catkin_make
-EOT
+RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
 # Set up the envoirement to actually run the code
 COPY ./scripts/entrypoint.bash ./entrypoint.bash
