@@ -35,8 +35,6 @@ def test_sensors(rob: IRobobo):
 def test_phone_movement(rob: IRobobo):
     rob.set_phone_pan_blocking(20, 100)
     print("Phone pan after move to 20: ", rob.read_phone_pan())
-    rob.set_pan_exact(120)
-    print("Phone pan after exact to 20: ", rob.read_phone_pan())
     rob.set_phone_tilt_blocking(50, 100)
     print("Phone tilt: ", rob.read_phone_tilt())
 

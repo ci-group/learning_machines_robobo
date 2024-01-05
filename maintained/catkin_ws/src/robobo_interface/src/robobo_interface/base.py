@@ -158,19 +158,6 @@ class IRobobo(ABC):
         )
 
     @abstractmethod
-    def set_pan_exact(self, pan_position: int = 121) -> None:
-        """Command the robot to move the smartphone holder in the horizontal (pan) axis.
-        This version tests a bunch to make sure it actually ends up where you think it ends up in the hardware implementation
-        Still not perfect for the hardware, and quite slow, but this function might be usefull for calibration / resetting.
-
-        Always blocks.
-
-        Arguments:
-        pan: int -> value to move to. Range: 11-343. Defaults to panning to center.
-        """
-        ...
-
-    @abstractmethod
     def read_phone_pan(self) -> int:
         """Get the current pan of the phone. Range: 0-100"""
         ...

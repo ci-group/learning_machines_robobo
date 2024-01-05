@@ -293,25 +293,12 @@ class HardwareRobobo(IRobobo):
             Int16(0),
         )
 
-    def set_pan_exact(self, pan_position: int = 121):
-        """Command the robot to move the smartphone holder in the horizontal (pan) axis.
-        This version tests a bunch to make sure it actually ends up where you think it ends up.
-        Still not perfect (it's hardware), and quite slow, but this function might be usefull for calibration / resetting.
-
-        Always blocks.
-
-        Arguments:
-        pan: int -> value to move to. Range: 11-343. Defaults to panning to center.
-        """
-        speed = 100
-        while not self.read_phone_pan() == pan_position:
-            self.perform_blocking(
-                functools.partial(self.set_phone_pan, pan_position, speed)
-            )
-            speed = math.ceil(speed * 0.5)
-
     def read_phone_pan(self) -> int:
-        """Get the current pan of the phone. Range: 0-100"""
+        """Get the current pan of the phone. Range: 0-100
+
+        For the hardware: This isn't guaranteed to be the same calibration as the movement,
+        but unlikely to be more than one or two units off
+        """
         return self._pan
 
     def set_phone_tilt(
@@ -341,7 +328,11 @@ class HardwareRobobo(IRobobo):
         )
 
     def read_phone_tilt(self) -> int:
-        """Get the current tilt of the phone. Range: 26-109"""
+        """Get the current tilt of the phone. Range: 26-109
+
+        For the hardware: This isn't guaranteed to be the same calibration as the movement,
+        but unlikely to be more than one or two units off
+        """
         return self._tilt
 
     def read_accel(self) -> Acceleration:
