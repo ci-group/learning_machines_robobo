@@ -8,7 +8,7 @@ from learning_machines import dance
 if __name__ == "__main__":
     # You can do better argument parsing than this!
     if sys.argv[1] == "--hardware":
-        rob = HardwareRobobo()
+        rob = HardwareRobobo(camera=True)
     elif sys.argv[1] == "--simulation":
         rob = SimulationRobobo()
     else:
