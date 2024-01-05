@@ -15,7 +15,7 @@ To run code in a container, then, is effectively to start up a seperate computer
 
 The reason this is useful is because of docker images. This is what you create when you `docker build`. They are, effectively, small mini-computers, that are completely set up and configured. you can create a file, called a `Dockerfile`, that specifies exactly how this sytem should be set up. It installs any needed software, applies all needed configuration, sets all envoirement variables, etc. Without docker, we'd have stuff like "Oh, this code works on my machine, but not on your machine, because I have ROS installed differently than you" or "I have this setting applied wheras you don't" or a meriad of other things. This way, the configuration of the operating system under which the code is run is completely reproducable. If the code runs in the container, it runs everywhere.
 
-The main reason we use it is ROS noetic, which is a mess to install, and doesn't even work on MacOS. Instead of that, we just use the `ros:noetic` docker base image, which will have everything installed properly. 
+The main reason we use it is ROS noetic, which is a mess to install, and doesn't even work on MacOS. Instead of that, we just use the `ros:noetic` docker base image, which will have everything installed properly.
 
 ## Installing Docker
 
@@ -41,7 +41,7 @@ If you want to have an identical experience to the plebs using MacOS or Windows,
 However, on linux, on any distribution, you can also install the Docker Engine directly with the instructions [here](https://docs.docker.com/engine/install/). This won't install any graphical interface, but will also remove a layer of virtualisation, allowing you more control and insight over the docker images than when using Docker Desktop, meaning you can play with visual pass-trough and other things like that.
 
 #### My OS is not supported?
-If you are on an OS that is too old, or too niche, you have to install something that is suppored. You can run a VM, or dual-boot. Probably the easiest thing to quickly set up that is also easy to use for this course is to dual-boot [LMDE](https://www.linuxmint.com/download_lmde.php). This is based on Debian Linux, so you can google "How to X on Debian" and follow any command-line results to the letter, but also comes with a nice installer that's easy to set up for a dual-boot. 
+If you are on an OS that is too old, or too niche, you have to install something that is suppored. You can run a VM, or dual-boot. Probably the easiest thing to quickly set up that is also easy to use for this course is to dual-boot [LMDE](https://www.linuxmint.com/download_lmde.php). This is based on Debian Linux, so you can google "How to X on Debian" and follow any command-line results to the letter, but also comes with a nice installer that's easy to set up for a dual-boot.
 
 ## Using Docker
 
@@ -87,7 +87,7 @@ FROM ubuntu:20.04
 # This has three stages:
 #  * First, we update apt, to make sure we are installing the latest version of everything
 #  * Second, we are installing git
-#  * Third, we are removing some junk files that were created in the process. 
+#  * Third, we are removing some junk files that were created in the process.
 #    (You don'& have to bother about this third step)
 RUN apt-get -y update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 ```
@@ -137,7 +137,7 @@ FROM ubuntu:20.04
 CMD ["head", "./REAMDE.md"]
 ```
 
-Again, build with `docker build --tag my_first_container .` and then run with `docker run my_first_container`. 
+Again, build with `docker build --tag my_first_container .` and then run with `docker run my_first_container`.
 
 This won't work. REAME.md might exist on your computer, but it doesn't exist on the container. We have to copy that file in from your computer to the container, and then view it:
 ```Dockerfile
@@ -178,11 +178,23 @@ Now, you can again `docker build --tag my_first_container .`, but we'll run it w
 ```sh
 docker run -it my_first_container bash
 ```
-This will run the container in interactive mode with `-it` (Technically, it stands for something else, but don't bother about that), and it will launch a single command on startup: `bash`. 
+This will run the container in interactive mode with `-it` (Technically, it stands for something else, but don't bother about that), and it will launch a single command on startup: `bash`.
 
 Now, you are spawned inside a bash shell in your container. You can `apt-get install`, you can `cat`, `ls` and `cd` around the place, and do anything else you might want to do for troubleshooting.
 
 This is a general pattern for debugging docker containers. You remove everything that breaks, you build, and then run in interactive mode to troubleshoot what is going on.
+
+Similarly, for debugging, you might find yourself in a situarion where the requested ports are already occupied. This means that the container is already running.
+
+To see all running docker containers type:
+```sh
+docker ps
+```
+
+After that, you can shut down a container by typing:
+```
+docker container stop [container id]
+```
 
 ---
 
