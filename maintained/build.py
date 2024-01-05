@@ -118,7 +118,8 @@ def main() -> None:
 
     make_tutorial(
         HARDWARE_SETUP,
-        scripts=["convert_line_endings.py", "setup_ros_uri.bash"],
+        caktin_packages=["robobo_msgs"],
+        scripts=["convert_line_endings.py", ("setup_ros_uri.bash", "setup.bash")],
         dockerfile="hardware.dockerfile",
     )
 

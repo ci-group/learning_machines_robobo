@@ -1,0 +1,4 @@
+# Commands the robot to reset the wheels encoders
+# back to zero. This service its empty.
+---
+std_msgs/Int8 error
