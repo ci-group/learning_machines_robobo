@@ -11,7 +11,7 @@ function sysCall_actuation()
     if v > 0 then
         posicion_actual = sim.getJointPosition(motor) * 180 / math.pi
         -- Cuando la diferencia entre la posicion objetivo y la actual sea menor a 2 se detiene la articulacion y se resetean las variables globales
-        if math.abs(posicion_objetivo - posicion_actual) < 2 then
+        if (posicion_objetivo - posicion_actual) * parametro < 0 then
             sim.setJointTargetVelocity(motor, 0)
             sim.setInt32Signal("Bloqueado", 0)
             v = 0
@@ -19,7 +19,7 @@ function sysCall_actuation()
     end
 end
 
-movePanTo = function(parametros, inFloat, inString, inBuffer) -- "parametros" es un vector de dos elementos: posicion objetivo (en grados) del pan y su velocidad
+movePanTo = function(parametros, inFloat, inString, inBuffer) -- "s" es un vector de dos elementos: posicion objetivo (en grados) del pan y su velocidad
     parametros[1] = -1 * (parametros[1] - 180)
     -- Se asegura que la posicion objetivo del pan este comprendida entre -160 y 160, y su velocidad entre 0 y 100
     if parametros[1] > 160 then

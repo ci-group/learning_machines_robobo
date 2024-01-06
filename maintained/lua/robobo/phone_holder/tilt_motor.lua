@@ -11,7 +11,7 @@ function sysCall_actuation()
     if v > 0 then
         posicion_actual = sim.getJointPosition(motor) * 180 / math.pi + 70
         -- Cuando la diferencia entre la posicion objetivo y la actual sea menor a 2 se detiene la articulacion y se resetean las variables globales
-        if math.abs(posicion_objetivo - posicion_actual) < 1 then
+        if (posicion_objetivo - posicion_actual) * parametro < 0 then
             sim.setJointTargetVelocity(motor, 0)
             sim.setInt32Signal("Bloqueado", 0)
             sim.setObjectInt32Param(motor, sim.jointintparam_ctrl_enabled, 1)

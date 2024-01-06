@@ -354,7 +354,7 @@ class SimulationRobobo(IRobobo):
         Arguments:
         blockid: the id to check
         """
-        res = sim.simxGetIntegerSignal(
+        res = sim.simxGetInt32Signal(
             self.clientID, "Bloqueado", sim.simx_opmode_blocking
         )
         return bool(res)
