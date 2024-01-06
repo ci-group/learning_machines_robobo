@@ -3,7 +3,6 @@
 # I do this quite a lot, as I think it's cleaner.
 # If you want more info: https://stackoverflow.com/a/35710527/18189817
 
-from .results import RESULT_DIR, FIGRURES_DIR
 from .example_process import ExampleProcess
 
-__all__ = ("RESULT_DIR", "FIGRURES_DIR", "ExampleProcess")
+__all__ = "ExampleProcess"

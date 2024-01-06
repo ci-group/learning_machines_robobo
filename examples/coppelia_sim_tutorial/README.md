@@ -42,8 +42,49 @@ You can now open it, and click and move around a bit. It's admittedly a rather a
 
 One thing you'll notice is little text/script icons next to some nodes in the Scene, mostly on the Robobo. These are lua scripts that are running on the CoppeliaSim side. Double-click the script symbol to open them.
 
-### Lua scripts
+## Lua
 
 Wait? We are learning an entirely new programming language? Well, yes. But, don't worry. Lua is a language that is designed specifically to be easy to pick up. You'll come across it more often if you end up doing profesional software developlement. It's a programming language designed to write config files and small add-ons in. I usually call it "sentient json" for that reason. It's famously easy to interface with from C, and quite fast. For example, it's the configuration / modding language of choise for games like World of Warcraft, Roblox and Factorio, and development tools ranging from Neovim to Redis to MediaWiki (the backend of Wikipedia and WikiData). Most people who write it are just making config files, and don't really know the langauge either. Just... bluff your way trough this one. Just [read the wikipedia page](<https://en.wikipedia.org/wiki/Lua_(programming_language)#Features>), and copy that when you need a loop, if-statement of similar. The standard library is effectively nonexistant, and the syntax is extremly minimal, without support for classes or overloading or any other non-essential feature, so everything the language has to offer is in those few examples.
 
 Technically, CoppeliaSim also supports python scripts. However, this is only since recently, and we didn't get that working in time for the course. You can try to play around with that, if you want. However, I encourage you to use Lua, as that is what the Robobo itself uses, meaning you can peak that code whenever you need to see how to get something workinng.
+
+
+### The used Lua scripts
+
+In this repository you'll find the lua scripts used in this course. The robobo scripts are (for this course modified) versions of what is officially supplied for the robobo. They have comments and variable names in Portugese, and generally overuse global variables. However, they are the best we have.
+
+Next to the robobo scripts, you'll find a `food.lua` script under arena. This is the script used for food for task 3. You're encouraged to modify this if and when you want to change the behavior of the food.
+
+
+### Writing your own lua script for python.
+
+Writing / calling your own lua scripts is quite easy, but it requires a bit of a weird setup.
+In `full_project_setup`, in the `robobo_interface` package in the `simulation.py` file, you can find some examples of lua code being called from python. To create a lua function to call from python, you should use this signature:
+
+```lua
+theFunctionName = function(inIntegers, inFloats, inStrings, inBuffer)
+    -- Do something here
+
+    -- If you don't want to return a byte buffer, you can replace it with an emty string,
+    -- In lua, the empty string and empty bye array are the same object.
+    return { output, integers }, { output, floats}, { output, strings}, outByteBuffer
+end
+```
+
+The type siginture from the python side will look like this:
+
+```python
+from coppelia_sim import sim
+
+out_ints, out_floats, out_strings, out_byte_buffer = sim.simxCallScriptFunction(
+    connection_client_id,
+    "Name_Of_Node",
+    sim.sim_scripttype_childscript,
+    "theFunctionName",
+    [any, input, integers],
+    [any, input, floats],
+    [any, input, strings],
+    bytearray(), # An input byte-array
+    sim.simx_opmode_blocking,
+)
+```

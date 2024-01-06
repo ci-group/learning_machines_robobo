@@ -4,7 +4,8 @@ import logging
 import argparse
 
 # Import our own code from src/
-from my_first_package import RESULT_DIR, ExampleProcess
+from my_first_package import ExampleProcess
+from data_files import RESULT_DIR
 
 from typing import List
 

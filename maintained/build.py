@@ -145,7 +145,7 @@ def main() -> None:
             ("entrypoint_example.bash", "entrypoint.bash"),
             "setup.bash",
         ],
-        caktin_packages=["my_first_package"],
+        caktin_packages=["my_first_package", "data_files"],
         dockerfile="full.dockerfile",
         requirements=True,
     )
@@ -164,6 +164,7 @@ def main() -> None:
         caktin_packages=[
             "coppelia_sim",
             "learning_machines",
+            "data_files",
             "learning_machines_prey",
             "robobo_interface",
             "robobo_msgs",

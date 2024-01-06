@@ -15,17 +15,17 @@ To run code in a container, then, is effectively to start up a seperate computer
 
 The reason this is useful is because of docker images. This is what you create when you `docker build`. They are, effectively, small mini-computers, that are completely set up and configured. you can create a file, called a `Dockerfile`, that specifies exactly how this sytem should be set up. It installs any needed software, applies all needed configuration, sets all envoirement variables, etc. Without docker, we'd have stuff like "Oh, this code works on my machine, but not on your machine, because I have ROS installed differently than you" or "I have this setting applied wheras you don't" or a meriad of other things. This way, the configuration of the operating system under which the code is run is completely reproducable. If the code runs in the container, it runs everywhere.
 
-The main reason we use it is ROS noetic, which is a mess to install, and doesn't even work on MacOS. Instead of that, we just use the `ros:noetic` docker base image, which will have everything installed properly.
+The main reason we use it is ROS noetic, which is a mess to install, works barely on Windows and not at all on MacOS. Instead of that, we just use the `ros:noetic` docker base image, which will have everything installed properly.
 
 ## Installing Docker
 
-The first thing that's important is installing it. What we are going to need is the [Docker engine](https://docs.docker.com/engine/install/), which can only be direcly installed on Linux. This is not an accident, Docker is Linux-based, and depends on it. Luckily enough, there exists the [Docker Desktop](https://docs.docker.com/desktop/), which is a software suite that will install the Docker engine for you on any operating system. It also comes with a ton more stuff, like a gui and Docker-compose, but we won't touch those here. We only care about the engine and the CLI.
+The first thing that's important is installing it. What we are going to need is the [Docker engine](https://docs.docker.com/engine/install/), which can only be direcly installed on Linux. This is not an accident, Docker is Linux-based, and depends on it. Luckily enough, there exists the [Docker Desktop](https://docs.docker.com/desktop/), which is a software suite that will install the Docker engine for you on any operating system (by installing a Linux VM and running docker in that). It also comes with a ton more stuff, like a gui and Docker-compose, but we won't touch those here. We only care about the engine and the CLI.
 
 During the installation process, you can use all default settings, and you can click "continue without logging in," as you don't need an account, either.
 
 #### Installing Docker Desktop on Windows.
 
-To install Docker Deskop on Windows, first things first, you're going to need to install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux), for which you need to [enable hardware virtualisation](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization) in your BIOS and Windows Control Panel. The supported versions are Windows 10 Home and Pro (22H2 or higher) and Windows 11 Home and Pro (21H2 or higher)
+To install Docker Deskop on Windows, first things first, you're going to need to install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux), for which you need to [enable hardware virtualisation](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization) in your BIOS and Windows Control Panel. The supported versions are Windows 10 Home and Pro (22H2 or higher) and Windows 11 Home and Pro (21H2 or higher) If WSL is not installed, docker will install, but it won't work.
 
 The full official installation guide can be found [at the Docker docs](https://docs.docker.com/desktop/install/windows-install/).
 
@@ -76,7 +76,7 @@ For this, clone the repository with `--config core.autocrlf=input`, and, if you'
 
 Alternatively, good code editors usually have a way to switch between CRLF and LF when editing files. In VSCode and Pycharm, it's on the bottom right.
 
-Alternatively alternatively, in `scripts`, there is a tool that does this, called `convert_line_endings.py`
+Alternatively alternatively, in `scripts`, there is a tool that does this, called `convert_line_endings.py`. In all provided dockerfiles in other examples, this is run automatically on your code, but if anything weird doesn't work and you are on Windows, checking the line endings is one of the first things you should try.
 
 Here is a small example, that installs ubuntu as a base, and then installs git on unbuntu:
 ```Dockerfile
@@ -88,7 +88,7 @@ FROM ubuntu:20.04
 #  * First, we update apt, to make sure we are installing the latest version of everything
 #  * Second, we are installing git
 #  * Third, we are removing some junk files that were created in the process.
-#    (You don'& have to bother about this third step)
+#    (You don't have to bother about this third step)
 RUN apt-get -y update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 ```
 
@@ -180,11 +180,11 @@ docker run -it my_first_container bash
 ```
 This will run the container in interactive mode with `-it` (Technically, it stands for something else, but don't bother about that), and it will launch a single command on startup: `bash`.
 
-Now, you are spawned inside a bash shell in your container. You can `apt-get install`, you can `cat`, `ls` and `cd` around the place, and do anything else you might want to do for troubleshooting.
+Now, you are spawned inside a bash shell in your container. You can `apt-get install`, you can `cat`, `ls` and `cd` around the place, and do anything else you might want to do for troubleshooting. This is the previously mentioned point where being good at a linux commandline really pays off. The more debugging you can do while in here, the less cumbersome working with containers is. To exit a container you started like this, type `exit` and hit enter.
 
 This is a general pattern for debugging docker containers. You remove everything that breaks, you build, and then run in interactive mode to troubleshoot what is going on.
 
-Similarly, for debugging, you might find yourself in a situarion where the requested ports are already occupied. This means that the container is already running.
+Similarly, for debugging, you might find yourself in a situation where the requested ports are already occupied. This means that the container is already running.
 
 To see all running docker containers type:
 ```sh
@@ -192,8 +192,8 @@ docker ps
 ```
 
 After that, you can shut down a container by typing:
-```
-docker container stop [container id]
+```sh
+docker container stop "container id"
 ```
 
 ---
@@ -215,3 +215,12 @@ docker run my_first_container "Hello World"
 ```
 
 As you can see, all arguments after the container name are passed to the entrypoint before running.
+
+---
+
+In `run.sh` / `run.ps1`, which are the scripts you'll use to start docker for the full project setup, we use a bunch more flags and things. These, you don't have to worry about. However, here is a quick summary of what they are, and how we use them:
+
+* `-v [host_path]:[container_path]` mount a volume. Basically, this allows you to have some directory on your own system to which the container can read and write. This is used such that you can save your results on your own system.
+* `-p [host_port]:[container_port]` Expose or link a TCP port from the container to your host. Used for talking with the robot.
+* `--rm` Remove any container of the same name that is already running.
+* `-t` Allocate a pseudo-TTY. Without it, some print functions from the container wouldn't show up on your own terminal when running.

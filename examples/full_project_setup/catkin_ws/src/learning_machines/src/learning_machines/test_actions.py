@@ -36,20 +36,20 @@ def test_phone_movement(rob: IRobobo):
     rob.set_phone_pan_blocking(20, 100)
     print("Phone pan after move to 20: ", rob.read_phone_pan())
     rob.set_phone_tilt_blocking(50, 100)
-    print("Phone tilt: ", rob.read_phone_tilt())
+    print("Phone tilt after move to 50: ", rob.read_phone_tilt())
 
 
 def test_sim(rob: SimulationRobobo):
-    print(rob.nr_food_collected())
     print(rob.get_sim_time())
     print(rob.is_running())
     rob.stop_simulation()
     print(rob.get_sim_time())
     print(rob.is_running())
     rob.play_simulation()
+    print(rob.get_sim_time())
 
 
-def dance(rob: IRobobo):
+def run_all_actions(rob: IRobobo):
     test_emotions(rob)
     test_sensors(rob)
     test_move_and_wheel_reset(rob)

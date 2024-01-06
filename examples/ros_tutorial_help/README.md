@@ -1,6 +1,6 @@
 # Basic ROS Docker setup
 
-For this course, it is not expected you learn what [ROS](https://www.ros.org/) (Robot Operating System) is or how to use it. However, we do use it in the backend, and you might end up hitting your head against words like `catkin_workspace`and `ros node`. If you are the kind of person who prefers knowing what they're doing over guessing and checking, you might prefer following an introductory tutorial on ROS. [This one, by Robotics Backend](https://www.youtube.com/playlist?list=PLLSegLrePWgIbIrA4iehUQ-impvIXdd9Q) is pretty good, and will be a good place to get yourself more familiar with the subject. You only need to get up to eposode 9. Episodes 10 and 11 deal with services, and we don't touch those anywhere in our codebase.
+For this course, it is not expected you learn what [ROS](https://www.ros.org/) (Robot Operating System) is or how to use it. However, we do use it in the backend, and you might end up hitting your head against words like `catkin_workspace`and `ros node`. If you are the kind of person who prefers knowing what they're doing over guessing and checking, you might prefer following an introductory tutorial on ROS. [This one, by Robotics Backend](https://www.youtube.com/playlist?list=PLLSegLrePWgIbIrA4iehUQ-impvIXdd9Q) is pretty good, and will be a good place to get yourself more familiar with the subject.
 
 This tutorial works by installing ROS noetic on a virtual machine of Ubuntu 20. However, for this course, we use Docker, meaning you might prefer following the tutorial in Docker as well. Little GUI things like `rqt_graph` and the turtle example won't work, but those are not necessairy. It is kind of sad you cannot run the turtle sim for episode 7, 8, and 9, but you can still follow those episodes, just without any visible result.
 
@@ -20,11 +20,11 @@ This will build / construct a container with the name (tag) `ros_tutorial`, from
 
 To then run it, and change into its shell, run:
 ```sh
-docker run --rm -it --net=host ros_tutorial bash
+docker run --rm -it ros_tutorial bash
 ```
-This will run the container called `ros_tutorial` (which we build in the previous step), and will use the network of your host computer (with `--net=host`) (this is in contrast to exposing only specific network adresses, which is the way Docker usually operates) it will remove / reset the container when it exits (`--rm`), and will run with an interactive `-i` mode (meaning that any input you put into your terminal gets redirected to the container) and it will display any output from the container in your shell as well, with `-t`. On startup, it will run the command `bash` to launch you into a shell.
+This will run the container called `ros_tutorial` (which we build in the previous step), it will remove / reset the container when it exits (`--rm`), it will run with an interactive `-i` mode (meaning that any input you put into your terminal gets redirected to the container), and it will display any output from the container in your shell as well, with `-t`. On startup, it will run the command `bash` to launch you into a shell.
 
-If you want to be able to do the GUI things anyway, you can run the following, presuming you are on Linux using X11:
+If you want to be able to do the GUI things anyway, you can run the following, presuming you are on Linux using X11 and have installed the Docker engine directly, not Docker Desktop:
 ```sh
 xhost + && docker run --rm -it --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --env="QT_X11_NO_MITSHM=1" ros_tutorial bash
 ```
@@ -32,9 +32,7 @@ xhost + && docker run --rm -it --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:
 
 Since this is a docker container, you need to re-build if you changed the Dockerfile or want to get updated version of any local files in `./catkin_ws`. Simply shutting down a docker container will delete all its contents, and re-running it will give you a clean new image like it was just built. To exit a container, type `exit`.
 
----
-
-Because we are using `--net=host` you can start up seperate docker containers for each of the ros nodes you want to run. You can `docker run` the container, and start up roscore in it, and then, in a different terminal, run `docker run` again and start a node there. This might not work on windows in some cases, however. For this, please view the help below.
+On Linux, because we are using `--net=host` you can start up seperate docker containers for each of the ros nodes you want to run. You can `docker run` the container, and start up roscore in it, and then, in a different terminal, run `docker run` again and start a node there. This doesn't work if you installed docker desktop, however. For this, please view the help below.
 
 ---
 

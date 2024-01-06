@@ -14,13 +14,15 @@ build it with:
 docker build --tag hardware_setup .
 ```
 
-run it with:
+run it with: 
 
 ```sh
 docker run --rm -it hardware_setup bash
 ```
 
 Make sure the system you are running the container on is on the exact same network as the phone (note, public networks like Eduroam won't work.), and observe the IP adress shown on the top left of your phone screen. The robobo UI has a problem where it sometimes cuts of too long IP adresses. You can scan for all active hosts on adresses using nmap (which you need to install as per your operating system). Simply enter all groups you can see, and then scan like so: `nmap -sn "192.168.0.*"` (Note that nmap is a pentesting tool and should be used responsibly.)
+
+Once you have the IP of your phone, you can run:
 
 ```sh
 curl http://[Adress shown on top left]:11311
@@ -86,7 +88,7 @@ You don't have to understand these `rostopic` commands, we won't use them for an
 After this, you should be able to run (again, commands you don't have to understand):
 
 ```sh
-rosservice call /robot/talk "text: {data: "Hello"}"
+rosservice call /robot/talk "text: {data: 'Hello'}"
 ```
 
 Which should make the text-to-speech of the robot say "hello".

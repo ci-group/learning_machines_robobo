@@ -2,67 +2,61 @@
 
 This is a small package that shows you how an ROS system is set up.
 
-The reason this is a seperate repository is such that you can look around and see the simplest version of each file. The end result of this package is the same as the chatter from Tutorial 2 from the ROS tutorial, only using the exact same structure as the larger project of this course. This example project has one publisher node, that publishes the string "Hello ROS" to the `/test/my_topic` topic, and one subscriber node that listens to that topic and logs anything posted on it. This string "Hello ROS" is exported from the main package, and is in message.py, standing in for a larger codebase.
+The reason this is a seperate repository is such that you can look around and see the simplest version of each file. The end result of this package is basically just a hello world. It prints the one argument you pass it trough the commandline, it then logs that, saves the log in a file, and saves "Hello!" to another file.
 
-If you haven't followed the `basic_ros_setup`, this code itself is not going to be easy to follow, but you should still read trough the documentation around it. What matters is not the code, it is the file structure and all that.
+If you haven't followed the `basic_ros_setup`, this thing is going to be a bit harder to follow, as you're new to the idea of a `catikin_ws` and all that. However, fear not, what you need to know will be explained.
 
 ### Running the code inside
 
-The funcionality of this package is a publisher and a subscriber node in ROS. You don't have to understand what that is. In fact, you don't have to run this code, and can instead jump to the structure explanation imediately. However, it might be smart to run it anyway, not to understand what all this does, but to get a feel for it. To run it, first build the docker image.
+To run, for the first time, you're not going to call docker yourself. Instead, there is a script under the `scripts/` directory, `run.sh` and `run.ps1`, that contains the commands you need to run. These are mostly there for convenience, as they are quite a mouthfull. Of course, to debug, you might still need to manually build and run, so you should still try to understand these commands, and know how to change them. They pass quite a few more flags than the commands from the docker tutorial, with all flags being `-t --rm -p 45100:45100 -p 45101:45101 -v ./results:/root/results`. You don't need to understand these, just know that, for interactive mode as per the docker tutorial, you can replace `-t` for `-it`, keeping all other arguments the same.
 
-As always when running docker, make sure the docker daemon is running before running any commands.
+This running script takes one argument: what to print / log, so calling it should just be as simple as `bash ./scripts/run.sh "hello"` or `.\scripts\run.ps1 "Hello"` This should print, log to file and to stdout, and save "Hello!" to `results/hello.txt` 
 
-```sh
-docker build --tag my_first_ros_package .
+Here is the sample output of what the output should look like:
+
+```
+bash ./scripts/run.sh hello
++ docker build --tag learning_machines .
+[+] Building 0.7s (18/18) FINISHED                        docker:default
+ => [internal] load build definition from Dockerfile                0.0s
+...
+ => => naming to docker.io/library/learning_machines                0.0s
++ docker run -t --rm -p 45100:45100 -p 45101:45101 -v ./results:/root/results learning_machines hello
+hello
+2024-01-06 19:01:55,090 [INFO] Started
+2024-01-06 19:01:55,090 [INFO] hello
+2024-01-06 19:01:55,090 [INFO] Finished
 ```
 
-After that, you can the containers. However, the containers won't start executing on their own. Instead, like the ROS tutorial, we are going to be entering the bash shell of the container to run some code in it. Because we need a publisher, subscriber, and a master node, we need to run three seperate docker containers, and run code in each of them.
+(Note: if you're wondering: you indeed don't need the `-p` for this tutorial, but it's needed for the full setup, so I included it here, too.)
 
-First, to run a container, run:
+## Project structure.
 
-```sh
-docker run --rm -it --net=host my_first_ros_package bash
-```
-
-After you have done this three times in three different shells, you'll have three seperate bash shells in seperate containers.
-
-In the first contianer, run the ROS master:
-```sh
-roscore
-```
-
-In the second, run the publisher:
-
-```sh
-rosrun my_first_package my_publisher.py
-```
-
-In the third, run the subscriber:
-
-```sh
-rosrun my_first_package my_subscriber.py
-```
-
-Now, observe that `my_subscriber` is printing stuff to the terminal that is being sent from `my_publisher`. 
-
-
-You only have to understand the basics of this example:
-This is the strucute (`tree -a --dirsfirst`)
+Everything here is structured as follows (`tree -a --dirsfirst`):
 ```
 ├── catkin_ws
 │   ├── src
-│   │   └── my_first_package
-│   │       ├── scripts
-│   │       │   ├── my_publisher.py
-│   │       │   └── my_subscriber.py
-│   │       ├── src
-│   │       │   └── my_first_package
-│   │       │       ├── __init__.py
-│   │       │       └── message.py
-│   │       ├── CMakeLists.txt
-│   │       ├── package.xml
-│   │       └── setup.py
+│   │   ├── my_first_package
+│   │   │   ├── scripts
+│   │   │   │   └── my_node.py
+│   │   │   ├── src
+│   │   │   │   └── my_first_package
+│   │   │   │       ├── example_process.py
+│   │   │   │       └── __init__.py
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── package.xml
+│   │   │   └── setup.py
+│   │   └── data_files
+│   │       └── ...
 │   └── .catkin_workspace
+├── results
+│   └── hello.txt
+├── scripts
+│   ├── convert_line_endings.py
+│   ├── entrypoint.bash
+│   ├── run.ps1
+│   ├── run.sh
+│   └── setup.bash
 ├── Dockerfile
 └── requirements.txt
 ```
@@ -84,16 +78,30 @@ Lastly, a few things are sourced into bashrc. This is to make sure that the shel
 ### catkin_ws
 This directory contains the catkin workspace. The full documentation on how this is supposed to be structured can be found [here](http://wiki.ros.org/catkin/workspaces), but you don't have to bother. It contains the directory `src`, in which all code will live, and an empty `.catkin_workspace` that is there because catkin works that way.
 
-In `src/` you'll find one package, named "my_first_package". In the actual code, there are multiple, but all of those follow the same structure. All code needs to be in a package. This is an *ROS package*, not jet a python package. Techincally speaking, this directory could have C++ code in it. 
+In `src/` you'll find a package named "my_first_package". This is the package you'll be writing your code in. There is anothier package, called `data_files`, that one is given for you. You can inspect it if you want, but you can use it as if it were a black box.
 
-In the root of the package, you'll find three files: `CMakeLists.txt`, `package.xml` and `setup.py`. These, you can completely forget. They are required to make this be a package, and that's all. The ROS tutorial explains a bit on how to use them. For example, you can add ROS dependencies and modules here, but all that is done for you already in the full example.
+When writing code for ROS, all code needs to be in a package. This is an *ROS package*, not jet a python package. Techincally speaking, this directory could have C++ code in it. 
 
-What matters more are the two directories: `scripts` and `src`. Everything in scripts is an executable: they should all be single files that call some code. The full example only needs one, likely you'll too. Just know this is where the place is of the code that is being called.
+In the root of `my_first_package`, you'll find three files: `CMakeLists.txt`, `package.xml` and `setup.py`. These, you can completely forget. They are required to make this be a package, and that's all. The ROS tutorial explains a bit on how to use them. For example, you can add ROS dependencies and modules here, but all that is done for you already in the full example.
 
-`src/` is finally our python package. I made it have the same name as the ROS package, because that is imo the only clean way to do it. Here, you can write any code you want like you would in any other python package, just remember to structure it with `__init__.py` files and all that. `setup.py` is installing this code as a proper python package, so hacks importing via relative filepaths and all that might not work. This package here can be imported in `scripts/` to actually run the code. 
+What matters more are the two directories: `scripts` and `src`. Everything in scripts is an executable: they should all be single files that call some code. We only need one, likely you'll too. Just know this is where the place is of the code that is actually being called by ROS.
+
+`src/` is finally our python package. I made it have the same name as the ROS package, because that is imo the only clean way to do it. Here, you can write any code you want like you would in any other python package, just remember to structure it with `__init__.py` files and all that. `setup.py` is installing this code as a proper python package, so hacks importing via relative filepaths and all that might not work. This package here can be imported in `scripts/` to actually run the code, but this is the place you should write it.
+
+
+### scripts
+
+The scripts derectory might be a bit cryptic at first, but you should by now be familair by all of one of these. The ones you should know are.
+* `run.sh` and `run.ps1` are the scripts we used eariler to start docker.
+* `setup.bash` you should already be familiar with from the `hardware_setup`. It's unused for this specific project (as we're only printing hello world), but it is the file that contains the IPs the project needs to be able to connect to the different devices, specifically the phone of the robobo and the ip of your own computer to find CoppeliaSim.
+* `convert_line_endings.py` is used to make sure that your files have the right line endings. The Dockerfile calls this for you, so this should not be something to worry about.
+
+Lastly, there is `entrypoint.bash`. This is the script that the docker container will actually call to run your code. We need this seperate bash script to make sure we have the entire envoirement ROS sets up available, including all packages we have installed. As you can see, it calls the `my_node.py` script from the `my_first_package` package with `rosrun`, passing trough any and all commandline arguments passed into itself (That's what `"$@"` does).
+
+### results
+
+Once you have run the code once, you'll find that the `./results` (relative to where you ran the project) is created. This is the directory you can save stuff too by importing `RESULT_DIR` and `FIGURES_DIR` from the `data_files` package. This is where your persistant files will live.
 
 ### References
 
-The subscriber and publisher node examples are taken from [The rospy docs](http://wiki.ros.org/rospy_tutorials/Tutorials/WritingPublisherSubscriber). See that page for further documentation on it.
-
-The general package structure is taken from [The Roboticks Back-End tutorial](https://roboticsbackend.com/ros-import-python-module-from-another-package/). See that page for further dockumentation on it.
+This general package template is taken from [The Roboticks Back-End tutorial](https://roboticsbackend.com/ros-import-python-module-from-another-package/). See that page for further dockumentation on it.
