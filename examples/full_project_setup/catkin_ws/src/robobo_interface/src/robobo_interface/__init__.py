@@ -5,6 +5,7 @@ from .datatypes import (
     LedId,
     Acceleration,
     Orientation,
+    Position,
     WheelPosition,
 )
 from .base import IRobobo
@@ -19,6 +20,7 @@ __all__ = (
     "LedId",
     "Acceleration",
     "Orientation",
+    "Position",
     "WheelPosition",
     "HardwareRobobo",
     "SimulationRobobo",

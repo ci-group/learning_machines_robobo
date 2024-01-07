@@ -5,4 +5,4 @@
 
 from .example_process import ExampleProcess
 
-__all__ = "ExampleProcess"
+__all__ = ("ExampleProcess",)
