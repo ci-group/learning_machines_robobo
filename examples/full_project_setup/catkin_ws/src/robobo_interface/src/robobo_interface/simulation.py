@@ -472,6 +472,22 @@ class SimulationRobobo(IRobobo):
         )
         return Position(*pos)
 
+    def set_position(self, position: Position, orientation: Orientation) -> None:
+        sim.simxSetObjectOrientation(
+            self._connection_id,
+            self._robobo,
+            -1,
+            [orientation.yaw, orientation.pitch, orientation.roll],
+            simConst.simx_opmode_blocking,
+        )
+        sim.simxSetObjectPosition(
+            self._connection_id,
+            self._robobo,
+            -1,
+            [position.x, position.y, position.z],
+            simConst.simx_opmode_blocking,
+        )
+
     def base_position(self) -> Position:
         """Get the position of the base to deliver food at.
 

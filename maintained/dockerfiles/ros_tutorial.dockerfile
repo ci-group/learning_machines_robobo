@@ -19,9 +19,6 @@ RUN apt-get -y update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /root/catkin_ws
 
 # This copies the local catkin_ws into the docker container, and then runs catkin_make on it.
-# The EOT creates a small inline bash script to execute. This is to allow setup.bash to run in the same shell,
-# which exports some global variables catkin_make needs to find the python packages.
-# (By default, Docker runs all RUN commands in seperately created shells)
 COPY ./catkin_ws .
 RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
