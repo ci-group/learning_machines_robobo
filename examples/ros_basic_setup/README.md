@@ -4,7 +4,7 @@ This is a small package that shows you how an ROS system is set up.
 
 The reason this is a separate repository is that you can look around and see the simplest version of each file. The result of this package is just a hello world. It prints the one argument you pass through the command line, it then logs that, saves the log in a file, and saves "Hello!" to another file.
 
-If you haven't followed the `basic_ros_setup`, this thing is going to be a bit harder to follow, as you're new to the idea of a `catikin_ws` and all that. However, fear not, what you need to know will be explained.
+If you haven't followed the [ros tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_tutorial_help), this thing is going to be a bit harder to follow, as you're new to the idea of a `catikin_ws` and all that. However, fear not, what you need to know will be explained.
 
 ### Running the code inside
 

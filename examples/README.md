@@ -34,26 +34,26 @@ If you've never used it before, it's going to be a similar experience to the fir
 
 Of course, this course won't require you to learn all of docker. We tried our absolute best to make sure you have to touch as little of it as possible, but every time you want to run your code you will do so by typing a docker command in the command-line.
 
-If you have never used Docker before, or have very little experience with it, you can check out the small tutorial on basic Docker usage that is in this examples directory. [[Basic Docker usage]]. This will also tell you what you need to have installed, and how to install that.
+If you have never used Docker before, or have very little experience with it, you can check out the small tutorial on basic Docker usage that is in this examples directory. [Docker Tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial). This will also tell you what you need to have installed, and how to install that.
 
 ### ROS
 
-For this course, we are using ROS. Again, you don't have to learn anything about it, but you might still find it pleasant to follow a small tutorial on it. There is a basic ROS setup in the examples directory that is meant to get you started. [[ROS tutorial help]]
+For this course, we are using ROS. Again, you don't have to learn anything about it, but you might still find it pleasant to follow a small tutorial on it. There is a basic ROS setup in the examples directory that is meant to get you started. [ROS tutorial help](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_tutorial_help)
 
 This is especially useful if you're not that good at programming jet, and aren't able to intuit what code does by relying on experience.
 
 ### Using the Robobo
 
-Getting the hardware running is not as easy as it might seem. There is a quick tutorial in the examples directory to get you started [[Getting the hardware running]]
+Getting the hardware running is not as easy as it might seem. There is a quick tutorial in the examples directory to get you started [Getting the hardware running](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup)
 
 ### Using CopellaSim.
 
-Getting CopellaSim running isn't trivial either. You know the deal, tutorial in examples. [[Setting up CopellaSim]]
+Getting CopellaSim running isn't trivial either. You know the deal, tutorial in examples. [Setting up CopellaSim](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial)
 
 ### Full project example
 
-Finally, we have reached the point where you can start working on the project. In the examples directory, there is a fully working project that has everything you need. [[Full project example]], this is the place you'll likely end up copy-pasting the most code from. In fact, I encourage you to copy-paste everything and use it as a template.
+Finally, we have reached the point where you can start working on the project. In the examples directory, there is a fully working project that has everything you need. [Full project example](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/full_project_setup), this is the place you'll likely end up copy-pasting the most code from. In fact, I encourage you to copy-paste everything and use it as a template.
 
 Just running this one will get you a basic project that makes the robot move around a bit, both in the simulation and with the actual hardware.
 
-You might (are going to) find the code in this example a bit overwhelming. At ros_basic_setup, there is a simpler version that doesn't do anything but does have the minimum required structure to run some code. Take a look through that one every time you are confused about what something in here does, or why it's there, especially when it comes to the shell scripts and other odd files.
+You might (are going to) find the code in this example a bit overwhelming. At [ros_basic_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup), there is a simpler version that doesn't do anything but does have the minimum required structure to run some code. Take a look through that one every time you are confused about what something in here does, or why it's there, especially when it comes to the shell scripts and other odd files.

@@ -1,6 +1,6 @@
 # Full project example
 
-This is the example you are expected to use as a project template. The structure is the same as `basic_ros_setup`, it contains the same dockerfile and some of the same scripts and packages, but it contains a lot more stuff on top of that. First of all, it contains the same `start_coppelia_sim` script as `coppelia_sim_tutorial`, meaning you should also copy-past CoppeliaSim to here, such that `./CoppeliaSim` exists. It also contains the `setup.bash` from `hardware_setup` that you should configure to have the `ROS_MASTER_URI`.
+This is the example you are expected to use as a project template. The structure is the same as [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup), it contains the same dockerfile and some of the same scripts and packages, but it contains a lot more stuff on top of that. First of all, it contains the same `start_coppelia_sim` script as [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), meaning you should also copy-past CoppeliaSim to here, such that `./CoppeliaSim` exists. It also contains the `setup.bash` from [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup) that you should configure to have the `ROS_MASTER_URI`.
 
 ### Running the code that is there
 
@@ -8,7 +8,7 @@ As you find it, this example is a fully working system. Currently, it contains a
 
 #### Running with hardware
 
-To run it with hardware, you have to set everything up in the same way as the `hardware_tutorial`, which is to say you have to confirm you're on the same (non-public) network with the phone and your laptop/desktop, and have to put the `ROS_MASTER_URI` (`http://[Adress shown on top left]:11311`) in `setup.bash`.
+To run it with hardware, you have to set everything up in the same way as the [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup), which is to say you have to confirm you're on the same (non-public) network with the phone and your laptop/desktop, and have to put the `ROS_MASTER_URI` (`http://[Adress shown on top left]:11311`) in `setup.bash`.
 
 After this, you can run with the flag `--hardware`. If you did everything correctly, you'll then see the robot move around and do a bunch of stuff.
 
@@ -22,7 +22,7 @@ bash ./scripts/run.sh --hardware
 
 #### Running with simulation
 
-To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim`. After that, you have to update `setup.bash` again, this time updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
+To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash` again, this time updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
 
 To get your own IP address, you have to run `Get-NetIPAddress` on Windows PowerShell, but this gives you a bunch of extra stuff. To get _only_ your IP address, you can run:
 
@@ -119,11 +119,11 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 └── requirements.txt
 ```
 
-All the scripts in `./script` should be familiar, with the `convert_line_endings.py` from the docker tutorial, `start_coppelia_sim.*` from the CoppeliaSim tutorial, the `entrypoint.bash` explained in the `basic_ros_setup` tutorial and the `setup.bash` and `run.*` from that same tutorial you used to run the code. `results/` should also be familiar to you, it is the exact same as it was in `basic_ros_setup`.
+All the scripts in `./script` should be familiar, with the `convert_line_endings.py` from the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial), `start_coppelia_sim.*` from the [CoppeliaSim tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), the `entrypoint.bash` explained in the [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup) tutorial and the `setup.bash` and `run.*` from that same tutorial you used to run the code. `results/` should also be familiar to you, it is the exact same as it was in `basic_ros_setup`.
 
 The scenes and models are kind of new. You'll be familiar with the concept of them from the CoppeliaSim tutorial, but there are more of them now. The new different ones each are for the different assignments of this course. You can look around in them if you want.
 
-The many packages in `catkin_ws` will be unfamiliar, however. In `basic_ros_setup` you saw one or two, but, now, there are a ton more. First of all, I should tell you that for most of these, you don't have to open them or understand them at all. They just exist. The two you should pay attention to are `robobo_interface` and `learning_machines`.
+The many packages in `catkin_ws` will be unfamiliar, however. In [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup) you saw one or two, but, now, there are a ton more. First of all, I should tell you that for most of these, you don't have to open them or understand them at all. They just exist. The two you should pay attention to are `robobo_interface` and `learning_machines`.
 
 `learning_machines` is the package you are expected to work in. You'll end up removing all the code that is there in favor of the stuff you need for the assignments. Currently, it contains the code needed for the little movement you saw when running the code, which you can remove when working on the project.
 

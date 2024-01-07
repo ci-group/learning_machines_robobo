@@ -2,7 +2,7 @@
 
 This is the GitHub repository for the Learning Machines course.
 
-If you're a student, everything you need for the course itself is in the [[examples]] directory. It contains all the documentation and code you need. Just clone this repository, cd into examples, and start at that readme, which will guide you through the whole thing.
+If you're a student, everything you need for the course itself is in the [examples](https://github.com/ci-group/learning_machines_robobo/tree/master/examples) directory. It contains all the documentation and code you need. Just clone this repository, cd into examples, and start at that readme, which will guide you through the whole thing.
 
 ### There is an issue / bug with the code.
 
