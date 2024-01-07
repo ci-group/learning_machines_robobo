@@ -1,3 +1,6 @@
+import cv2
+
+from data_files import FIGRURES_DIR
 from robobo_interface import (
     IRobobo,
     Emotion,
@@ -25,7 +28,8 @@ def test_move_and_wheel_reset(rob: IRobobo):
 
 def test_sensors(rob: IRobobo):
     print("IRS data: ", rob.read_irs())
-    print("Image data: ", rob.get_image_front())
+    image = rob.get_image_front()
+    cv2.imwrite(str(FIGRURES_DIR / "photo.png"), image)
     print("Phone pan: ", rob.read_phone_pan())
     print("Phone tilt: ", rob.read_phone_tilt())
     print("Current acceleration: ", rob.read_accel())

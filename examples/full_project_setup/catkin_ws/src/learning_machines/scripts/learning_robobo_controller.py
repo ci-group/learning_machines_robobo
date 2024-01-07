@@ -10,7 +10,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         raise ValueError(
             """To run, we need to know if we are running on hardware of simulation
-                         Pass `--hardware` or `--simulation` to specify."""
+            Pass `--hardware` or `--simulation` to specify."""
         )
     elif sys.argv[1] == "--hardware":
         rob = HardwareRobobo(camera=True)

@@ -21,11 +21,6 @@ RUN python3 -m pip install -r /requirements.txt && rm /requirements.txt
 WORKDIR /root/catkin_ws
 
 # This copies the local catkin_ws into the docker container, and then runs catkin_make on it.
-# The EOT creates a small inline bash script to execute. This is to allow setup.bash to run in the same shell,
-# which exports some global variables catkin_make needs to find the python packages.
-# (By default, Docker runs all RUN commands in seperately created shells)
-# Note: This fails on Windows \r\n line endings. Make sure your files have Unix \n line endings.
-# See more about this in the Docker Tutorial
 COPY ./catkin_ws .
 RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
