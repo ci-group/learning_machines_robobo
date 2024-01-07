@@ -47,13 +47,20 @@ def test_sim(rob: SimulationRobobo):
     print(rob.is_running())
     rob.play_simulation()
     print(rob.get_sim_time())
+    print(rob.position())
 
 
 def run_all_actions(rob: IRobobo):
+    if isinstance(rob, SimulationRobobo):
+        rob.play_simulation()
     test_emotions(rob)
     test_sensors(rob)
     test_move_and_wheel_reset(rob)
     if isinstance(rob, SimulationRobobo):
         test_sim(rob)
+        rob.set_realtime()
 
     test_phone_movement(rob)
+
+    if isinstance(rob, SimulationRobobo):
+        rob.stop_simulation()

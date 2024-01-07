@@ -74,6 +74,15 @@ class Acceleration:
 
 
 @dataclass
+class Position:
+    """A basic 3d vector to represent a position"""
+
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+
+
+@dataclass
 class Orientation:
     """Orientation in Yaw, Pitch, Roll"""
 
