@@ -104,6 +104,12 @@ class HardwareRobobo(IRobobo):
 
     It is for this reason it is recommended to only use the `_blocking` functions of the robot,
     which are inherited from the IRobobo in the format of a template method.
+
+    However, if you want the robot to move the tilt motor while also driving and such,
+    you can still experiment with them.
+
+    Arguments:
+    camera: bool = False -> Wether to initialise the camera (this makes it slower)
     """
 
     def __init__(self, camera=False) -> None:
@@ -190,7 +196,7 @@ class HardwareRobobo(IRobobo):
         right_speed: int,
         millis: int,
         blockid: Optional[int] = None,
-    ) -> None:
+    ) -> int:
         """Move the robot wheels for `millis` time
 
         Arguments
@@ -200,6 +206,9 @@ class HardwareRobobo(IRobobo):
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
         if blockid in self._used_pids:
             raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
@@ -208,6 +217,7 @@ class HardwareRobobo(IRobobo):
         self._move_srv(
             Int8(left_speed), Int8(right_speed), Int32(millis), Int16(blockid)
         )
+        return blockid
 
     def reset_wheels(self) -> None:
         """Allows to reset the wheel encoder positions to 0.
@@ -266,7 +276,7 @@ class HardwareRobobo(IRobobo):
 
     def set_phone_pan(
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
-    ) -> None:
+    ) -> int:
         """Command the robot to move the smartphone holder in the horizontal (pan) axis.
 
         Notice that the robot, especially on high speeds, doesn't always run perfectly
@@ -279,6 +289,9 @@ class HardwareRobobo(IRobobo):
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
         if blockid in self._used_pids:
             raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
@@ -292,6 +305,7 @@ class HardwareRobobo(IRobobo):
             Int8(0),
             Int16(0),
         )
+        return blockid
 
     def read_phone_pan(self) -> int:
         """Get the current pan of the phone. Range: 0-100
@@ -303,7 +317,7 @@ class HardwareRobobo(IRobobo):
 
     def set_phone_tilt(
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
-    ) -> None:
+    ) -> int:
         """Command the robot to move the smartphone holder in the vertical (tilt) axis.
         This function is asyncronous.
 
@@ -313,6 +327,9 @@ class HardwareRobobo(IRobobo):
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
         if blockid in self._used_pids:
             raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
@@ -326,6 +343,7 @@ class HardwareRobobo(IRobobo):
             Int8(tilt_speed),
             Int16(blockid),
         )
+        return blockid
 
     def read_phone_tilt(self) -> int:
         """Get the current tilt of the phone. Range: 26-109
@@ -354,24 +372,6 @@ class HardwareRobobo(IRobobo):
         """
         rospy.sleep(seconds)
 
-    def perform_blocking(self, f: Callable[[int], None]) -> None:
-        """Perform a function in a blocking manner.
-        Which is to say, only return once the action is completed.
-        Usefull for all functions that take a blockid argument.
-
-        To call this with a function, use partually applied versions. Pass all arguments
-        except the blockid, which will be provided by this function.
-        example:
-        `rob.perform_blocking(functools.partial(rob.move, 10, 100, 250))`
-
-        Arguments:
-        f: Callable[[int], None]. Some function to call.
-        """
-        blockid = self._first_unblocked()
-        f(blockid)
-        while blockid in self._used_pids:
-            self.sleep(0.002)
-
     def is_blocked(self, blockid: int) -> bool:
         """See if the robot is currently "blocked", which is to say, performing an action
 
@@ -384,9 +384,6 @@ class HardwareRobobo(IRobobo):
         """Block untill (e.g. only return once) all blocking actions are completed"""
         while len(self._used_pids):
             self.sleep(0.002)
-
-    def _first_unblocked(self) -> int:
-        return min(set(range(1, 768)) - self._used_pids)
 
     def _irs_callback(self, ros_data: IRs) -> None:
         self._irs_values = [

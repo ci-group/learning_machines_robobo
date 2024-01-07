@@ -16,7 +16,7 @@ function sysCall_actuation()
         if (sim.getSimulationTime() - t_inicial) >= d then
             sim.setJointTargetVelocity(motorI, 0)
             sim.setJointTargetVelocity(motorD, 0)
-            sim.setInt32Signal("Bloqueado", 0)
+            sim.setInt32Signal(signal, 0)
             d = 0
             vI = 0
             vD = 0
@@ -27,7 +27,8 @@ end
 moveWheelsByTime = function(velocidad, tiempo, inString, inBuffer) -- "velocidad" es un vector de dos elementos: velocidades de la rueda derecha e izquierda
     d = tiempo[1] -- Definicion de una variable que guarda el tiempo que se moveran las ruedas
     t_inicial = sim.getSimulationTime() -- Definicion de una variable que guarda el instante en el que se llama a la funcion
-    sim.setInt32Signal("Bloqueado", 1) -- Definicion de una variable global que bloquea la funcion (1) o la desbloquea (0)
+    signal = inString[1]
+    sim.setInt32Signal(signal, 1) -- Definicion de una variable global que bloquea la funcion (1) o la desbloquea (0)
     -- Se asegura que los argumentos de velocidad recibidos tienen un valor entre -100 y 100
     if velocidad[2] > 100 then
         vI = 100

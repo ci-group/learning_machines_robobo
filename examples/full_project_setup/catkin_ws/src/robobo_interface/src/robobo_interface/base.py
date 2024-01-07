@@ -12,6 +12,7 @@ from robobo_interface.datatypes import (
     WheelPosition,
     SoundEmotion,
 )
+from robobo_interface.utils import LockedSet
 
 from typing import List, Optional, Callable
 from numpy.typing import NDArray
@@ -29,6 +30,8 @@ class IRobobo(ABC):
     All of these have sister methods that end in `_blocking` instead.
     This will prevent you from doing simulatanious tasks, but decrease complexity.
     """
+
+    _used_pids: LockedSet[int]
 
     @abstractmethod
     def __init__(self, *args, **kwargs) -> None:
@@ -50,7 +53,7 @@ class IRobobo(ABC):
         right_speed: int,
         millis: int,
         blockid: Optional[int] = None,
-    ) -> None:
+    ) -> int:
         """Move the robot wheels for `millis` time
 
         Arguments
@@ -60,6 +63,9 @@ class IRobobo(ABC):
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
         ...
 
@@ -132,7 +138,7 @@ class IRobobo(ABC):
     @abstractmethod
     def set_phone_pan(
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
-    ) -> None:
+    ) -> int:
         """Command the robot to move the smartphone holder in the horizontal (pan) axis.
         This function is asyncronous.
 
@@ -142,6 +148,9 @@ class IRobobo(ABC):
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
         ...
 
@@ -165,7 +174,7 @@ class IRobobo(ABC):
     @abstractmethod
     def set_phone_tilt(
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
-    ) -> None:
+    ) -> int:
         """Command the robot to move the smartphone holder in the vertical (tilt) axis.
         This function is asyncronous.
 
@@ -175,6 +184,9 @@ class IRobobo(ABC):
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
         ...
 
@@ -218,8 +230,7 @@ class IRobobo(ABC):
         """
         ...
 
-    @abstractmethod
-    def perform_blocking(self, f: Callable[[int], None]) -> None:
+    def perform_blocking(self, f: Callable[[], int]) -> None:
         """Perform a function in a blocking manner.
         Which is to say, only return once the action is completed.
         Usefull for all functions that take a blockid argument.
@@ -232,7 +243,9 @@ class IRobobo(ABC):
         Arguments:
         f: Callable[[int], None]. Some function to call.
         """
-        ...
+        blockid = f()
+        while self.is_blocked(blockid):
+            self.sleep(0.002)
 
     @abstractmethod
     def is_blocked(self, blockid: int) -> bool:
@@ -247,3 +260,7 @@ class IRobobo(ABC):
     def block(self) -> None:
         """Block untill (only return once) all blocking actions are completed"""
         ...
+
+    def _first_unblocked(self) -> int:
+        """Get the first available blockid"""
+        return min(set(range(1, 768)) - self._used_pids)

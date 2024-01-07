@@ -11,9 +11,9 @@ function sysCall_actuation()
     if v > 0 then
         posicion_actual = sim.getJointPosition(motor) * 180 / math.pi + 70
         -- Cuando la diferencia entre la posicion objetivo y la actual sea menor a 2 se detiene la articulacion y se resetean las variables globales
-        if (posicion_objetivo - posicion_actual) * parametro < 0 then
+        if (posicion_objetivo - posicion_actual) * parametro < 1 then
             sim.setJointTargetVelocity(motor, 0)
-            sim.setInt32Signal("Bloqueado", 0)
+            sim.setInt32Signal(signal, 0)
             sim.setObjectInt32Param(motor, sim.jointintparam_ctrl_enabled, 1)
             sim.setJointTargetPosition(motor, (posicion_actual - 70) * math.pi / 180)
             v = 0
@@ -38,7 +38,8 @@ moveTiltTo = function(parametros, inFloat, inString, inBuffer) -- "parametros" e
         v = parametros[2]
     end
     if v > 0 then
-        sim.setInt32Signal("Bloqueado", 1) -- Definicion de una variable global que bloquea la funcion (1) o la desbloquea (0)
+        signal = inString[1]
+        sim.setInt32Signal(signal, 1) -- Definicion de una variable global que bloquea la funcion (1) o la desbloquea (0)
         posicion_inicial = math.floor(sim.getJointPosition(motor) * 180 / math.pi + 70) -- Posicion del tilt en el momento de la llamada a la funcion
         -- Comparacion de la posicion objetivo del tilt con la posicion inicial y asignacion del sentido de giro de la articulacion
         if posicion_objetivo > posicion_inicial then

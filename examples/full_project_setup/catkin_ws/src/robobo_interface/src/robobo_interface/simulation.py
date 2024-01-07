@@ -17,10 +17,12 @@ from robobo_interface.datatypes import (
     WheelPosition,
     SoundEmotion,
 )
+from robobo_interface.utils import LockedSet
+
 from coppelia_sim import sim, simConst, ping
 from coppelia_sim.error import CoppeliaSimApiError
 
-from typing import List, Optional, Callable
+from typing import List, Optional
 from numpy.typing import NDArray
 
 
@@ -30,12 +32,16 @@ class SimulationRobobo(IRobobo):
     The simulation needs to be running for the init to be callable
     (as, otherwise, the api server is not running)
 
-    A few functions take blockid. When they do, they are not blocking.
-    However, the simulator does not work with ids, and, therefore, this argument is always ignored.
+    A few functions take blockid. When they do, they are not blocking. If you call
+    these while the action is still blocked with a new blockid
+    stuff might go seriously wrong, and the robot might halt indefinetly.
 
     Since the behavior of non-blocking functions is different from Simulation to Hardware,
     it is recommended to only use the `_blocking` functions of the robot,
     which are inherited from the IRobobo in the format of a template method.
+
+    However, if you want the robot to move the tilt motor while also driving and such,
+    you can still experiment with them.
 
     Arguments:
     realtime: bool = False -> Wether to run the simulation in realtime, or as fast as possible
@@ -44,6 +50,7 @@ class SimulationRobobo(IRobobo):
     """
 
     def __init__(self, realtime=False, identifier: int = 0):
+        self._used_pids: LockedSet[int] = LockedSet()
         self._identifier = f"[{identifier}]"
 
         sim.simxFinish(-1)  # just in case, close all opened connections
@@ -88,15 +95,24 @@ class SimulationRobobo(IRobobo):
         right_speed: int,
         millis: int,
         blockid: Optional[int] = None,
-    ) -> None:
+    ) -> int:
         """Move the robot wheels for `millis` time
 
         Arguments
         left_speed: speed of the left wheel. Range: 0-100
         right_speed: speed of the right wheel. Range: 0-100
         millis: how many millisecond to move the robot
-        blockid: ignored, but implied unblocked.
+        blockid: A unique blockid to test if the robot is still perfoming the action.
+            If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
+        if blockid in self._used_pids:
+            raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
+        blockid = blockid if blockid is not None else self._first_unblocked()
+        self._used_pids.add(blockid)
+
         sim.simxCallScriptFunction(
             self._connection_id,
             f"/Robobo{self._identifier}/Left_Motor",
@@ -104,10 +120,12 @@ class SimulationRobobo(IRobobo):
             "moveWheelsByTime",
             [left_speed, right_speed],
             [millis / 1000.0],
-            [],
+            [self._block_string(blockid)],
             bytearray(),
             sim.simx_opmode_blocking,
         )
+
+        return blockid
 
     def reset_wheels(self) -> None:
         """Allows to reset the wheel encoder positions to 0.
@@ -211,15 +229,24 @@ class SimulationRobobo(IRobobo):
 
     def set_phone_pan(
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
-    ) -> None:
+    ) -> int:
         """Command the robot to move the smartphone holder in the horizontal (pan) axis.
         This function is asyncronous.
 
         Arguments
         pan_position: Angle to position the pan at. Range: 11-343.
         pan_speed: Movement speed for the pan mechanism. Range: 0-100.
-        blockid: ignored, but implied unblocked.
+        blockid: A unique blockid to test if the robot is still perfoming the action.
+            If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
+        if blockid in self._used_pids:
+            raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
+        blockid = blockid if blockid is not None else self._first_unblocked()
+        self._used_pids.add(blockid)
+
         sim.simxCallScriptFunction(
             self._connection_id,
             f"/Robobo{self._identifier}/Pan_Motor",
@@ -227,10 +254,12 @@ class SimulationRobobo(IRobobo):
             "movePanTo",
             [pan_position, pan_speed],
             [],
-            [],
+            [self._block_string(blockid)],
             bytearray(),
             sim.simx_opmode_blocking,
         )
+
+        return blockid
 
     def read_phone_pan(self) -> int:
         """Get the current pan of the phone. Range: 0-100"""
@@ -250,15 +279,24 @@ class SimulationRobobo(IRobobo):
 
     def set_phone_tilt(
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
-    ) -> None:
+    ) -> int:
         """Command the robot to move the smartphone holder in the vertical (tilt) axis.
         This function is asyncronous.
 
         Arguments
         tilt_position: Angle to position the tilt at. Range: 26-109.
         tilt_speed: Movement speed for the tilt mechanism. Range: 0-100.
-        blockid: ignored, but implied unblocked.
+        blockid: A unique blockid to test if the robot is still perfoming the action.
+            If None is passed, a random available blockid is chosen.
+
+        returns:
+            the blockid
         """
+        if blockid in self._used_pids:
+            raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
+        blockid = blockid if blockid is not None else self._first_unblocked()
+        self._used_pids.add(blockid)
+
         sim.simxCallScriptFunction(
             self._connection_id,
             f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor",
@@ -266,10 +304,12 @@ class SimulationRobobo(IRobobo):
             "moveTiltTo",
             [tilt_position, tilt_speed],
             [],
-            [],
+            [self._block_string(blockid)],
             bytearray(),
             sim.simx_opmode_blocking,
         )
+
+        return blockid
 
     def read_phone_tilt(self) -> int:
         """Get the current tilt of the phone. Range: 26-109"""
@@ -344,23 +384,6 @@ class SimulationRobobo(IRobobo):
         while self.get_sim_time() - start_time < duration:
             time.sleep(0.02)
 
-    def perform_blocking(self, f: Callable[[int], None]) -> None:
-        """Perform a function in a blocking manner.
-        Which is to say, only return once the action is completed.
-        Usefull for all functions that take a blockid argument.
-
-        To call this with a function, use partually applied versions. Pass all arguments
-        except the blockid, which will be provided by this function.
-        example:
-        `rob.perform_blocking(functools.partial(rob.move, 10, 100, 250))`
-
-        Arguments:
-        f: Callable[[int], None]. Some function to call.
-        """
-        # CoppeliaSim ignores blockids - 0 is just there to make the types check out.
-        f(0)
-        self.block()
-
     def is_blocked(self, blockid: int) -> bool:
         """See if the robot is currently "blocked", which is to say, performing an action
 
@@ -368,13 +391,20 @@ class SimulationRobobo(IRobobo):
         blockid: the id to check
         """
         res = sim.simxGetInt32Signal(
-            self._connection_id, "Bloqueado", sim.simx_opmode_blocking
+            self._connection_id,
+            self._block_string(blockid),
+            sim.simx_opmode_blocking,
         )
-        return bool(res)
+        if res == 0:
+            self._used_pids.discard(blockid)
+            return False
+        else:
+            self._used_pids.add(blockid)
+            return True
 
     def block(self):
         """Block untill (only return once) all blocking actions are completed"""
-        while self.is_blocked(0):
+        while any(self.is_blocked(blockid) for blockid in self._used_pids):
             time.sleep(0.02)
         ping.ping(self._connection_id)
 
@@ -466,6 +496,12 @@ class SimulationRobobo(IRobobo):
             self._connection_id, self._base, simConst.simx_opmode_buffer
         )
         return detection and what == self._base
+
+    def _block_string(self, blockid: int) -> str:
+        """Return some unique string based on the identifier and the blockid
+        to make sure they don't overlap
+        """
+        return f"Block_{self._identifier}_{blockid}"
 
     def _initialise_handles(self) -> None:
         self._robobo = sim.simxGetObjectHandle(
