@@ -1,91 +1,24 @@
-# ROS ROBOBO FOR LEARNING MACHINES
+# Learning Machines Robobo
 
-Note, if you feel like not using this path but installing directly on your system, you are free to do it, but you are on your own.
+This is the github repository for the Learning machines course.
 
-## Download/Install requirements
-Here are the instructions to have the simulation system running.
+If you're a student, everything you need for the course itself is in the [[examples]] directory. It contains all documentation and code you need. Just clone this repository, cd into examples, and start at that readme, which will guide you trough the whole thing.
 
-- Download VREP from [here](http://coppeliarobotics.com/previousVersions), V-REP PRO EDU V3.5.0 rev4
-  - extract folder anywhere, where you preferer
-  - make sure you have the the version 3.5, other versions may not work properly
+### There is an issue / bug with the code.
 
-- Download `Robobo_Scene.ttt` and `Robobo_Model.ttm` files and place them inside your VREP folder
-  - place `Robobo_Scene.ttt` file in `VREP/scenes`
-  - place `Robobo_Model.ttm` file in `VREP/models/robots/mobile`
+If you find a problem with the code, please create an issue [here](https://github.com/ci-group/learning_machines_robobo/issues) on the github repository. For this, please make sure you include these three things:
+* Some example code with instructions how to run and include it. This should preferably be a minimum failing example, just linking to your entire assignment won't cut it. You might think this is a lot of extra work, but the amount of times I personally found a bug in my own code by trying to contstruct an example like this is staggering. It's a really good test to make sure that what you think is happening is actually what is happening. Also, it helps whoever wants to fix it understand what is going wrong.
+* The behavior you would expect from this minimum failing example. No "it should work," be specific in what output you expect.
+* The actual behavior you observed, and that anyone can observe by running the example code you provided. Here, also provide the platform you ran it under, in case it cannot be reproduced.
 
-- Download docker
-  - Linux: download from your package manager
-  - OsX: register and download from [here](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
-  - Windows PRO: register and download from [here](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
-  - Windows HOME: register and download from [here](https://docs.docker.com/toolbox/toolbox_install_windows/)
+## Contributing / maintaining
 
-- Download git + Editor
+If you are working on the project, you should notice that all code you write yourself should be in `maintained/`. All code in the examples is automatically generated (or, well, copied over) from there. This architecture is quite weird, but I couldn't find a better option. Because everything is ROS, it is hard to distrubute the individual packages without having to teach students on how to install ROS packages, making the code too much of a black box. Alternatively, having only one template (e.g. only `full_project_setup`), which is what was here before, has issues with documentation, as that makes it quite a large project to just dump students into. With the way it currently is, everything is in one place while maintaining, but students can still cd from example to example to explore the codebase.
 
-- Download [repository](https://github.com/ci-group/learning_machines_robobo)
-  ```
-  git clone https://github.com/ci-group/learning_machines_robobo.git
-  ```
+To work on the project, first, `cd` into maintained. Here, you can edit the code and test it. Once you are confident it is good, you can type `python3 ./build.py`, this will copy all files over to the right examples. If you created new scripts or catkin packages, this build script is also where to make the needed changes to always copy over the files to the apropriate examples. The build script will ask for confirmation for every file it wants to delete. If you're confident everything is backed up, you can just run it like `yes | python3 ./build.py` to answer yes to all prompts.
 
-## Running
-Now you downloaded everything, you can start the environment
+After you have built, it is important to go trough the READMEs in the examples, and assert all of them are still correct.
 
-- Start docker
-  - Linux/systemd: start docker daemon
-  - OsX/Windows: open docker app
+If you changed anything with the docker setup or run scripts it is important to test everything under Linux (X11), Windows and MacOS before pushing to master, making sure the behavior is consistant.
 
-- Start docker container (this will open a terminal with python and all required libraries installed). This step could take a while, since first your computer will download the docker image from the internet, secondly will compile some stuff from your project folder.
-  - Linux/OsX, open a terminal in the **learning_machines_robobo** project folder and type:
-    ```
-    ./start-docker.sh
-    ```
-  - Windows, open CMD and change directory to the&nbsp;<strong>learning_machines_robobo</strong> project folder, and type:
-    ```
-    start-docker.bat
-    ```
-
-- Start VREP
-  - open the program
-  - open the scene file that you downloaded before: Robobo_Scene.ttt
-  - enable Real Time button (optional)
-  - start the simulation with the play button
-  
-- Run the script
-  - inside the docker container running, type
-  ```
-  ./src/send_commands.py
-  ```
-
-- Change the script, experiment and HAVE FUN :D
-
-# Windows HOME + Docker Toolbox
-If you are having problems with Windows HOME, follow this guide it may fix your issues
-
-You need to change the file `start-docker.bat` changing from
-```bat
-SET project_folder=%~dp0
-
-docker run --rm -it -v %project_folder%:/root/projects --net=host cigroup/learning-machines bash
-```
-to
-```bat
-SET project_folder=/c/Users/YourUser/path/to/learning_machines_robobo
-
-docker run --rm -it -v %project_folder%:/root/projects --net=host cigroup/learning-machines bash
-```
-where your project is in the folder `C:\Users\YourUser\path\to\learning_machines_robobo`. Change this variable accordingly to your own username and path to the project folder. You cannot use folders outside `C:\Users\` and remember to change all backslasesh (`\`) to forward slashes (`/`).
-
-# Informations to run this project alternatevely
-
-## Setup (with ros image)
-
-- start docker with `docker run --rm -it -v "${PROJECT_FOLDER}:/root/projects/" --net=host cigroup/learning-machines bash`
-- change folder to `/root/projects/` (inside docker)
-- run `catkin_make install` (only run for the first setup, it's not needed even across different docker containers)
-- run `source devel/setup.bash`
-- run `src/send_commands.py` command to test the connection
-
-### Important Notes
-
-The environment variable `ROS_MASTER_URI` idendifies where the ROS MASTER NODE is running. Verify that your phone is in "Local ROS Master" and adjust the IP of the `ROS_MASTER_URI` variable with the address of the phone (visible at the first page of the application).
-
-The library we provide is already taking care of this enviroment variable, but in case you encouter any problems you know where to look for.
+If you changed the lua scripts, make sure to update all affected models and scenes to match. This is quite tedious, and if you find a way to automate it, please let me know.
