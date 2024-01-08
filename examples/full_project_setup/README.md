@@ -134,3 +134,19 @@ The many packages in `catkin_ws` will be unfamiliar, however. In [basic_ros_setu
 - `base.py` contains an interface (or, technically, a template method pattern, but who cares), `IRobobo` to abstract over hardware and software. You'll find abstract definitions of all functions that are on both the hardware and the software and a few template methods like `move_blocking` that work for both with a generic implementation. These are all the functions that work for both hardware and software, and so, these are the functions you should use when training your robot, to make sure that, at least in theory, the behavior of your real Robobo will be similar to the one in the simulation.
 
 If you understood all this, you know everything you should know, and can now get actually finally started with the course itself.
+
+### Troubleshooting
+
+- My smartphone does not connect to the wifi or has a limited connection -> try to update the date/time of the phone.
+- My phone’s Bluetooth keeps disconnecting from the Robobo -> this indeed sometimes happens. Maybe you can make a script to deal with it.
+- My script keeps trying to connect to the physical Robobo, but nothing happens -> check if the `ROS_MASTER_URI` in `scripts/setup.bash` matches your phone’s current/updated IP address.
+- The infrared sensors of my Robobo keep constantly receiving info, even though nothing is touching it -> they may be broken. Get a new Robobo with your supervisor
+- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, usually starting with 192.168, following RFC1918
+
+```ps1
+(Get-NetIPAddress | Where-Object { $_.AddressState -eq "Preferred" -and $_.ValidLifetime -lt "24:00:00" }).IPAddress
+```
+
+```sh
+hostname -I | awk '{print $1}'
+```
