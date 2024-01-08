@@ -6,21 +6,21 @@ First, download the edu version of CoppeliaSim from their [website](https://www.
 
 One thing to note when running on Linux is that there have previously been unexpected issues with the program when running on Wayland. Exactly why this is the case, we don't know. But, on Debian KDE with Wayland, it doesn't start at all, and on Fedora Gnome with Wayland, it randomly crashes every now and then. If you experience weird issues, consider switching to X11.
 
-On Linux/Windows after it is all downloaded, you will find yourself with a zip file. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so you should extract this to a location where you think you'll have access to it from the command line. You should extract this to `./CoppeliaSim` such that the commands below work. This exact path is required because some startup scripts, later on, rely on it being in this location.
+On Linux and Windows after it is all downloaded, you will find yourself with a zip file. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so we are going to extract it to a location we have access to it from the terminal, specifically `./CoppeliaSim` such that you can run the exact same commands as the ones in this README. This exact path is also required because some startup scripts, later on, rely on it being in this location.
 
 On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the relevant directory so the commands below work.
 
 By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the command line):
 
 ```sh
-# This one should usually work.
-./CoppeliaSim/coppeliaSim
-
-# Or, on Windows:
+# On Windows:
 ./CoppeliaSim/coppeliaSim.exe
 
 # Or, on MacOS:
 ./coppeliaSim.app/Contents/MacOS/coppeliaSim
+
+# This one should usually work on Linux.
+./CoppeliaSim/coppeliaSim
 
 # You might need to instead run the shell script that launches this executable.
 # This fixes some unexplained issues sometimes:
@@ -37,17 +37,17 @@ If you want to make sure you installed things correctly, the first thing to run 
 ./CoppeliaSim/libLoadErrorCheck.sh
 ```
 
-For this course, we are accessing this simulator from Python code, meaning we need to open a TCP port to connect to. For this, we start CoppeliaSim with the `-gREMOTEAPISERVERSERVICE_19999_FALSE_TRUE` flag. You don't have to remember this, you'll find `./scripts/start_coppelia_sim.sh` (and `".zsh`, `".ps1`), which starts the program with this flag, too.
+For this course, we are accessing this simulator from Python code, meaning we need to open a TCP port to connect to. For this, we start CoppeliaSim with the `-gREMOTEAPISERVERSERVICE_19999_FALSE_TRUE` flag. You don't have to remember this, you'll find `./scripts/start_coppelia_sim.sh` (or `".zsh` for mac and `".ps1` for Windows), which starts the program with this flag, too.
 
-This script also takes one argument, the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt`. This will open everything for you, ready to use.
+This script also takes one argument, the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt`. This will open everything for you, ready to use. (or `.\scritps\start_coppelia_sim.ps1` on Windows)
 
-If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory around, from this example directory to the `full_project_set` example to your own project directory to make sure it's available everywhere.
+If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory (or, on macOS, `coppeliaSim.app` file) around, from this example directory to the `full_project_set` example to your own project directory to make sure it's available everywhere.
 
 You can now open it, and click and move around a bit. It's admittedly a rather awkward UI, but you'll need to be somewhat familiar with it.
 
 One thing you'll notice is little text/script icons next to some nodes in the Scene, mostly on the Robobo. These are Lua scripts that are running on the CoppeliaSim side. Double-click the script symbol to open them.
 
-This `./scripts/start_coppelia_sim.sh`, `".zsh` on mcOS, or `".ps1` on Windows,  script you are expected to need to change from time to time. For example, to run CoppeliaSim headless, you might want to add the `-h` flag to the argument list that is being passed to it.
+This `./scripts/start_coppelia_sim.sh`, `".zsh` on macOS, or `".ps1` on Windows,  script you are expected to need to change from time to time. For example, to run CoppeliaSim headless, you might want to add the `-h` flag to the argument list that is being passed to it.
 
 ## Lua
 

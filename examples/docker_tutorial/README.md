@@ -225,3 +225,6 @@ In `run.sh` / `run.ps1`, which are the scripts you'll use to start docker for th
 - `-p [host_port]:[container_port]` Expose or link a TCP port from the container to your host. Used for talking with the robot.
 - `--rm` Remove any container of the same name that is already running.
 - `-t` Allocate a pseudo-TTY. Without it, some print functions from the container wouldn't show up on your own terminal when running.
+
+In `run_apple_sillicon.zsh` we use one more flag:
+- `--platform linux/amd64` Specify to `buildx` to run or build the container under the `x86` (amd64) CPU architecture (and virtualise that when needed), which only works after having run `docker buildx create --use` (By default, apple sillicon macs use the `linux/arm64` platform)
