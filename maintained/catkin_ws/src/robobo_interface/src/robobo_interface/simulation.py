@@ -473,6 +473,7 @@ class SimulationRobobo(IRobobo):
         return Position(*pos)
 
     def set_position(self, position: Position, orientation: Orientation) -> None:
+        """Set the position of the Robobo in the simulation"""
         sim.simxSetObjectOrientation(
             self._connection_id,
             self._robobo,
