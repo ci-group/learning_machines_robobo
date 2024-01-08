@@ -179,3 +179,7 @@ dmypy.json
 
 # Where we are installing CoppeliaSim
 CoppeliaSim/
+coppeliaSim.app/
+
+# macOS stuff
+.DS_sture
