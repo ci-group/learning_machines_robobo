@@ -22,7 +22,7 @@ bash ./scripts/run.sh --hardware
 
 #### Running with simulation
 
-To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash` again, this time updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
+To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` or './coppeliaSim.app' like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash` again, this time updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
 
 To get your own IP address, you have to run `Get-NetIPAddress` on Windows PowerShell, but this gives you a bunch of extra stuff. To get _only_ your IP address, you can run:
 
@@ -55,6 +55,12 @@ bash ./scripts/run.sh --simulation
 ```ps1
 .\scripts\run.ps1 --simulation
 ```
+
+This might not work, however, if you are under apple sillicon (a M1, M2 or M3 chip), as that is an ARM CPU architecture instead of x86. For that, you need to enable experimental features in docker desktop, and run this command after that:
+```zsh
+docker buildx create --use
+```
+After this, you can run the code with `./scripts/run_apple_sillicon.zsh`
 
 ## Project structure
 
