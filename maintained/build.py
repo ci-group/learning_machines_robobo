@@ -125,6 +125,7 @@ def main() -> None:
 
     make_tutorial(
         ROS_TUTORIAL_HELP,
+        caktin_packages=["my_robot_controller"],
         scripts=["convert_line_endings.py"],
         dockerfile="ros_tutorial.dockerfile",
     )

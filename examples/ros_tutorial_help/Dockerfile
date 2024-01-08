@@ -22,6 +22,10 @@ WORKDIR /root/catkin_ws
 COPY ./catkin_ws .
 RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
+# Convert the line endings for the Windows users
+COPY ./scripts/convert_line_endings.py ./convert_line_endings.py
+RUN python3 ./convert_line_endings.py "**/*.py"
+
 # Chmod (permit execution of) everything in the catkin_ws. This is not *recommended*,
 # But it doesn't matter as long as you don't have any malware in there.
 RUN chmod -R u+x /root/catkin_ws/src
