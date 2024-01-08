@@ -43,7 +43,7 @@ bash ./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt
 ```
 
 ```ps1
-.\scripts\start_coppelia_sim.ps1 .\scense\Robobo_Scene.ttt
+.\scripts\start_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt
 ```
 
 Once all this is started, you can use the run scripts to run the example with the `--simulation` flag:
