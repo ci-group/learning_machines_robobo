@@ -45,7 +45,7 @@ BASE = Path(__file__).parent.resolve(strict=True)
 def remove_existing_in(directory: Path) -> None:
     to_del: List[Path] = []
     for file in directory.iterdir():
-        if file.name in ["README.md", "CoppeliaSim"]:
+        if file.name in ["README.md", "CoppeliaSim", "coppeliaSim.app"]:
             continue
 
         if input(f"\n{file} exists. Should it be removed? [y/N]") in ["y", "yes", "Y"]:
@@ -132,7 +132,11 @@ def main() -> None:
 
     make_tutorial(
         COPPELIA_SIM_TUTORIAL,
-        scripts=["start_coppelia_sim.sh", "start_coppelia_sim.ps1"],
+        scripts=[
+            "start_coppelia_sim.sh",
+            "start_coppelia_sim.ps1",
+            "start_coppelia_sim.zsh",
+        ],
         scenes=["Robobo_Scene.ttt"],
         lua=True,
     )
@@ -143,6 +147,7 @@ def main() -> None:
             "convert_line_endings.py",
             "run.ps1",
             "run.sh",
+            "run_apple_sillicon.zsh",
             ("entrypoint_example.bash", "entrypoint.bash"),
             "setup.bash",
         ],
@@ -159,8 +164,10 @@ def main() -> None:
             "setup.bash",
             "run.sh",
             "run.ps1",
+            "run_apple_sillicon.zsh",
             "start_coppelia_sim.sh",
             "start_coppelia_sim.ps1",
+            "start_coppelia_sim.zsh",
         ],
         caktin_packages=[
             "coppelia_sim",
