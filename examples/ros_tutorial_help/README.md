@@ -12,7 +12,7 @@ In this directory, you will find a single `Dockerfile`. This will perform the sa
 
 As always when running docker, make sure the docker daemon is running before running any commands.
 
-To build it, cd into this directory, and then run:
+To build it, cd into this directory, and then run in your OS's main terminal:
 
 ```sh
 docker build --tag ros_tutorial .
@@ -20,7 +20,7 @@ docker build --tag ros_tutorial .
 
 This will build / construct a container with the name (tag) `ros_tutorial`, from the current directory `.` This command will take a while (~5 min) to run the first time, but Docker cashes everything, so rebuilds won't take as long.
 
-To then run it, and change into its shell, run:
+To then run it, and change into its shell, run in your OS's main terminal:
 
 ```sh
 docker run --rm -it ros_tutorial bash
@@ -48,7 +48,7 @@ roscore &> ~/projects/roscore_output.txt &
 
 This will run the node (in this case `roscore`), keep the terminal open (by ending in `&`), and redirect all output of that program (`&>` redirects `stdout` and `sterr`) to a file (in this case `~/projects/roscore_output.txt`).
 
-To stop anything you started like this, you can run this:
+To stop anything you started like this, you can run this from the terminal of the container:
 
 ```sh
 pkill roscore
@@ -56,7 +56,7 @@ pkill roscore
 
 and you can view the output of them with any terminal-based text viewer. I'd use [less](<https://en.wikipedia.org/wiki/Less_(Unix)>), but you can install any terminal-based text editor (such as nano, vim, or emacs), by changing line 15 of the Dockerfile. Please note that piping is buffered (and this is non-trivial to circumvent: neither `script -f` nor `stdbuf -o0` work.), meaning you might not see the output of a node until it is closed.
 
-```
+```sh
 less --follow-name ~/projects/roscore_output.txt
 ```
 

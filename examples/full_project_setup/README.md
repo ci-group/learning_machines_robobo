@@ -1,10 +1,71 @@
 # Full project example
 
-This is the example you are expected to use as a project template. The structure is the same as [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup), it contains the same dockerfile and some of the same scripts and packages, but it contains a lot more stuff on top of that. First of all, it contains the same `start_coppelia_sim` script as [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), meaning you should also copy-past CoppeliaSim to here, such that `./CoppeliaSim` exists. It also contains the `setup.bash` from [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup) that you should configure to have the `ROS_MASTER_URI`.
+This is the example you are expected to use as a project template. The structure is the same as [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup), it contains the same dockerfile and some of the same scripts and packages, but it contains a lot more stuff on top of that. First of all, it contains the same `start_coppelia_sim` script as [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), meaning you should also copy-past CoppeliaSim to here, such that `./CoppeliaSim` (or `coppeliaSim.app`) exists. It also contains the `setup.bash` from [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup) that you should configure to have the `ROS_MASTER_URI`.
 
 ### Running the code that is there
 
 As you find it, this example is a fully working system. Currently, it contains a script that simply connects to the robot, be it hardware or software, and then runs through the motions it supports: moving itself and the phone around, getting input from the camera and the IR sensors, and a whole bunch more.
+
+If you're on Apple Sillicon (e.g. an M1, or  M2 mac), you need to do one more thing, as that is an ARM CPU architecture instead of x86. You need to enable experimental features in docker desktop, and then run this command in your terminal:
+```zsh
+docker buildx create --use
+```
+
+#### Running with simulation
+
+To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` or `./coppeliaSim.app` like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash`, updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
+
+To get your own IP address, you have to run `Get-NetIPAddress` on Windows PowerShell, but this gives you a bunch of extra stuff. To get _only_ your IP address, you can run:
+
+```ps1
+(Get-NetIPAddress | Where-Object { $_.AddressState -eq "Preferred" -and $_.ValidLifetime -lt "24:00:00" }).IPAddress
+```
+
+similarly, on Linux, you can run `hostname -I` to get all the information, but the following to get only the IP you are looking for:
+
+```sh
+hostname -I | awk '{print $1}'
+```
+
+Finally, on macOS, you can run `ifconfig` for all information, and (presuming you only have one network card on your laptop), this to get only what you are looking for:
+```zsh
+ifconfig en0 | awk '/inet / {print $2}'
+```
+
+After you have updated `./scripts/setup.bash` you can start CoppeliaSim with the `start_coppelia_sim.sh` script like in that example:
+
+```sh
+# Linux
+bash ./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt
+```
+
+```zsh
+# MacOS
+zsh ./scripts/start_coppelia_sim.zsh ./scenes/Robobo_Scene.ttt
+```
+
+```ps1
+# Windows
+.\scripts\start_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt
+```
+
+Once all this is started, you can use the run scripts to run the example with the `--simulation` flag:
+
+```sh
+# Linux, or mac with Intel processor
+bash ./scripts/run.sh --simulation
+```
+
+```ps1
+# Windows
+.\scripts\run.ps1 --simulation
+```
+
+Or, if you're on a mac *with apple sillicon* (other mac users can just use `run.sh`)
+```zsh
+# Mac with apple sillicon
+zsh ./scripts/run_apple_sillicon.zsh --simulation
+```
 
 #### Running with hardware
 
@@ -13,54 +74,22 @@ To run it with hardware, you have to set everything up in the same way as the [h
 After this, you can run with the flag `--hardware`. If you did everything correctly, you'll then see the robot move around and do a bunch of stuff.
 
 ```sh
+# Linux, or mac with Intel processor
 bash ./scripts/run.sh --hardware
 ```
 
 ```ps1
+# Windows
 .\scripts\run.ps1 --hardware
 ```
 
-#### Running with simulation
-
-To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` or './coppeliaSim.app' like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash` again, this time updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
-
-To get your own IP address, you have to run `Get-NetIPAddress` on Windows PowerShell, but this gives you a bunch of extra stuff. To get _only_ your IP address, you can run:
-
-```ps1
-(Get-NetIPAddress | Where-Object { $_.AddressState -eq "Preferred" -and $_.ValidLifetime -lt "24:00:00" }).IPAddress
-```
-
-similarly, on Unix, you can run `hostname -I` to get all the information, but the following to get only the IP you are looking for:
-
-```sh
-hostname -I | awk '{print $1}'
-```
-
-After you have updated `setup.bash` you can start CoppeliaSim with the `start_coppelia_sim.sh` script like in that example:
-
-```sh
-bash ./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt
-```
-
-```ps1
-.\scripts\start_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt
-```
-
-Once all this is started, you can use the run scripts to run the example with the `--simulation` flag:
-
-```sh
-bash ./scripts/run.sh --simulation
-```
-
-```ps1
-.\scripts\run.ps1 --simulation
-```
-
-This might not work, however, if you are under apple sillicon (a M1, M2 or M3 chip), as that is an ARM CPU architecture instead of x86. For that, you need to enable experimental features in docker desktop, and run this command after that:
+Or, if you're on a mac *with apple sillicon* (other mac users can just use `run.sh`)
 ```zsh
-docker buildx create --use
+# Mac with apple sillicon
+zsh ./scripts/run_apple_sillicon.zsh --hardware
 ```
-After this, you can run the code with `./scripts/run_apple_sillicon.zsh`
+
+
 
 ## Project structure
 
@@ -112,13 +141,15 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   ├── arena_push_hard.ttt
 │   └── Robobo_Scene.ttt
 ├── scripts
-│   ├── convert_line_endings.py
-│   ├── entrypoint.bash
-│   ├── run.ps1
-│   ├── run.sh
-│   ├── setup.bash
-│   ├── start_coppelia_sim.ps1
-│   └── start_coppelia_sim.sh
+│   ├── convert_line_endings.py
+│   ├── entrypoint.bash
+│   ├── run_apple_sillicon.zsh
+│   ├── run.ps1
+│   ├── run.sh
+│   ├── setup.bash
+│   ├── start_coppelia_sim.ps1
+│   ├── start_coppelia_sim.sh
+│   └── start_coppelia_sim.zsh
 ├── results
 │   └── ...
 ├── Dockerfile
@@ -139,20 +170,15 @@ The many packages in `catkin_ws` will be unfamiliar, however. In [basic_ros_setu
 - `simulation.py` contains the final layer of code that talks to the robot in CoppeliaSim. It exports one class `SimulationRobobo`, which, when instantiated, has most of the same functions as `HardwareRobobo` plus some more. Most importantly, functions like `start_simulation` and `stop_simulation` work with the simulation itself, but also functions like `nr_food_collected` for assignment 3.
 - `base.py` contains an interface (or, technically, a template method pattern, but who cares), `IRobobo` to abstract over hardware and software. You'll find abstract definitions of all functions that are on both the hardware and the software and a few template methods like `move_blocking` that work for both with a generic implementation. These are all the functions that work for both hardware and software, and so, these are the functions you should use when training your robot, to make sure that, at least in theory, the behavior of your real Robobo will be similar to the one in the simulation.
 
+Lastly, there is the `Dockerfile` and the `requirements.txt`. In the dockerfile, you are going to see quite a lot of things that you haven't seen before. However, you have to edit these dockerfiles very little (in fact, you can completely avoid editing them without TA instruction if you want), and every line has a comment above it, so it should all be clear. Secondly, the `requrements.txt` file contains the python requirements for your python code (e.g. pandas, keras, tensorflow, whatever). The requirements specified here will be installed in the docker container. If you have never used a file like this before, you can install all things specified in it yourself with `pip install -r requirements.txt`, and specify dependency versions using [python version specifiers](https://packaging.python.org/en/latest/specifications/version-specifiers/), just make sure you're specifying python 3.8 compatible versions of packages.
+
 If you understood all this, you know everything you should know, and can now get actually finally started with the course itself.
 
 ### Troubleshooting
 
-- My smartphone does not connect to the wifi or has a limited connection -> try to update the date/time of the phone.
+- My smartphone does not connect to the wifi or has a limited connection -> try to update the date/time of the phone. Also, make sure you're on a somewhat private network (eduroam does not work.)
 - My phone’s Bluetooth keeps disconnecting from the Robobo -> this indeed sometimes happens. Maybe you can make a script to deal with it.
 - My script keeps trying to connect to the physical Robobo, but nothing happens -> check if the `ROS_MASTER_URI` in `scripts/setup.bash` matches your phone’s current/updated IP address.
 - The infrared sensors of my Robobo keep constantly receiving info, even though nothing is touching it -> they may be broken. Get a new Robobo with your supervisor
-- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, usually starting with 192.168, following RFC1918
-
-```ps1
-(Get-NetIPAddress | Where-Object { $_.AddressState -eq "Preferred" -and $_.ValidLifetime -lt "24:00:00" }).IPAddress
-```
-
-```sh
-hostname -I | awk '{print $1}'
-```
+- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, how to find your IP is listed [here](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/full_project_setup#running-with-simulation).
+- Stuff trows an error, but I cannot find why because it's all in the black box that is Docker. -> In the [docker_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial), it is shown how to run docker in "interactive" mode. To do that for this example, you should change the `run` script (and the Dockerfile) to start the container like that.

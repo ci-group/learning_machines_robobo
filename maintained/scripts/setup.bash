@@ -7,5 +7,5 @@ export ROS_MASTER_URI="http://localhost:11311"
 # linux:
 #    hostname -I | awk '{print $1}'
 # macOS:
-#    ifconfig ev0 | awk '/inet / {print $2}'
+#    ifconfig en0 | awk '/inet / {print $2}'
 export COPPELIA_SIM_IP="0.0.0.0"
