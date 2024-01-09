@@ -2,15 +2,21 @@
 
 For this course, we use CoppeliaSim to simulate the robot. This is not the easiest program to use or install, so this should serve as a short tutorial on how to install and run it.
 
-First, download the edu version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads). Click "edu" and then select your operating system. For Linux, it says "Ubuntu," but the package ships with most of its dependencies, so it will run on any distro. (Tested Debian, Arch and Fedora) On Arch, to get a fully smooth experience, the only dependency you might want to install is [icu60](https://aur.archlinux.org/packages/icu60). On Windows, use the zip package without an installer. On Mac, everything should be fine by default.
+First, download the edu version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads). Click "edu" and then select your operating system. On Windows, use the zip package without an installer. On Mac, everything should be fine by default. For Linux, it says "Ubuntu," but the package ships with most of its dependencies, so it will run on any distro. (Tested Debian, Arch and Fedora) On Arch, to get a fully smooth experience, the only dependency you might want to install is [icu60](https://aur.archlinux.org/packages/icu60).
 
 One thing to note when running on Linux is that there have previously been unexpected issues with the program when running on Wayland. Exactly why this is the case, we don't know. But, on Debian KDE with Wayland, it doesn't start at all, and on Fedora Gnome with Wayland, it randomly crashes every now and then. If you experience weird issues, consider switching to X11.
 
+#### Windows / Linux post-download
+
 On Linux and Windows after it is all downloaded, you will find yourself with a zip file. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so we are going to extract it to a location we have access to it from the terminal, specifically `./CoppeliaSim` such that you can run the exact same commands as the ones in this README. This exact path is also required because some startup scripts, later on, rely on it being in this location.
 
-If you're wondering what extracting to `./CoppeliaSim` means here, it is to say that you should extract to a new directory called "CoppeliaSim" located in the current working directory.
+If you're wondering what extracting to `./CoppeliaSim` or means here, it is to say that you should extract to a new directory called "CoppeliaSim" or located in the current working directory.
 
-On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the relevant directory so the commands below work.
+#### Mac post-download
+
+On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the current directory (so to `./coppeliaSim.app`) so the commands below work.
+
+### Running CoppeliaSim
 
 By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the command line, never by clicking an executable in a graphical interface):
 
@@ -51,7 +57,7 @@ You can now open it, and click and move around a bit. It's admittedly a rather a
 
 One thing you'll notice is little text/script icons next to some nodes in the Scene, mostly on the Robobo. These are Lua scripts that are running on the CoppeliaSim side. Double-click the script symbol to open them.
 
-This `./scripts/start_coppelia_sim.sh`, `".zsh` on macOS, or `".ps1` on Windows,  script you are expected to need to change from time to time. For example, to run CoppeliaSim headless, you might want to add the `-h` flag to the argument list that is being passed to it.
+This `./scripts/start_coppelia_sim.sh`, `".zsh` on macOS, or `".ps1` on Windows, script you are expected to need to change from time to time. For example, to run CoppeliaSim headless, you might want to add the `-h` flag to the argument list that is being passed to it.
 
 ## Lua
 
