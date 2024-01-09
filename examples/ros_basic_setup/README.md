@@ -10,7 +10,7 @@ If you haven't followed the [ros tutorial](https://github.com/ci-group/learning_
 
 To run, for the first time, you're not going to call docker yourself. Instead, there is a script under the `scripts/` directory, `run.sh` and `run.ps1`, that contains the commands you need to run. These are mostly there for convenience, as they are quite a mouthful. Of course, to debug, you might still need to manually build and run, so you should still try to understand these commands, and know how to change them. They pass quite a few more flags than the commands from the docker tutorial, with all flags being `-t --rm -p 45100:45100 -p 45101:45101 -v ./results:/root/results`. You don't need to understand these, just know that, for interactive mode as per the docker tutorial, you can replace `-t` for `-it`, keeping all other arguments the same.
 
-This running script takes one argument: what to print / log, so calling it should just be as simple as `bash ./scripts/run.sh "hello"` or `.\scripts\run.ps1 "Hello"` This should print, log to file and to stdout, and save "Hello!" to `results/hello.txt`
+This running script takes one argument: what to print / log, so calling it should just be as simple as `bash ./scripts/run.sh "hello"` on Linux / macOS or `.\scripts\run.ps1 "Hello"` on Windows. This should print, log to file and to stdout, and save "Hello!" to `results/hello.txt`
 
 Here is the sample output of what the output should look like:
 

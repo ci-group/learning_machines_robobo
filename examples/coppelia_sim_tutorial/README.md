@@ -8,9 +8,11 @@ One thing to note when running on Linux is that there have previously been unexp
 
 On Linux and Windows after it is all downloaded, you will find yourself with a zip file. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so we are going to extract it to a location we have access to it from the terminal, specifically `./CoppeliaSim` such that you can run the exact same commands as the ones in this README. This exact path is also required because some startup scripts, later on, rely on it being in this location.
 
+If you're wondering what extracting to `./CoppeliaSim` means here, it is to say that you should extract to a new directory called "CoppeliaSim" located in the current working directory.
+
 On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the relevant directory so the commands below work.
 
-By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the command line):
+By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the command line, never by clicking an executable in a graphical interface):
 
 ```sh
 # On Windows:
@@ -27,11 +29,13 @@ By default, running CoppeliaSim is as easy as just running (You should always ru
 ./CoppeliaSim/coppeliaSim.sh
 ```
 
+If these commands say that the file does not excist, either you're not in the correct working directory with your terminal, or you did not extract CoppeliaSim to the correct location.
+
 For the full startup options, please refer to the [docs](https://www.coppeliarobotics.com/helpFiles/en/commandLine.htm).
 
 This will complain there is no ZMQ or Zero-MQ library available. This is expected, you did not install that, and likely won't.
 
-If you want to make sure you installed things correctly, the first thing to run is its error checker. This will report if all dynamically linked libraries are available.
+If you want to make sure you installed things correctly, the first thing to run is its error checker. This will report if all dynamically linked libraries are available. (change `.sh` extension to the one your OS uses as a shell.)
 
 ```
 ./CoppeliaSim/libLoadErrorCheck.sh

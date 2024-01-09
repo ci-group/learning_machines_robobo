@@ -6,33 +6,14 @@ This is the example you are expected to use as a project template. The structure
 
 As you find it, this example is a fully working system. Currently, it contains a script that simply connects to the robot, be it hardware or software, and then runs through the motions it supports: moving itself and the phone around, getting input from the camera and the IR sensors, and a whole bunch more.
 
-If you're on Apple Sillicon (e.g. an M1, or  M2 mac), you need to do one more thing, as that is an ARM CPU architecture instead of x86. You need to enable experimental features in docker desktop, and then run this command:
+If you're on Apple Sillicon (e.g. an M1, or  M2 mac), you need to do one more thing, as that is an ARM CPU architecture instead of x86. You need to enable experimental features in docker desktop, and then run this command in your terminal:
 ```zsh
 docker buildx create --use
 ```
 
-#### Running with hardware
-
-To run it with hardware, you have to set everything up in the same way as the [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup), which is to say you have to confirm you're on the same (non-public) network with the phone and your laptop/desktop, and have to put the `ROS_MASTER_URI` (`http://[Adress shown on top left]:11311`) in `setup.bash`.
-
-After this, you can run with the flag `--hardware`. If you did everything correctly, you'll then see the robot move around and do a bunch of stuff.
-
-```sh
-bash ./scripts/run.sh --hardware
-```
-
-```ps1
-.\scripts\run.ps1 --hardware
-```
-
-Or, if you're on a mac *with apple sillicon* (other mac users can just use `run.sh`)
-```zsh
-zsh ./scripts/run_apple_sillicon.zsh --hardware
-```
-
 #### Running with simulation
 
-To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` or `./coppeliaSim.app` like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash` again, this time updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
+To run it with the simulation, you have to, first of all, make sure that CoppeliaSim is installed under `./CoppeliaSim` or `./coppeliaSim.app` like in the [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial). After that, you have to update `setup.bash`, updating `COPPELIA_SIM_IP` with the IP of the computer you're running CoppeliaSim on, which is to say your own. We have to do this because the container (again, think of it as a small separate computer), has to connect to your computer to find it. Technically, though, this also means you can run the simulation on another system as this package.
 
 To get your own IP address, you have to run `Get-NetIPAddress` on Windows PowerShell, but this gives you a bunch of extra stuff. To get _only_ your IP address, you can run:
 
@@ -40,7 +21,7 @@ To get your own IP address, you have to run `Get-NetIPAddress` on Windows PowerS
 (Get-NetIPAddress | Where-Object { $_.AddressState -eq "Preferred" -and $_.ValidLifetime -lt "24:00:00" }).IPAddress
 ```
 
-similarly, on Windows, you can run `hostname -I` to get all the information, but the following to get only the IP you are looking for:
+similarly, on Linux, you can run `hostname -I` to get all the information, but the following to get only the IP you are looking for:
 
 ```sh
 hostname -I | awk '{print $1}'
@@ -48,17 +29,17 @@ hostname -I | awk '{print $1}'
 
 Finally, on macOS, you can run `ifconfig` for all information, and (presuming you only have one network card on your laptop), this to get only what you are looking for:
 ```zsh
-ifconfig ev0 | awk '/inet / {print $2}'
+ifconfig en0 | awk '/inet / {print $2}'
 ```
 
-After you have updated `setup.bash` you can start CoppeliaSim with the `start_coppelia_sim.sh` script like in that example:
+After you have updated `./scripts/setup.bash` you can start CoppeliaSim with the `start_coppelia_sim.sh` script like in that example:
 
 ```sh
 # Linux
 bash ./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt
 ```
 
-```sh
+```zsh
 # MacOS
 zsh ./scripts/start_coppelia_sim.zsh ./scenes/Robobo_Scene.ttt
 ```
@@ -71,17 +52,44 @@ zsh ./scripts/start_coppelia_sim.zsh ./scenes/Robobo_Scene.ttt
 Once all this is started, you can use the run scripts to run the example with the `--simulation` flag:
 
 ```sh
+# Linux, or mac with Intel processor
 bash ./scripts/run.sh --simulation
 ```
 
 ```ps1
+# Windows
 .\scripts\run.ps1 --simulation
 ```
 
 Or, if you're on a mac *with apple sillicon* (other mac users can just use `run.sh`)
 ```zsh
+# Mac with apple sillicon
 zsh ./scripts/run_apple_sillicon.zsh --simulation
 ```
+
+#### Running with hardware
+
+To run it with hardware, you have to set everything up in the same way as the [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup), which is to say you have to confirm you're on the same (non-public) network with the phone and your laptop/desktop, and have to put the `ROS_MASTER_URI` (`http://[Adress shown on top left]:11311`) in `setup.bash`.
+
+After this, you can run with the flag `--hardware`. If you did everything correctly, you'll then see the robot move around and do a bunch of stuff.
+
+```sh
+# Linux, or mac with Intel processor
+bash ./scripts/run.sh --hardware
+```
+
+```ps1
+# Windows
+.\scripts\run.ps1 --hardware
+```
+
+Or, if you're on a mac *with apple sillicon* (other mac users can just use `run.sh`)
+```zsh
+# Mac with apple sillicon
+zsh ./scripts/run_apple_sillicon.zsh --hardware
+```
+
+
 
 ## Project structure
 
