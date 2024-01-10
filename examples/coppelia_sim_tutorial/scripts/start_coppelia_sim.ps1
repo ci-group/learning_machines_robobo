@@ -1,7 +1,16 @@
 # if PowerShell scripts don't work, make sure to:
 # `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`
 # in a powershell running in administrator mode.
-param($p1)
+param(
+    [Parameter(Mandatory=$true, Position=0, HelpMessage="Path to the .ttt scene to load in CoppeliaSim")]
+    [string] $scenePath,
+    [Parameter(Mandatory=$false, Position=1, HelpMessage="The TCP port to start the CoppeliaSim API at")]
+    [int] $apiPort = 19999,
+    [Parameter(Mandatory=$false, Position=2, HelpMessage="Wether to run in headless (GUI-less) mode")]
+    [switch] $headless
+)
+
+$h = if ($headless.IsPresent) {"-h"} else {""} 
 
 # Presumes you have CoppeliaSim extracted to ./CoppeliaSim
-.\CoppeliaSim\coppeliaSim.exe $PSBoundParameters["p1"] "-gREMOTEAPISERVERSERVICE_19999_FALSE_TRUE"
+.\CoppeliaSim\coppeliaSim.exe $scenePath $h "-gREMOTEAPISERVERSERVICE_$($apiPort)_FALSE_TRUE"
