@@ -1,5 +1,4 @@
-import math
-import functools
+import os
 
 import rospy
 import cv2
@@ -108,23 +107,46 @@ class HardwareRobobo(IRobobo):
     However, if you want the robot to move the tilt motor while also driving and such,
     you can still experiment with them.
 
-    Arguments:
+    Arguments you should understand:
     camera: bool = False -> Wether to initialise the camera (this makes it slower)
+
+    Arguments you only have to understand if you want to do advanced stuff:
+    xmlrpc_port: Optional[int] = None -> The port to start the xmlrps of the ROS node at.
+        If None, it will try to see if ROS_XMLRPC_PORT is set, and use that.
+        If that envoirement variable is not set, it will default to 45100
+    tcpros_port: Optional[int] = None -> The port to start the tcpros of the ROS node at.
+        If None, it will try to see if ROS_XMLRPC_PORT is set, and use that.
+        If that envoirement variable is not set, it will default to 45101
+    logger: Callable[[str], None] = print -> The function to use for logging / printing.
     """
 
-    def __init__(self, camera=False) -> None:
+    def __init__(
+        self,
+        camera=False,
+        xmlrpc_port: Optional[int] = None,
+        tcpros_port: Optional[int] = None,
+        logger: Callable[[str], None] = rospy.loginfo,
+    ) -> None:
         """This sets up the HardwareRobobo, and presumes everything is running
         So, it cannot be started up unless the Robobo is actually connected.
 
         Arguments
         camera: bool - Whether or not to enable the camera
         """
+        self._logger = logger
         self._enable_camera: bool = camera
 
+        if xmlrpc_port is None:
+            xmlrpc_port = int(os.getenv("ROS_XMLRPC_PORT", "45100"))
+        if tcpros_port is None:
+            tcpros_port = int(os.getenv("ROS_TCPROS_PORT", "45101"))
+
         rospy.init_node(
-            "learning_machines_robobo_controler", xmlrpc_port=45100, tcpros_port=45101
+            "learning_machines_robobo_controler",
+            xmlrpc_port=xmlrpc_port,
+            tcpros_port=tcpros_port,
         )
-        rospy.loginfo("Starting the Learning Machines robobo controller node")
+        self._logger("Starting the Learning Machines robobo controller node")
 
         # Service Proxys
         self._move_srv = rospy.ServiceProxy(MOVE_WHEELS_SERVICE, MoveWheels)
@@ -176,9 +198,7 @@ class HardwareRobobo(IRobobo):
                 IMAGE_TOPIC, CompressedImage, self._camera_callback_front, queue_size=1
             )
 
-        rospy.loginfo(
-            "Succesfully initialised Learning Machines robobo controller node"
-        )
+        self._logger("Succesfully initialised Learning Machines robobo controller node")
 
     def set_emotion(self, emotion: Emotion) -> None:
         """Show the emotion of the robot.
@@ -200,8 +220,8 @@ class HardwareRobobo(IRobobo):
         """Move the robot wheels for `millis` time
 
         Arguments
-        left_speed: speed of the left wheel. Range: 0-100
-        right_speed: speed of the right wheel. Range: 0-100
+        left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement, negative backward.
+        right_speed: speed of the right wheel. Range: -100-0-100. 0 is no movement, negative backward.
         millis: how many millisecond to move the robot
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
@@ -253,7 +273,7 @@ class HardwareRobobo(IRobobo):
 
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
-        [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
         """
         return self._irs_values
 
@@ -365,8 +385,7 @@ class HardwareRobobo(IRobobo):
         """Get the wheel orientation and speed of the robot"""
         return self._wheelpos
 
-    @staticmethod
-    def sleep(seconds: float) -> None:
+    def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """
@@ -387,22 +406,20 @@ class HardwareRobobo(IRobobo):
 
     def _irs_callback(self, ros_data: IRs) -> None:
         self._irs_values = [
-            ros_data.BackR.range,
-            ros_data.BackC.range,
             ros_data.BackL.range,
-            ros_data.FrontRR.range,
+            ros_data.BackR.range,
+            ros_data.FrontL.range,
             ros_data.FrontR.range,
             ros_data.FrontC.range,
-            ros_data.FrontL.range,
+            ros_data.FrontRR.range,
+            ros_data.BackC.range,
             ros_data.FrontLL.range,
         ]
 
     def _camera_callback_front(self, ros_data: CompressedImage):
         if self._receiving_image_front is None:
-            #### direct conversion to CV2 ####
             np_arr = numpy.fromstring(ros_data.data, numpy.uint8)
             image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-            # save result in memory (FLIP NEEDED [only front camera?])
             self._receiving_image_front = cv2.flip(image_np, 1)
 
     def _pan_callback(self, ros_data: Int16) -> None:
@@ -438,8 +455,8 @@ class HardwareRobobo(IRobobo):
 
     def _phone_battery_callback(self, ros_data: Int8) -> None:
         if ros_data.data < 10:
-            rospy.logwarn(f"Phone battery is getting low: {ros_data.data}%")
+            self._logger(f"Phone battery is getting low: {ros_data.data}%")
 
     def _robot_battery_callback(self, ros_data: Int8) -> None:
         if ros_data.data < 10:
-            rospy.logwarn(f"Robot battery is getting low: {ros_data.data}%")
+            self._logger(f"Robot battery is getting low: {ros_data.data}%")

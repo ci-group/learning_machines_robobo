@@ -57,8 +57,8 @@ class IRobobo(ABC):
         """Move the robot wheels for `millis` time
 
         Arguments
-        left_speed: speed of the left wheel. Range: 0-100
-        right_speed: speed of the right wheel. Range: 0-100
+        left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement.
+        right_speed: speed of the right wheel. Range: -100-0-100. 0 is no movement.
         millis: how many millisecond to move the robot
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
@@ -73,8 +73,8 @@ class IRobobo(ABC):
         """Move the robot wheels for `millis` time
 
         Arguments
-        left_speed: speed of the left wheel. Range: 0-100
-        right_speed: speed of the right wheel. Range: 0-100
+        left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement, negative backward.
+        right_speed: speed of the right wheel. Range: -100-0-100. 0 is no movement, negative backward.
         millis: how many millisecond to move the robot
         """
         self.perform_blocking(
@@ -122,7 +122,7 @@ class IRobobo(ABC):
     @abstractmethod
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
-        [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
         """
         ...
 
@@ -222,9 +222,8 @@ class IRobobo(ABC):
         """Get the wheel orientation and speed of the robot"""
         ...
 
-    @staticmethod
     @abstractmethod
-    def sleep(seconds: float) -> None:
+    def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """
