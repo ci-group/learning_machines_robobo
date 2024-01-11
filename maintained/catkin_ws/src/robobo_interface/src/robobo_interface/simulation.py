@@ -127,8 +127,8 @@ class SimulationRobobo(IRobobo):
         """Move the robot wheels for `millis` time
 
         Arguments
-        left_speed: speed of the left wheel. Range: 0-100
-        right_speed: speed of the right wheel. Range: 0-100
+        left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement, negative backward.
+        right_speed: speed of the right wheel. Range: -100-0-100. 0 is no movement, negative backward.
         millis: how many millisecond to move the robot
         blockid: A unique blockid to test if the robot is still perfoming the action.
             If None is passed, a random available blockid is chosen.
