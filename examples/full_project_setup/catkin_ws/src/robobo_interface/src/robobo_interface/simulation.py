@@ -22,7 +22,7 @@ from robobo_interface.utils import LockedSet
 from coppelia_sim import sim, simConst, ping
 from coppelia_sim.error import CoppeliaSimApiError
 
-from typing import List, Optional
+from typing import Callable, List, Optional
 from numpy.typing import NDArray
 
 
@@ -43,40 +43,68 @@ class SimulationRobobo(IRobobo):
     However, if you want the robot to move the tilt motor while also driving and such,
     you can still experiment with them.
 
-    Arguments:
+    Arguments you should understand:
     realtime: bool = False -> Wether to run the simulation in realtime, or as fast as possible
     identifier: int = 0 -> The value number to use. If you have one robobo in the scene,
             or want to use the first one, this is 0. Else, increase the value
+
+    Arguments you only have to understand if you want to do advanced stuff:
+    api_port: Optional[int] = None -> The port at which to look for the CoppeliaSim API.
+        If None, it will try to see if COPPELIA_SIM_PORT is set, and use that.
+        If that envoirement variable is not set, it will default to 19999
+    ip_adress: Optional[str] = None -> The TCP adress at which to look for the CoppeliaSim API.
+        If None, it will try to see if COPPELIA_SIM_IP is set, and use that.
+        If that envoirement variable is not set, it will default to "0.0.0.0"
+    logger: Callable[[str], None] = print -> The function to use for logging / printing.
     """
 
-    def __init__(self, realtime=False, identifier: int = 0):
+    def __init__(
+        self,
+        realtime=False,
+        identifier: int = 0,
+        api_port: Optional[int] = None,
+        ip_adress: Optional[str] = None,
+        logger: Callable[[str], None] = print,
+    ):
+        self._logger = logger
         self._used_pids: LockedSet[int] = LockedSet()
         self._identifier = f"[{identifier}]"
 
         sim.simxFinish(-1)  # just in case, close all opened connections
         # 0.0.0.0 to connect to the current computer on Linux, with `--net=host`
         # This doesn't work on Windows or MacOS. There, the variable needs to be specified.
-        ip_adress = os.getenv("COPPELIA_SIM_IP", "0.0.0.0")
-        self._connection_id = sim.simxStart(ip_adress, 19999, True, True, 5000, 5)
+
+        if api_port is None:
+            api_port = int(os.getenv("COPPELIA_SIM_PORT", "19999"))
+        if ip_adress is None:
+            ip_adress = os.getenv("COPPELIA_SIM_IP", "0.0.0.0")
+
+        self._connection_id = sim.simxStart(ip_adress, api_port, True, True, 5000, 5)
         if self._connection_id == -1:
-            print(
-                """Failed connecting to remote API server:
-                Cannot find one hosted on port 19999
+            self._logger(
+                """CoppeliaSim Api Connection Error
+                Failed connecting to remote API server
                 Is the simulation running / playing?
 
                 If not on Linux with --net=host:
                 Did you specify the IP adress of your computer in scripts/setup.bash?
                 """
             )
+            self._logger(f"Looked for API at port: {api_port} at IP adress: {ip_adress}")
             sys.exit(1)
 
         ping.ping(self._connection_id)
-        print("Connected to remote API server")
+        self._logger(
+            f"""Connected to remote CoppeliaSim API server at port {api_port}
+            Connected to robot: {self._identifier}"""
+        )
 
         self._initialise_handles()
         self.set_realtime(realtime)
 
     def __del__(self):
+        # Yes, having __enter__ and __exit__ on a seperate CoppeliaSimConnection object would be cleaner.
+        # However, this gives the simler API, for which I am willing to sacrifice code quality.
         sim.simxFinish(self._connection_id)
 
     def set_emotion(self, emotion: Emotion) -> None:
@@ -87,7 +115,7 @@ class SimulationRobobo(IRobobo):
         Arguments
         emotion: Emotion - What emotion to show.
         """
-        print(f"The robot shows {emotion.value} on its screen")
+        self._logger(f"The robot shows {emotion.value} on its screen")
 
     def move(
         self,
@@ -152,7 +180,7 @@ class SimulationRobobo(IRobobo):
         Arguments
         message: str - what to say
         """
-        print(f"The robot says: {message}")
+        self._logger(f"The robot {self._identifier} says: {message}")
 
     def play_emotion_sound(self, emotion: SoundEmotion) -> None:
         """Let the robot make an emotion sound
@@ -161,7 +189,7 @@ class SimulationRobobo(IRobobo):
         Arguments:
         emotion: SoundEmotion - The sound to make.
         """
-        print(f"The robot makes sound: {emotion.value}")
+        self._logger(f"The robot {self._identifier} makes sound: {emotion.value}")
 
     def set_led(self, selector: LedId, color: LedColor) -> None:
         """Set the led of the robot

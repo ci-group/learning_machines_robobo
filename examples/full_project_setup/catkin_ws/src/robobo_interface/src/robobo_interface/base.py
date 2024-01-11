@@ -222,9 +222,8 @@ class IRobobo(ABC):
         """Get the wheel orientation and speed of the robot"""
         ...
 
-    @staticmethod
     @abstractmethod
-    def sleep(seconds: float) -> None:
+    def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """

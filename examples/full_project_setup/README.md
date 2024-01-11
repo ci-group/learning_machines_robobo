@@ -188,6 +188,76 @@ Lastly, there is the `Dockerfile` and the `requirements.txt`. In the dockerfile,
 
 If you understood all this, you know everything you should know, and can now get actually finally started with the course itself.
 
+## Looking ahead
+
+A lot more things are possible with this code that is not specified in this readme. Here, we provide some code snippits that you might like to look at to see what is possible.
+
+### Running multiple instances of the Simulation.
+
+When training your models, you might like to run multiple instances of CoppeliaSim at a time, each of which to be connected to by a different instance of `SimulationRobobo`, which gives a performance increase when you have a lot (>8) of CPU cores available.
+
+For this, you first want to start the differenet instances of CoppeliaSim. For this, you can run the `start_copplia_sim` script multiple times:
+
+for example, on Linux:
+```sh
+# One terminal
+bash ./scripts/run_coppelia_sim.sh ./scenes/Robobo_Scene.ttt 20000 -h
+
+# In another termnial
+bash ./scripts/run_coppelia_sim.sh ./scenes/Robobo_Scene.ttt 20001 -h
+
+# ... etc
+```
+
+On Windows:
+```ps1
+# One terminal
+.\scripts\run_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt 20000 -headless
+
+# In another termnial
+.\scripts\run_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt 20001 -headless
+
+# ... etc
+```
+
+On macOS:
+```sh
+# One terminal
+zsh ./scripts/run_coppelia_sim.zsh ./scenes/Robobo_Scene.ttt 20000 -h
+
+# In another termnial
+zsh ./scripts/run_coppelia_sim.zsh ./scenes/Robobo_Scene.ttt 20001 -h
+
+# ... etc
+```
+
+Let's say you stared three instances of CoppeliaSim, at ports 20000, 20001, and 20002.
+
+After this, you can make your main python script (`learning_robobo_controller.py`) into something like this:
+
+```python
+#!/usr/bin/env python3
+import multiprocessing
+
+from robobo_interface import SimulationRobobo
+
+# The same default function that is there when you first pulled
+from learning_machines import run_all_actions
+
+
+def run(i: int) -> None:
+    rob = SimulationRobobo(api_port=(20000 + i))
+    run_all_actions(rob)
+
+
+if __name__ == "__main__":
+    with multiprocessing.Pool(3) as p:
+        p.map(run, range(3))
+```
+This will use three seperate python threads / processes, to connect to the three CoppeliaSim API instances, and run the `run_all_actions` function in those threads.
+
+You can run this with your OS's equivilant of `./scripts/run.sh` without any further arguments (as don't parse any in python's `__main__`)
+
 ## Troubleshooting
 
 - My smartphone does not connect to the wifi or has a limited connection -> try to update the date/time of the phone. Also, make sure you're on a somewhat private network (eduroam does not work.)

@@ -41,15 +41,9 @@ For the full startup options, please refer to the [docs](https://www.coppeliarob
 
 This will complain there is no ZMQ or Zero-MQ library available. This is expected, you did not install that, and likely won't.
 
-If you want to make sure you installed things correctly, the first thing to run is its error checker. This will report if all dynamically linked libraries are available. (change `.sh` extension to the one your OS uses as a shell.)
-
-```
-./CoppeliaSim/libLoadErrorCheck.sh
-```
-
 For this course, we are accessing this simulator from Python code, meaning we need to open a TCP port to connect to. For this, we start CoppeliaSim with the `-gREMOTEAPISERVERSERVICE_19999_FALSE_TRUE` flag. You don't have to remember this, you'll find `./scripts/start_coppelia_sim.sh` (or `".zsh` for mac and `".ps1` for Windows), which starts the program with this flag, too.
 
-This script also takes one argument, the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt`. This will open everything for you, ready to use. (or `.\scritps\start_coppelia_sim.ps1` on Windows)
+This script also takes one required argument, the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt`. This will open everything for you, ready to use. (or `.\scritps\start_coppelia_sim.ps1` on Windows)
 
 If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory (or, on macOS, `coppeliaSim.app` file) around, from this example directory to the `full_project_set` example to your own project directory to make sure it's available everywhere.
 
@@ -57,7 +51,16 @@ You can now open it, and click and move around a bit. It's admittedly a rather a
 
 One thing you'll notice is little text/script icons next to some nodes in the Scene, mostly on the Robobo. These are Lua scripts that are running on the CoppeliaSim side. Double-click the script symbol to open them.
 
-This `./scripts/start_coppelia_sim.sh`, `".zsh` on macOS, or `".ps1` on Windows, script you are expected to need to change from time to time. For example, to run CoppeliaSim headless, you might want to add the `-h` flag to the argument list that is being passed to it.
+#### Advanced usage of `start_coppelia_sim`
+
+This `./scripts/start_coppelia_sim.sh`, `".zsh` on macOS, or `".ps1` on Windows, script has two more optional parameters. 
+
+The first is the TCP port to start CoppeliaSim under. As said eariler, by default, this is port 19999, but, you can set this to any port you like by providing this second argument. 
+This is useful if you want to run multiple instances of CoppeliaSim when training your models.
+
+The second optional argument is `-h` on Unix or `-headless` on Windows as a last argument. This starts CoppeliaSim in headless mode. It still uses your GPU (we have a camera, after all,) but it no longer renders to the screen, drastically improving performance. To keep the scripts simple, you have to specify this as the third argument, meaning you cannot pass it if you did not also specify the TCP port.
+
+One thing to note when starting CoppeliaSim is that it expects a TTY to be conected. Because of this, you sadly cannot run it with `coppeliaSim.sh &`, and launch multiple instances from one terminal. If you do find a way to do this do let us know.
 
 ## Lua
 
@@ -103,3 +106,7 @@ out_ints, out_floats, out_strings, out_byte_buffer = sim.simxCallScriptFunction(
     sim.simx_opmode_blocking,
 )
 ```
+
+## Troubleshooting
+
+If you want to make sure you installed things correctly, the first thing to run is its error checker. This will report if all dynamically linked libraries are available. It's name is `libLoadErrorCheck`, and where it lives depends on your OS and installation method. Just searching for a file of this name in the directory you extracted CoppeliaSim to should let you find it.
