@@ -273,7 +273,7 @@ class HardwareRobobo(IRobobo):
 
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
-        [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
         """
         return self._irs_values
 
@@ -406,13 +406,13 @@ class HardwareRobobo(IRobobo):
 
     def _irs_callback(self, ros_data: IRs) -> None:
         self._irs_values = [
-            ros_data.BackR.range,
-            ros_data.BackC.range,
             ros_data.BackL.range,
-            ros_data.FrontRR.range,
+            ros_data.BackR.range,
+            ros_data.FrontL.range,
             ros_data.FrontR.range,
             ros_data.FrontC.range,
-            ros_data.FrontL.range,
+            ros_data.FrontRR.range,
+            ros_data.BackC.range,
             ros_data.FrontLL.range,
         ]
 

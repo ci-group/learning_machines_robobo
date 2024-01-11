@@ -122,7 +122,7 @@ class IRobobo(ABC):
     @abstractmethod
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
-        [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
         """
         ...
 

@@ -90,7 +90,9 @@ class SimulationRobobo(IRobobo):
                 Did you specify the IP adress of your computer in scripts/setup.bash?
                 """
             )
-            self._logger(f"Looked for API at port: {api_port} at IP adress: {ip_adress}")
+            self._logger(
+                f"Looked for API at port: {api_port} at IP adress: {ip_adress}"
+            )
             sys.exit(1)
 
         ping.ping(self._connection_id)
@@ -212,7 +214,7 @@ class SimulationRobobo(IRobobo):
 
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
-        [backR, backC, backL, frontRR, frontR, frontC, frontL, frontLL]
+        [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
         """
         ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
             self._connection_id,
