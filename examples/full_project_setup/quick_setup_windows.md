@@ -3,7 +3,7 @@
 Follow these steps to install and run the robot simulator:
 
 1. **Clone the Repository:**
-   ```bash
+   ```pwsh
    git clone https://github.com/ci-group/learning_machines_robobo.git
    cd learning_machines_robobo
    ```
@@ -12,7 +12,7 @@ Follow these steps to install and run the robot simulator:
    - To ensure compatibility, use Python 3.8. If you don't have Python installed, consider using Anaconda.
     - If using Anaconda, download it [here](https://www.anaconda.com/download).
     
-    ```bash
+    ```powershell
     conda create -n learning_machines python=3.8
     conda activate learning_machines
     conda install -c conda-forge numpy
@@ -21,7 +21,7 @@ Follow these steps to install and run the robot simulator:
 
     - For general Python users:
 
-    ```bash
+    ```powershell
     virtualenv lm_venv
     source lm_venv/bin/activate
     pip install -r requirements. txt
@@ -51,7 +51,7 @@ On Windows PowerShell, run:
 
 Update the line in `scripts/setup.bash`:
 
-```bash
+```powershell
 export COPPELIA_SIM_IP="your.ip.address"
 ```
 
