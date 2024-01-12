@@ -78,4 +78,8 @@ Assuming you are currently in `learning_machines_robobo/examples/full_project_se
 
 *Note: The docker build takes a while. After it successfully runs, you should see the Robobo move the phone, and the following in your terminal:*
 
+<p allign="center">
+  <img src="./assets/windows_terminal_ss.png" />
+</p>
+
 Congratulations! You've successfully completed the setup. 
