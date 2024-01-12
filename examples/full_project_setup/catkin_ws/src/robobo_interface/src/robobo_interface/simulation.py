@@ -148,7 +148,7 @@ class SimulationRobobo(IRobobo):
             f"/Robobo{self._identifier}/Left_Motor",
             sim.sim_scripttype_childscript,
             "moveWheelsByTime",
-            [left_speed, right_speed],
+            [right_speed, left_speed],
             [millis / 1000.0],
             [self._block_string(blockid)],
             bytearray(),
