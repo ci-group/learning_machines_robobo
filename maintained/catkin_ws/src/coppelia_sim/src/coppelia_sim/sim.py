@@ -937,7 +937,6 @@ def simxSetBoolParam(clientID, paramIdentifier, paramValue, operationMode):
     return c_SetBoolParam(clientID, paramIdentifier, paramValue, operationMode)
 
 
-@simx_function
 def simxGetIntegerParameter(clientID, paramIdentifier, operationMode):
     return simxGetInt32Param(clientID, paramIdentifier, operationMode)
 
