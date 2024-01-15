@@ -42,10 +42,18 @@ for directory in MANAGED_DIRS:
 BASE = Path(__file__).parent.resolve(strict=True)
 
 
+def is_ignored_path(path: Path) -> bool:
+    """When true, the item of this name will not be deleted when building"""
+    return (
+        any(reserved in path.name.lower() for reserved in ["coppeliasim", "assets"])
+        or path.suffix == ".md"
+    )
+
+
 def remove_existing_in(directory: Path) -> None:
     to_del: List[Path] = []
     for file in directory.iterdir():
-        if file.name in ["README.md", "CoppeliaSim", "coppeliaSim.app"]:
+        if is_ignored_path(file):
             continue
 
         if input(f"\n{file} exists. Should it be removed? [y/N]") in ["y", "yes", "Y"]:
