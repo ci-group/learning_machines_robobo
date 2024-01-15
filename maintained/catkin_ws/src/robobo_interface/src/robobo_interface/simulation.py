@@ -489,7 +489,10 @@ class SimulationRobobo(IRobobo):
         value: bool = False -> to set realtime true or false
         """
         sim.simxSetBoolParam(
-            self._connection_id, 25, value, simConst.simx_opmode_oneshot
+            self._connection_id,
+            simConst.sim_boolparam_realtime_simulation,
+            value,
+            simConst.simx_opmode_oneshot,
         )
 
     def position(self) -> Position:
