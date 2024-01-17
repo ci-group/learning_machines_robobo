@@ -10,7 +10,7 @@ param(
     [switch] $headless
 )
 
-$h = if ($headless.IsPresent) {"-h"} else {""} 
+$h = if ($headless.IsPresent) {"-h"} else {""}
 
 # Presumes you have CoppeliaSim extracted to ./CoppeliaSim
-.\CoppeliaSim\coppeliaSim.exe $scenePath $h "-gREMOTEAPISERVERSERVICE_$($apiPort)_FALSE_TRUE"
+.\CoppeliaSim\coppeliaSim.exe "$scenePath" $h "-gREMOTEAPISERVERSERVICE_$($apiPort)_FALSE_TRUE"

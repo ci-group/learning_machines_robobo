@@ -6,4 +6,4 @@
 ${1:?"Specify the scene you want to load as a first argument"}
 
 # Presumes you have CoppeliaSim extracted to ./CoppeliaSim
-./CoppeliaSim/coppeliaSim.sh $1 $3 "-gREMOTEAPISERVERSERVICE_${2:-19999}_FALSE_TRUE"
+./CoppeliaSim/coppeliaSim.sh "$1" $3 "-gREMOTEAPISERVERSERVICE_${2:-19999}_FALSE_TRUE"

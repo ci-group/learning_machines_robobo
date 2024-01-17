@@ -11,4 +11,4 @@ param(
 docker build --tag learning_machines .
 # Mounting to a directory that does not exist creates it.
 # Mounting to relative path doesn't create non-existing directories on Windows.
-Invoke-Expression -Command "docker run -t --rm -p 45100:45100 -p 45101:45101 -v ${PWD}/results:/root/results learning_machines $arguments"
+Invoke-Expression -Command "docker run -t --rm -p 45100:45100 -p 45101:45101 -v ""${PWD}/results"":/root/results learning_machines $arguments"
