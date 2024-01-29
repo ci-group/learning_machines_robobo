@@ -219,6 +219,15 @@ docker run my_first_container "Hello World"
 
 As you can see, all arguments after the container name are passed to the entrypoint before running.
 
+### Deleting built images
+
+Every now and then, you might want to delete all the images you have build in the past. They don't take up a lof of space, and you will usually overwrite them anyway, but it's good to clean stuff up every now and then.
+
+To do this, run:
+```sh
+docker container prune
+```
+
 ### Docker permission issues.
 
 If you're on macOS or Linux, you might find yourself with docker permission issues. Errors like: `ERROR: failed to solve: ros:noetic: error getting credentials - err: exit status 1, out: `, or having to always call docker with `sudo`. There are several things you might need to do to fix this. The first command you should try running on your terminal is:
