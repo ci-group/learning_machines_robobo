@@ -29,9 +29,6 @@ from numpy.typing import NDArray
 class SimulationRobobo(IRobobo):
     """The simulation robot.
 
-    The simulation needs to be running for the init to be callable
-    (as, otherwise, the api server is not running)
-
     A few functions take blockid. When they do, they are not blocking. If you call
     these while the action is still blocked with a new blockid
     stuff might go seriously wrong, and the robot might halt indefinetly.
@@ -540,12 +537,33 @@ class SimulationRobobo(IRobobo):
         """Get whether the base detects food on top of it.
 
         This only works in the simulation.
-        Trivially doesn't work when the simulation does not have a base.
+        Trivially doesn't work when the simulation does not have a base or food.
         """
-        detection, _, what, _ = sim.simxReadProximitySensor(
-            self._connection_id, self._base, simConst.simx_opmode_buffer
+        return self._base_food_distance() > 0
+
+    def _base_food_distance(self) -> float:
+        """Get the distance between the food and the base,
+        0 if the food is too far away (which is to say, not on the plate)
+
+        This only works in the simulation.
+        Trivially doesn't work when the simulation does not have a base or food.
+        """
+        ping.ping(self._connection_id)
+        _ints, floats, _strings, _buffer = sim.simxCallScriptFunction(
+            self._connection_id,
+            "/Base",
+            simConst.sim_scripttype_childscript,
+            "getFoodDistance",
+            [],
+            [],
+            [],
+            bytearray(),
+            simConst.simx_opmode_blocking,
         )
-        return detection and what == self._base
+        ret = floats[0]
+        if ret < 0:
+            raise ValueError("Cannot find any food in the scene")
+        return ret
 
     def _block_string(self, blockid: int) -> str:
         """Return some unique string based on the identifier and the blockid
@@ -564,7 +582,7 @@ class SimulationRobobo(IRobobo):
         try:
             self._base = sim.simxGetObjectHandle(
                 self._connection_id,
-                "/Base_Proximity_sensor",
+                "/Base",
                 simConst.simx_opmode_blocking,
             )
         except CoppeliaSimApiError:
