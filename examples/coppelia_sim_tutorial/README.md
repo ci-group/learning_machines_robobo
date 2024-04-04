@@ -14,7 +14,7 @@ If you're wondering what extracting to `./CoppeliaSim` or means here, it is to s
 
 #### Mac post-download
 
-On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the current directory (so to `./coppeliaSim.app`) so the commands below work.
+On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the current directory (so to `./coppeliaSim.app`) so the commands below work. Note that MacOS might tell you it cannot verify the integrety of the app and refuse to run it. To give it permissions anyway, open finder in the current directory (with `open .`), and control-click the application to show the menu that lets you overwrite these settings.
 
 ### Running CoppeliaSim
 
@@ -39,11 +39,9 @@ If these commands say that the file does not excist, either you're not in the co
 
 For the full startup options, please refer to the [docs](https://www.coppeliarobotics.com/helpFiles/en/commandLine.htm).
 
-This will complain there is no ZMQ or Zero-MQ library available. This is expected, you did not install that, and likely won't.
+This might complain there is no ZMQ or Zero-MQ library available, or that certain python packages are not installed. The troubleshooting section at the end explains how to fix this.
 
-For this course, we are accessing this simulator from Python code, meaning we need to open a TCP port to connect to. For this, we start CoppeliaSim with the `-gREMOTEAPISERVERSERVICE_19999_FALSE_TRUE` flag. You don't have to remember this, you'll find `./scripts/start_coppelia_sim.sh` (or `".zsh` for mac and `".ps1` for Windows), which starts the program with this flag, too.
-
-This script also takes one required argument, the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./scripts/start_coppelia_sim.sh ./scenes/Robobo_Scene.ttt`. This will open everything for you, ready to use. (or `.\scritps\start_coppelia_sim.ps1` on Windows)
+The executable takes several commandline arguments, one of them being the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./CoppeliaSim/coppeliaSim ./scenes/Robobo_Scene.ttt` or similar for your OS. 
 
 If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory (or, on macOS, `coppeliaSim.app` file) around, from this example directory to the `full_project_set` example to your own project directory to make sure it's available everywhere.
 

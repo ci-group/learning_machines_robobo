@@ -77,7 +77,7 @@ def make_tutorial(
     scenes: List[Union[str, Tuple[str, str]]] = [],
     dockerfile: Optional[str] = None,
     lua: bool = False,
-    requirements: bool = False,
+    requirements: Optional[str] = None,
 ):
     def get_base_target(name: str) -> Tuple[Path, Path]:
         base = BASE / name
@@ -114,8 +114,8 @@ def make_tutorial(
     if lua:
         shutil.copytree((BASE / "lua"), (where / "lua_scripts"))
 
-    if requirements:
-        shutil.copyfile((BASE / "requirements.txt"), (where / "requirements.txt"))
+    if requirements is not None:
+        shutil.copyfile((BASE / "requirements" / requirements), (where / "requirements.txt"))
 
 
 def main() -> None:
@@ -147,6 +147,7 @@ def main() -> None:
         ],
         scenes=["Robobo_Scene.ttt"],
         lua=True,
+        requirements="coppeliasim_tutorial_requirements.txt",
     )
 
     make_tutorial(
@@ -161,7 +162,7 @@ def main() -> None:
         ],
         caktin_packages=["my_first_package", "data_files"],
         dockerfile="full.dockerfile",
-        requirements=True,
+        requirements="full_requirements.txt",
     )
 
     make_tutorial(
@@ -194,7 +195,7 @@ def main() -> None:
             "Robobo_Scene.ttt",
         ],
         dockerfile="full.dockerfile",
-        requirements=True,
+        requirements="full_requirements.txt",
     )
 
 
