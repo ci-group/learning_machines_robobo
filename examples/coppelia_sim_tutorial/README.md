@@ -18,6 +18,14 @@ On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move th
 
 ### Running CoppeliaSim
 
+#### The python venv
+
+The first thing to do when running CoppeliaSim is to create a python virtual envoirement, and install some requirements on it. Technically speaking, we don't need it just jet, but CoppeliaSim gives you nice red error messages if you don't, and those can be confusing.
+
+I am going to presume you know what a venv is, but, if you don't, you can just use the [default `venv` module](https://docs.python.org/3.8/library/venv.html), as we don't need any of the fancy features of poetry or annaconda. (In fact, annaconda specifically is known to cause issues, and I recommend using venv or virtualenv.) So, just `python3.8 -m venv .venv` and then `source ./venv/bin/activate` or `.\.venv\bin\Activate.ps1`. After this, the python modules you need are aleady in `requirements.txt`, so you can just run `python -m pip install -r requirements.txt` to install those.
+
+#### Running the executable
+
 By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the command line, never by clicking an executable in a graphical interface):
 
 ```sh
@@ -35,7 +43,7 @@ By default, running CoppeliaSim is as easy as just running (You should always ru
 ./CoppeliaSim/coppeliaSim.sh
 ```
 
-If these commands say that the file does not excist, either you're not in the correct working directory with your terminal, or you did not extract CoppeliaSim to the correct location.
+If these commands say that the file does not exist, either you're not in the correct working directory with your terminal, or you did not extract CoppeliaSim to the correct location.
 
 For the full startup options, please refer to the [docs](https://www.coppeliarobotics.com/helpFiles/en/commandLine.htm).
 
@@ -58,6 +66,37 @@ Technically, CoppeliaSim also supports Python scripts. However, this has only be
 In this repository, you'll find the Lua scripts used in this course. The Robobo scripts are (for this course modified) versions of what is officially supplied for the Robobo. They have comments and variable names in Portuguese and generally overuse global variables. However, they are the best we have.
 
 Next to the Robobo scripts, you'll find a `food.lua` script under the arena. This is the script used for food for task 3. You're encouraged to modify this if and when you want to change the behavior of the food.
+
+## Talking to CoppeliaSim from Python
+
+For this course, most of the python code that talks to CoppeliaSim directly is abstracted away, so you're not really required to understand how to do it. However, it might still be good to get a hello world of sort running, just so you know what it is doing, and to make sure that it all works. If you want a more detailed explanation on what is going on, the official source code, documentation, and examples can be found on the [GitHub repo](https://github.com/CoppeliaRobotics/zmqRemoteApi/tree/master/clients/python).
+
+Let's create a Python file `send_commands.py` like this:
+
+```python
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
+
+
+client = RemoteAPIClient(
+    host="localhost",  # This is just to say, "this same computer"
+    port=23000,  # The default port CoppeliaSim launces the ZMQ API at.
+)
+# This is Lua nonsense. We are gathering a global Lua object called "sim",
+# and calling python functions on *that*.
+# You can ignore it, and pretend we created a "sim" object.
+sim = client.require("sim")
+
+# Start the simulation
+sim.startSimulation()
+
+# Wait 5 seconsd
+sim.wait(5)
+
+# Stop the simulation
+sim.stopSimulation()
+```
+
+After this, you can run CoppeliaSim (e.g. `./CoppeliaSim/coppeliaSim.sh ./scenes/Robobo_Scene.ttt`) in your venv, and, in a new terminal in the same venv run `python send_commands.py`. You should see the simulation starting (but still nothing moving, as we're not telling any robot to do anything,) and then stopping again. Nothing special.
 
 ## Troubleshooting
 
