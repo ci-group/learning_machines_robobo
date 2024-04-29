@@ -15,7 +15,7 @@ import argparse
 from pathlib import Path
 from dataclasses import dataclass
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 # Using Cmake style stuff because what else would I use.
 EXAMPLES = Path(__file__).parent.parent.joinpath("examples").resolve(strict=True)
@@ -76,10 +76,10 @@ def remove_existing_in(directory: Path) -> None:
 def make_tutorial(
     where: Path,
     *,
-    scripts: List[Union[str, Tuple[str, str]]] = [],
-    caktin_packages: List[str] = [],
-    models: List[Union[str, Tuple[str, str]]] = [],
-    scenes: List[Union[str, Tuple[str, str]]] = [],
+    scripts: Sequence[Union[str, Tuple[str, str]]] = [],
+    caktin_packages: Sequence[str] = [],
+    models: Sequence[Union[str, Tuple[str, str]]] = [],
+    scenes: Sequence[Union[str, Tuple[str, str]]] = [],
     dockerfile: Optional[str] = None,
     lua: bool = False,
     requirements: Optional[str] = None,
@@ -127,7 +127,7 @@ def make_tutorial(
 
 @dataclass
 class Args:
-    pass
+    adv_coppelia_sim: bool
 
 
 def parse_args(args: List[str]) -> Args:
@@ -144,8 +144,15 @@ def parse_args(args: List[str]) -> Args:
                 **/*.md
             """,
     )
+    parser.add_argument(
+        "--advanced_coppelia_sim",
+        action="store_true",
+        help="If passed, a more advanced Dockerfile to run CoppeliaSim is created.",
+        default=False,
+        required=False,
+    )
     arguments = parser.parse_args()
-    return Args()
+    return Args(adv_coppelia_sim=arguments.advanced_coppelia_sim)
 
 
 def main(args: List[str]) -> None:
@@ -170,15 +177,26 @@ def main(args: List[str]) -> None:
         dockerfile="ros_tutorial.dockerfile",
     )
 
-    make_tutorial(
-        COPPELIA_SIM_TUTORIAL,
-        scripts=[
+    coppelia_dockerfile = "coppelia.dockerfile" if arguments.adv_coppelia_sim else None
+    scripts = (
+        [
+            "start_coppelia_docker.sh",
+            "start_coppelia_docker.ps1",
+            "start_coppelia_docker_apple_sillicon.zsh",
+        ]
+        if arguments.adv_coppelia_sim
+        else [
             "start_coppelia_sim.sh",
             "start_coppelia_sim.ps1",
             "start_coppelia_sim.zsh",
-        ],
+        ]
+    )
+    make_tutorial(
+        COPPELIA_SIM_TUTORIAL,
+        scripts=scripts,
         scenes=["Robobo_Scene.ttt"],
         lua=True,
+        dockerfile=coppelia_dockerfile,
         requirements="coppeliasim_tutorial_requirements.txt",
     )
 

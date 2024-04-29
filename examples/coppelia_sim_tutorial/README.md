@@ -118,4 +118,14 @@ You should be able to read that `libbsd` does not exist on this sytem. This erro
 
 This is a recursive dependency, so `libLoadErrorCheck` finds nothing, but `ldd ./CoppeliaSim/libsimZMQ.so` reports the `libbsd.so.0 => not found`
 
-Note that `ldd ./CoppeliaSim/*.so | grep "not found"` is likely to find missing objects regardless. As long as there are no errors, it's not trying to load or use those missing libraries, so it's not a problem. 
+Note that `ldd ./CoppeliaSim/*.so | grep "not found"` is likely to find missing objects regardless. As long as there are no errors, it's not trying to load or use those missing libraries, so it's not a problem.
+
+## Advanced usage - Docker
+
+At some point, you might want to start CoppeliaSim inside a container. This can be because you want to train your simulation on a server somewhere, or because you simply cannot get it running on your system. For this, you can use the [official CoppeliaSim docker image](https://github.com/CoppeliaRobotics/docker-image-coppeliasim) as a guide, or you can use the one provided in this repository, which is effectively identical, but which comes with runscripts to help you play around with it, if you had issues with that.
+
+To get access to these, you have to re-build the examples (as will be the case for all "advanced usage" sections,) This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this. To re-build cd into `maintained/` of this project, and run `python3 build.py --advanced_coppelia_sim`.
+
+After you have run this, you will find that the runscripts have changed to `_docker` variants, where it should be noted that (like `run.*` from the full project setup,) MacOS users with intel chips should use the `.sh` version of the runscript, the same as Linux, and MacOS users with Apple Sillicon should use the `apple_sillicon.zsh` version.
+
+Once this example has been rebuild, you should download the `Ubuntu 22.04` version of CoppeliaSim, and rename it to `./CoppeliaSim.tar.xz`, to make the naming consistant. After this, you should be able to call the runscripts, which will launch a headless instance of CoppeliaSim inside a freshly built container. You can test if this worked by creating and running the `send_commands.py` from earlier again.
