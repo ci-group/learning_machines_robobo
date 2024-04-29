@@ -2,7 +2,7 @@
 
 For this course, we use CoppeliaSim to simulate the robot. This is not the easiest program to use or install, so this should serve as a short tutorial on how to install and run it.
 
-First, download the edu version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads). Click "edu" and then select your operating system. On Windows, use the zip package without an installer. On Mac, everything should be fine by default. For Linux, it says "Ubuntu," but the package ships with most of its dependencies, so it will run on any distro. (Tested Debian, Arch and Fedora) On Arch, to get a fully smooth experience, the only dependency you might want to install is [icu60](https://aur.archlinux.org/packages/icu60).
+First, download the edu version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads). Click "edu" and then select your operating system. On Windows, use the zip package without an installer. On Mac, everything should be fine by default, just select the right version for your hardware. For Linux, it says "Ubuntu," but the package ships with most of its dependencies, so it will run on any distro with some minor troubleshooting. (Tested Debian, Arch and Fedora) On Arch, to get a smooth experience, the only dependency you might want to install is [`icu60`](https://aur.archlinux.org/packages/icu60), on Fedora, you want to install [`libbsd`](https://packages.fedoraproject.org/pkgs/libbsd/libbsd/).
 
 One thing to note when running on Linux is that there have previously been unexpected issues with the program when running on Wayland. Exactly why this is the case, we don't know. But, on Debian KDE with Wayland, it doesn't start at all, and on Fedora Gnome with Wayland, it randomly crashes every now and then. If you experience weird issues, consider switching to X11.
 
@@ -10,7 +10,7 @@ One thing to note when running on Linux is that there have previously been unexp
 
 On Linux and Windows after it is all downloaded, you will find yourself with a zip file. When extracted, this will expose quite a large amount of scripts and executables you might want to run, so we are going to extract it to a location we have access to it from the terminal, specifically `./CoppeliaSim` such that you can run the exact same commands as the ones in this README. This exact path is also required because some startup scripts, later on, rely on it being in this location.
 
-If you're wondering what extracting to `./CoppeliaSim` or means here, it is to say that you should extract to a new directory called "CoppeliaSim" or located in the current working directory.
+If you're wondering what extracting to `./CoppeliaSim` or means here, it is to say that you should extract to a new directory called "CoppeliaSim" that is located in the directory this README is in.
 
 #### Mac post-download
 
@@ -39,26 +39,13 @@ If these commands say that the file does not excist, either you're not in the co
 
 For the full startup options, please refer to the [docs](https://www.coppeliarobotics.com/helpFiles/en/commandLine.htm).
 
-This might complain there is no ZMQ or Zero-MQ library available, or that certain python packages are not installed. The troubleshooting section at the end explains how to fix this.
-
 The executable takes several commandline arguments, one of them being the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./CoppeliaSim/coppeliaSim ./scenes/Robobo_Scene.ttt` or similar for your OS. 
 
-If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory (or, on macOS, `coppeliaSim.app` file) around, from this example directory to the `full_project_set` example to your own project directory to make sure it's available everywhere.
+If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory (or, on macOS, `coppeliaSim.app` file) around, from this example directory to the `full_project_setup` example to your own project directory to make sure it's available everywhere.
 
 You can now open it, and click and move around a bit. It's admittedly a rather awkward UI, but you'll need to be somewhat familiar with it.
 
 One thing you'll notice is little text/script icons next to some nodes in the Scene, mostly on the Robobo. These are Lua scripts that are running on the CoppeliaSim side. Double-click the script symbol to open them.
-
-#### Advanced usage of `start_coppelia_sim`
-
-This `./scripts/start_coppelia_sim.sh`, `".zsh` on macOS, or `".ps1` on Windows, script has two more optional parameters. 
-
-The first is the TCP port to start CoppeliaSim under. As said eariler, by default, this is port 19999, but, you can set this to any port you like by providing this second argument. 
-This is useful if you want to run multiple instances of CoppeliaSim when training your models.
-
-The second optional argument is `-h` on Unix or `-headless` on Windows as a last argument. This starts CoppeliaSim in headless mode. It still uses your GPU (we have a camera, after all,) but it no longer renders to the screen, drastically improving performance. To keep the scripts simple, you have to specify this as the third argument, meaning you cannot pass it if you did not also specify the TCP port.
-
-One thing to note when starting CoppeliaSim is that it expects a TTY to be conected. Because of this, you sadly cannot run it with `coppeliaSim.sh &`, and launch multiple instances from one terminal. If you do find a way to do this do let us know.
 
 ## Lua
 
@@ -72,46 +59,13 @@ In this repository, you'll find the Lua scripts used in this course. The Robobo 
 
 Next to the Robobo scripts, you'll find a `food.lua` script under the arena. This is the script used for food for task 3. You're encouraged to modify this if and when you want to change the behavior of the food.
 
-### Writing your own Lua script for Python.
-
-Writing / calling your own Lua scripts is quite easy, but it requires a bit of a weird setup.
-In `full_project_setup`, in the `robobo_interface` package in the `simulation.py` file, you can find some examples of lua code being called from Python. To create a lua function to call from Python, you should use this signature:
-
-```lua
-theFunctionName = function(inIntegers, inFloats, inStrings, inBuffer)
-    -- Do something here
-
-    -- If you don't want to return a byte buffer, you can replace it with an empty string,
-    -- In Lua, the empty string and empty bye array are the same object.
-    return { output, integers }, { output, floats}, { output, strings}, outByteBuffer
-end
-```
-
-The type signature from the Python side will look like this:
-
-```python
-from coppelia_sim import sim
-
-out_ints, out_floats, out_strings, out_byte_buffer = sim.simxCallScriptFunction(
-    connection_client_id,
-    "Name_Of_Node",
-    sim.sim_scripttype_childscript,
-    "theFunctionName",
-    [any, input, integers],
-    [any, input, floats],
-    [any, input, strings],
-    bytearray(), # An input byte-array
-    sim.simx_opmode_blocking,
-)
-```
-
 ## Troubleshooting
 
 If something isn't working correctly (So, kind of working, but with errors), the first thing to run is its dependency error checker. This will report if all dynamically linked libraries are available (`.dll` on Windows, `.so` on Unix). It's name is `libLoadErrorCheck`, and where it lives depends on your OS and installation method. Just searching for a file of this name in the directory you extracted CoppeliaSim to should let you find it.
 
 If this script fails on MacOS and Windows, you have found the problem, but all you can do is try to re-download and re-extract everything, and if that doesn't work, your OS is having problems, and should be troubleshoot on a case-by-case basis, and you should try googeling some error messages.
 
-If the script fails on Linux, you can try to install the `.so` file yourself. It might be that your distribution simply doesn't ship it by default, and it can just be installed trough your package manager (if the library's name is `libSomething`, it's package will be called `libSomething` on Fedora and Arch based systems, but `libSomething-dev` on Debian based systems), and, if that doesn't work, you can find a working version of the file elsewhere, and put it in `./CoppeliaSim/` (Maybe modifying `$LD_LIBRARY_PATH` to get it recognised). Wrince and repeat with recursive dependencies (Find those with `ldd libSomething.so.0`)
+If the script fails on Linux, you can try to install the `.so` file yourself. It might be that your distribution simply doesn't ship it by default, and it can just be installed trough your package manager. If that doesn't work, you can find a working version of the file elsewhere, and put it in `./CoppeliaSim/` (Maybe modifying `$LD_LIBRARY_PATH` to get it recognised). Wrince and repeat with recursive dependencies (Find those with `ldd libSomething.so.0`)
 
 For example, if you get this common error:
 ```
