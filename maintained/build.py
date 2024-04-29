@@ -45,7 +45,10 @@ BASE = Path(__file__).parent.resolve(strict=True)
 def is_ignored_path(path: Path) -> bool:
     """When true, the item of this name will not be deleted when building"""
     return (
-        any(reserved in path.name.lower() for reserved in ["coppeliasim", "assets"])
+        any(
+            reserved in path.name.lower()
+            for reserved in ["coppeliasim", "assets", ".venv"]
+        )
         or path.suffix == ".md"
     )
 
@@ -115,7 +118,9 @@ def make_tutorial(
         shutil.copytree((BASE / "lua"), (where / "lua_scripts"))
 
     if requirements is not None:
-        shutil.copyfile((BASE / "requirements" / requirements), (where / "requirements.txt"))
+        shutil.copyfile(
+            (BASE / "requirements" / requirements), (where / "requirements.txt")
+        )
 
 
 def main() -> None:
