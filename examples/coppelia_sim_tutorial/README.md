@@ -107,4 +107,18 @@ out_ints, out_floats, out_strings, out_byte_buffer = sim.simxCallScriptFunction(
 
 ## Troubleshooting
 
-If you want to make sure you installed things correctly, the first thing to run is its error checker. This will report if all dynamically linked libraries are available. It's name is `libLoadErrorCheck`, and where it lives depends on your OS and installation method. Just searching for a file of this name in the directory you extracted CoppeliaSim to should let you find it.
+If something isn't working correctly (So, kind of working, but with errors), the first thing to run is its dependency error checker. This will report if all dynamically linked libraries are available (`.dll` on Windows, `.so` on Unix). It's name is `libLoadErrorCheck`, and where it lives depends on your OS and installation method. Just searching for a file of this name in the directory you extracted CoppeliaSim to should let you find it.
+
+If this script fails on MacOS and Windows, you have found the problem, but all you can do is try to re-download and re-extract everything, and if that doesn't work, your OS is having problems, and should be troubleshoot on a case-by-case basis, and you should try googeling some error messages.
+
+If the script fails on Linux, you can try to install the `.so` file yourself. It might be that your distribution simply doesn't ship it by default, and it can just be installed trough your package manager (if the library's name is `libSomething`, it's package will be called `libSomething` on Fedora and Arch based systems, but `libSomething-dev` on Debian based systems), and, if that doesn't work, you can find a working version of the file elsewhere, and put it in `./CoppeliaSim/` (Maybe modifying `$LD_LIBRARY_PATH` to get it recognised). Wrince and repeat with recursive dependencies (Find those with `ldd libSomething.so.0`)
+
+For example, if you get this common error:
+```
+[Connectivity >> ZMQ remote API server@addOnScript:error]   plugin simZMQ: Cannot load library [PATH]/CoppeliaSim/libsimZMQ.so: (libbsd.so.0: cannot open shared object file: No such file or directory)
+```
+You should be able to read that `libbsd` does not exist on this sytem. This error happens on Fedora, because it doesn't ship with `libbsd`. Installing it (`sudo dnf install libbsd`) solves the issue.
+
+This is a recursive dependency, so `libLoadErrorCheck` finds nothing, but `ldd ./CoppeliaSim/libsimZMQ.so` reports the `libbsd.so.0 => not found`
+
+Note that `ldd ./CoppeliaSim/*.so | grep "not found"` is likely to find missing objects regardless. As long as there are no errors, it's not trying to load or use those missing libraries, so it's not a problem. 
