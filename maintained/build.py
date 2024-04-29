@@ -11,7 +11,9 @@
 
 import sys
 import shutil
+import argparse
 from pathlib import Path
+from dataclasses import dataclass
 
 from typing import List, Optional, Tuple, Union
 
@@ -123,7 +125,32 @@ def make_tutorial(
         )
 
 
-def main() -> None:
+@dataclass
+class Args:
+    pass
+
+
+def parse_args(args: List[str]) -> Args:
+    parser = argparse.ArgumentParser(
+        prog="learning_machines_robobo_build",
+        description="""
+            The build script of learning_machines_robobo.
+
+            This script deletes everything that is in `examples/` and re-creates it from maintained/.
+            The exceptions, the files that are not getting deleted, are:
+                **/assets/
+                **/.venv/
+                **/coppeliasim/
+                **/*.md
+            """,
+    )
+    arguments = parser.parse_args()
+    return Args()
+
+
+def main(args: List[str]) -> None:
+    arguments = parse_args(args)
+
     for directory in MANAGED_DIRS:
         remove_existing_in(directory)
 
@@ -205,4 +232,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
