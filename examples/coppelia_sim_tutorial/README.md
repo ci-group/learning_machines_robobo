@@ -22,7 +22,7 @@ On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move th
 
 The first thing to do when running CoppeliaSim is to create a python virtual envoirement, and install some requirements on it. Technically speaking, we don't need it just jet, but CoppeliaSim gives you nice red error messages if you don't, and those can be confusing.
 
-I am going to presume you know what a venv is, but, if you don't, you can just use the [default `venv` module](https://docs.python.org/3.8/library/venv.html), as we don't need any of the fancy features of poetry or annaconda. (In fact, annaconda specifically is known to cause issues, and I recommend using venv or virtualenv.) So, just `python3.8 -m venv .venv` and then `source ./venv/bin/activate` or `.\.venv\bin\Activate.ps1`. After this, the python modules you need are aleady in `requirements.txt`, so you can just run `python -m pip install -r requirements.txt` to install those.
+I am going to presume you know what a venv is, but, if you don't, you can just use the [default `venv` module](https://docs.python.org/3.8/library/venv.html), as we don't need any of the fancy features of poetry or annaconda. (In fact, annaconda specifically is known to cause issues, and I recommend using venv or virtualenv.) So, just `python3.8 -m venv .venv` and then `source ./venv/bin/activate` or `.\.venv\Scripts\Activate.ps1`. After this, the python modules you need are aleady in `requirements.txt`, so you can just run `python -m pip install -r requirements.txt` to install those.
 
 #### Running the executable
 
@@ -124,7 +124,7 @@ Note that `ldd ./CoppeliaSim/*.so | grep "not found"` is likely to find missing 
 
 At some point, you might want to start CoppeliaSim inside a container. This can be because you want to train your simulation on a server somewhere, or because you simply cannot get it running on your system. For this, you can use the [official CoppeliaSim docker image](https://github.com/CoppeliaRobotics/docker-image-coppeliasim) as a guide, or you can use the one provided in this repository, which is effectively identical, but which comes with runscripts to help you play around with it, if you had issues with that.
 
-To get access to these, you have to re-build the examples (as will be the case for all "advanced usage" sections,) This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this. To re-build cd into `maintained/` of this project, and run `python3 build.py --advanced_coppelia_sim`.
+To get access to these, you have to re-build the examples (as will be the case for all "advanced usage" sections,) This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this. To re-build cd into `maintained/` of this project, and run `python3 build.py --advanced_coppelia_sim` from the `maintained/` directory.
 
 After you have run this, you will find that the runscripts have changed to `_docker` variants, where it should be noted that (like `run.*` from the full project setup,) MacOS users with intel chips should use the `.sh` version of the runscript, the same as Linux, and MacOS users with Apple Sillicon should use the `apple_sillicon.zsh` version.
 
