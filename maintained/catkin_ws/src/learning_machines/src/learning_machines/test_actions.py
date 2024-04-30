@@ -51,7 +51,7 @@ def test_sim(rob: SimulationRobobo):
     print(rob.is_running())
     rob.play_simulation()
     print(rob.get_sim_time())
-    print(rob.position())
+    print(rob.get_position())
 
 
 def run_all_actions(rob: IRobobo):
@@ -62,7 +62,6 @@ def run_all_actions(rob: IRobobo):
     test_move_and_wheel_reset(rob)
     if isinstance(rob, SimulationRobobo):
         test_sim(rob)
-        rob.set_realtime()
 
     test_phone_movement(rob)
 

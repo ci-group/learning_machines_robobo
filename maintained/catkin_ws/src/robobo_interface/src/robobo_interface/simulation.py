@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-
+import signal
 
 import cv2
 import numpy
@@ -19,11 +19,12 @@ from robobo_interface.datatypes import (
 )
 from robobo_interface.utils import LockedSet
 
-from coppelia_sim import sim, simConst, ping
-from coppelia_sim.error import CoppeliaSimApiError
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
-from typing import Callable, List, Optional
+from typing import Callable, List, NoReturn, Optional, TypeVar
 from numpy.typing import NDArray
+
+T = TypeVar("T")
 
 
 class SimulationRobobo(IRobobo):
@@ -41,7 +42,6 @@ class SimulationRobobo(IRobobo):
     you can still experiment with them.
 
     Arguments you should understand:
-    realtime: bool = False -> Wether to run the simulation in realtime, or as fast as possible
     identifier: int = 0 -> The value number to use. If you have one robobo in the scene,
             or want to use the first one, this is 0. Else, increase the value
 
@@ -53,58 +53,48 @@ class SimulationRobobo(IRobobo):
         If None, it will try to see if COPPELIA_SIM_IP is set, and use that.
         If that envoirement variable is not set, it will default to "0.0.0.0"
     logger: Callable[[str], None] = print -> The function to use for logging / printing.
+    timeout_dur: int -> The amount of time to wait for API calls before erroring out.
     """
 
     def __init__(
         self,
-        realtime=False,
         identifier: int = 0,
         api_port: Optional[int] = None,
         ip_adress: Optional[str] = None,
         logger: Callable[[str], None] = print,
+        timeout_dur: int = 10,
     ):
         self._logger = logger
         self._used_pids: LockedSet[int] = LockedSet()
         self._identifier = f"[{identifier}]"
 
-        sim.simxFinish(-1)  # just in case, close all opened connections
+        if api_port is None:
+            api_port = int(os.getenv("COPPELIA_SIM_PORT", "23000"))
+
         # 0.0.0.0 to connect to the current computer on Linux, with `--net=host`
         # This doesn't work on Windows or MacOS. There, the variable needs to be specified.
-
-        if api_port is None:
-            api_port = int(os.getenv("COPPELIA_SIM_PORT", "19999"))
         if ip_adress is None:
             ip_adress = os.getenv("COPPELIA_SIM_IP", "0.0.0.0")
 
-        self._connection_id = sim.simxStart(ip_adress, api_port, True, True, 5000, 5)
-        if self._connection_id == -1:
-            self._logger(
-                """CoppeliaSim Api Connection Error
-                Failed connecting to remote API server
-                Is the simulation running / playing?
-
-                If not on Linux with --net=host:
-                Did you specify the IP adress of your computer in scripts/setup.bash?
-                """
+        # The RemoteAPIClient waits indefinetly, but I want some way to show an error.
+        # It closes the connection when it gets garbage collected, so no need to close
+        try:
+            self._client = timeout(
+                lambda: RemoteAPIClient(host=ip_adress, port=api_port), timeout_dur
             )
-            self._logger(
-                f"Looked for API at port: {api_port} at IP adress: {ip_adress}"
-            )
-            sys.exit(1)
+        except TimeoutError:
+            self._fail_connect(api_port, ip_adress)
 
-        ping.ping(self._connection_id)
+        try:
+            self._sim = timeout(lambda: self._client.require("sim"), timeout_dur)
+        except TimeoutError:
+            self._fail_connect(api_port, ip_adress)
+
+        self._initialise_handles()
         self._logger(
             f"""Connected to remote CoppeliaSim API server at port {api_port}
             Connected to robot: {self._identifier}"""
         )
-
-        self._initialise_handles()
-        self.set_realtime(realtime)
-
-    def __del__(self):
-        # Yes, having __enter__ and __exit__ on a seperate CoppeliaSimConnection object would be cleaner.
-        # However, this gives the simler API, for which I am willing to sacrifice code quality.
-        sim.simxFinish(self._connection_id)
 
     def set_emotion(self, emotion: Emotion) -> None:
         """Show the emotion of the robot on the screen
@@ -135,21 +125,20 @@ class SimulationRobobo(IRobobo):
         returns:
             the blockid
         """
+        if not self.is_running():
+            raise RuntimeError("Cannot move wheels when simulation is not running")
         if blockid in self._used_pids:
             raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
         blockid = blockid if blockid is not None else self._first_unblocked()
         self._used_pids.add(blockid)
 
-        sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Left_Motor",
-            sim.sim_scripttype_childscript,
+        self._sim.callScriptFunction(
             "moveWheelsByTime",
+            self._wheels_script,
             [right_speed, left_speed],
             [millis / 1000.0],
             [self._block_string(blockid)],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
 
         return blockid
@@ -159,18 +148,16 @@ class SimulationRobobo(IRobobo):
         After calling this topic both encoders (topic /robot/wheels) will start again
         in position 0.
         """
-        sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Left_Motor",
-            sim.sim_scripttype_childscript,
+        if not self.is_running():
+            raise RuntimeError("Cannot reset wheels when simulation is not running")
+        self._sim.callScriptFunction(
             "resetWheelEncoders",
+            self._wheels_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
 
     def talk(self, message: str) -> None:
         """Let the robot speak.
@@ -197,34 +184,29 @@ class SimulationRobobo(IRobobo):
         selector: LedId
         color: LedColor
         """
-        sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Back_L",
-            sim.sim_scripttype_childscript,
+        if not self.is_running():
+            raise RuntimeError("Cannot set leds when simulation is not running")
+        self._sim.callScriptFunction(
             "setLEDColor",
+            self._leds_script,
             [],
             [],
             [selector.value, color.value],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
 
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
         [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
         """
-        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/IR_Back_C",
-            sim.sim_scripttype_childscript,
+        ints, _floats, _strings, _buffer = self._sim.callScriptFunction(
             "readAllIRSensor",
+            self._ir_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
         return list(ints)
 
     def get_image_front(self) -> NDArray[numpy.uint8]:
@@ -233,26 +215,14 @@ class SimulationRobobo(IRobobo):
         You can, for example, write this image to file with:
         https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#gabbc7ef1aa2edfaa87772f1202d67e0ce
         """
-        ping.ping(self._connection_id)
-        ints, _floats, _strings, buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable",
-            sim.sim_scripttype_childscript,
-            "getCameraImage",
-            [],
-            [],
-            [],
-            bytearray(),
-            sim.simx_opmode_blocking,
-        )
+        img, [resX, resY] = self._sim.getVisionSensorImg(self._smartphone_camera)
+        img = numpy.frombuffer(img, dtype=numpy.uint8).reshape(resY, resX, 3)
 
-        # reshape image
-        image = buffer[::-1]
-        im_cv2 = numpy.array(image, dtype=numpy.uint8)
-        im_cv2.resize([ints[0], ints[1], 3])
-        im_cv2 = cv2.flip(im_cv2, 1)
-
-        return im_cv2
+        # In CoppeliaSim images are left to right (x-axis), and bottom to top (y-axis)
+        # (consistent with the axes of vision sensors, pointing Z outwards, Y up)
+        # and color format is RGB triplets, whereas OpenCV uses BGR:
+        cv2.flip(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), 0)
+        return img
 
     def set_phone_pan(
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
@@ -269,39 +239,34 @@ class SimulationRobobo(IRobobo):
         returns:
             the blockid
         """
+        if not self.is_running():
+            raise RuntimeError("Cannot set phone pan when simulation is not running")
         if blockid in self._used_pids:
             raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
         blockid = blockid if blockid is not None else self._first_unblocked()
         self._used_pids.add(blockid)
 
-        sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor",
-            sim.sim_scripttype_childscript,
+        self._sim.callScriptFunction(
             "movePanTo",
+            self._pan_motor_script,
             [pan_position, pan_speed],
             [],
             [self._block_string(blockid)],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
 
         return blockid
 
     def read_phone_pan(self) -> int:
         """Get the current pan of the phone. Range: 0-100"""
-        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor",
-            sim.sim_scripttype_childscript,
+        ints, _floats, _strings, _buffer = self._sim.callScriptFunction(
             "readPanPosition",
+            self._pan_motor_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
         return int(ints[0])
 
     def set_phone_tilt(
@@ -319,96 +284,81 @@ class SimulationRobobo(IRobobo):
         returns:
             the blockid
         """
+        if not self.is_running():
+            raise RuntimeError("Cannot set phone tilt when simulation is not running")
         if blockid in self._used_pids:
             raise ValueError(f"BlockID {blockid} is already in use: {self._used_pids}")
         blockid = blockid if blockid is not None else self._first_unblocked()
         self._used_pids.add(blockid)
 
-        sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor",
-            sim.sim_scripttype_childscript,
+        self._sim.callScriptFunction(
             "moveTiltTo",
+            self._tilt_motor_script,
             [tilt_position, tilt_speed],
             [],
             [self._block_string(blockid)],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
 
         return blockid
 
     def read_phone_tilt(self) -> int:
         """Get the current tilt of the phone. Range: 26-109"""
-        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor",
-            sim.sim_scripttype_childscript,
+        ints, _floats, _strings, _buffer = self._sim.callScriptFunction(
             "readTiltPosition",
+            self._tilt_motor_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
+
         return int(ints[0])
 
     def read_accel(self) -> Acceleration:
         """Get the acceleration of the robot"""
-        _ints, floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable",
-            sim.sim_scripttype_childscript,
+        _ints, floats, _strings, _buffer = self._sim.callScriptFunction(
             "readAccelerationSensor",
+            self._smartphone_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
         return Acceleration(*floats)
 
     def read_orientation(self) -> Orientation:
         """Get the orientation of the robot"""
-        _ints, floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable",
-            sim.sim_scripttype_childscript,
+        _ints, floats, _strings, _buffer = self._sim.callScriptFunction(
             "readOrientationSensor",
+            self._smartphone_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
         return Orientation(*floats)
 
     def read_wheels(self) -> WheelPosition:
         """Get the wheel orientation and speed of the robot"""
-        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            f"/Robobo{self._identifier}/Left_Motor",
-            sim.sim_scripttype_childscript,
+        ints, _floats, _strings, _buffer = self._sim.callScriptFunction(
             "readWheels",
+            self._wheels_script,
             [],
             [],
             [],
             bytearray(),
-            sim.simx_opmode_blocking,
         )
-        ping.ping(self._connection_id)
         return WheelPosition(*ints)
 
     def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
         """
-        duration = seconds * 1000
         start_time = self.get_sim_time()
-        while self.get_sim_time() - start_time < duration:
+        while self.get_sim_time() - start_time < seconds:
+            if not self.is_running():
+                raise RuntimeError("Cannot sleep when simulation is not running")
             time.sleep(0.02)
 
     def is_blocked(self, blockid: int) -> bool:
@@ -417,11 +367,7 @@ class SimulationRobobo(IRobobo):
         Arguments:
         blockid: the id to check
         """
-        res = sim.simxGetInt32Signal(
-            self._connection_id,
-            self._block_string(blockid),
-            sim.simx_opmode_blocking,
-        )
+        res = self._sim.getInt32Signal(self._block_string(blockid))
         if res == 0:
             self._used_pids.discard(blockid)
             return False
@@ -433,31 +379,44 @@ class SimulationRobobo(IRobobo):
         """Block untill (only return once) all blocking actions are completed"""
         while any(self.is_blocked(blockid) for blockid in self._used_pids):
             time.sleep(0.02)
-        ping.ping(self._connection_id)
 
     def play_simulation(self):
         """Start the simulation"""
-        sim.simxStartSimulation(self._connection_id, simConst.simx_opmode_blocking)
-        ping.ping(self._connection_id)
+        self._sim.startSimulation()
 
     def pause_simulation(self):
         """Pause the simulation"""
-        sim.simxPauseSimulation(self._connection_id, simConst.simx_opmode_blocking)
-        ping.ping(self._connection_id)
+        self._sim.pauseSimulation()
+        while self._sim.getSimulationState() != self._sim.simulation_paused:
+            time.sleep(0.002)
 
     def stop_simulation(self):
         """Stop the simulation"""
-        sim.simxStopSimulation(self._connection_id, simConst.simx_opmode_blocking)
-        ping.ping(self._connection_id)
+        self._sim.stopSimulation()
+        while self._sim.getSimulationState() != self._sim.simulation_stopped:
+            time.sleep(0.002)
+
+    def is_stopped(self) -> bool:
+        """Return wether the simulation is stopped"""
+        return self._sim.getSimulationState() == self._sim.simulation_stopped
+
+    def is_paused(self) -> bool:
+        """Return wether the simulation is stopped"""
+        return self._sim.getSimulationState() == self._sim.simulation_paused
 
     def is_running(self) -> bool:
-        """Return wether the simulation is currently running"""
-        return not self.get_sim_time() == 0
+        """Return wether the simulation is running"""
+        # There are 6 different types of running we don't care about
+        state = self._sim.getSimulationState()
+        return (state != self._sim.simulation_stopped) and (
+            state != self._sim.simulation_paused
+        )
 
-    def get_sim_time(self) -> int:
-        """Get simulation time (in ms), or 0 if the simulation is not running"""
-        ping.ping(self._connection_id)
-        return sim.simxGetLastCmdTime(self._connection_id)
+    def get_sim_time(self) -> float:
+        """Get simulation time (in seconds),
+        returning the last value if the simulation is stopped
+        """
+        return self._sim.getSimulationTime()
 
     def nr_food_collected(self) -> int:
         """Return the amount of food currently collected.
@@ -465,58 +424,41 @@ class SimulationRobobo(IRobobo):
         This only works in the simulation
         Trivially doesn't work when the simulation does not have any food.
         """
-        ping.ping(self._connection_id)
-        ints, _floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            "Food",
-            simConst.sim_scripttype_childscript,
+        ints, _floats, _strings, _buffer = self._sim.callScriptFunction(
             "remote_get_collected_food",
+            self._food_script,
             [],
             [],
             [],
             bytearray(),
-            simConst.simx_opmode_blocking,
         )
         return ints[0]
 
-    def set_realtime(self, value: bool = True, /) -> None:
-        """Make the simulation run either at the actual speed, or as fast as it can.
-
-        Arguments:
-        value: bool = False -> to set realtime true or false
-        """
-        sim.simxSetBoolParam(
-            self._connection_id,
-            simConst.sim_boolparam_realtime_simulation,
-            value,
-            simConst.simx_opmode_oneshot,
-        )
-
-    def position(self) -> Position:
-        """Get the position of the Robobo
+    def get_position(self) -> Position:
+        """Get the position of the Robobo (Relative to the world)
 
         This only works in the simulation.
         """
-        pos = sim.simxGetObjectPosition(
-            self._connection_id, self._robobo, -1, simConst.simx_opmode_blocking
-        )
+        pos = self._sim.getObjectPosition(self._robobo, self._sim.handle_world)
         return Position(*pos)
+
+    def get_orientation(self) -> Orientation:
+        """Get the orientation of the Robobo (Relative to the world)
+
+        This only works in the simulation.
+        """
+        orient = self._sim.getOBjectOrientation(self._robobo, self._sim.handle_world)
+        return Orientation(*orient)
 
     def set_position(self, position: Position, orientation: Orientation) -> None:
         """Set the position of the Robobo in the simulation"""
-        sim.simxSetObjectOrientation(
-            self._connection_id,
-            self._robobo,
-            -1,
-            [orientation.yaw, orientation.pitch, orientation.roll],
-            simConst.simx_opmode_blocking,
+        self._sim.setObjectPosition(
+            self._robobo, [position.x, position.y, position.z], self._sim.handle_world
         )
-        sim.simxSetObjectPosition(
-            self._connection_id,
+        self._sim.setObjectOrientation(
             self._robobo,
-            -1,
-            [position.x, position.y, position.z],
-            simConst.simx_opmode_blocking,
+            [orientation.yaw, orientation.pitch, orientation.roll],
+            self._sim.handle_world,
         )
 
     def base_position(self) -> Position:
@@ -526,11 +468,9 @@ class SimulationRobobo(IRobobo):
         Trivially doesn't work when the simulation does not have a base.
         """
         if self._base is None:
-            raise ValueError("Connected scene does not appear to have a base")
+            raise AttributeError("Scene does not have a base")
 
-        pos = sim.simxGetObjectPosition(
-            self._connection_id, self._base, -1, simConst.simx_opmode_blocking
-        )
+        pos = self._sim.getObjectPosition(self._base, self._sim.handle_world)
         return Position(*pos)
 
     def base_detects_food(self) -> bool:
@@ -548,21 +488,23 @@ class SimulationRobobo(IRobobo):
         This only works in the simulation.
         Trivially doesn't work when the simulation does not have a base or food.
         """
-        ping.ping(self._connection_id)
-        _ints, floats, _strings, _buffer = sim.simxCallScriptFunction(
-            self._connection_id,
-            "/Base",
-            simConst.sim_scripttype_childscript,
+        if self._base is None:
+            raise AttributeError("Scene does not have a base")
+
+        if self._food_script is None:
+            raise AttributeError("Cannot find any food in the scene")
+
+        _ints, floats, _strings, _buffer = self._sim.callScriptFunction(
             "getFoodDistance",
+            self._base_script,
             [],
             [],
             [],
             bytearray(),
-            simConst.simx_opmode_blocking,
         )
         ret = floats[0]
         if ret < 0:
-            raise ValueError("Cannot find any food in the scene")
+            raise AttributeError("Cannot find any food in the scene")
         return ret
 
     def _block_string(self, blockid: int) -> str:
@@ -572,18 +514,73 @@ class SimulationRobobo(IRobobo):
         return f"Block_{self._identifier}_{blockid}"
 
     def _initialise_handles(self) -> None:
-        self._robobo = sim.simxGetObjectHandle(
-            self._connection_id,
-            f"/Robobo{self._identifier}",
-            simConst.simx_opmode_blocking,
-        )
+        # fmt: off
+        self._robobo = self._get_object(f"/Robobo{self._identifier}")
+        self._wheels_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Left_Motor"))
+        self._leds_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Back_L"))
+        self._ir_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/IR_Back_C"))
+        self._pan_motor_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Pan_Motor"))
+        self._tilt_motor_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor"))
+        self._smartphone_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable"))
+        self._smartphone_camera = self._get_object(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable/Smartphone_camera")
+        # fmt: on
 
-        # The base might not exist in this scene.
         try:
-            self._base = sim.simxGetObjectHandle(
-                self._connection_id,
-                "/Base",
-                simConst.simx_opmode_blocking,
-            )
-        except CoppeliaSimApiError:
+            self._base = self._get_object("/Base")
+            self._base_script = self._get_childscript(self._base)
+        except AttributeError:
             self._base = None
+            self._base_script = None
+
+        try:
+            self._food_script = self._get_childscript(self._get_object("/Food"))
+        except AttributeError:
+            self._food_script = None
+
+    def _get_object(self, name: str) -> int:
+        ret = self._sim.getObject(name)
+        if ret < 0:
+            raise AttributeError(f"Could not find {str} in scene")
+        return ret
+
+    def _get_childscript(self, obj_handle: int) -> int:
+        ret = self._sim.getScript(self._sim.scripttype_childscript, obj_handle)
+        if ret < 0:
+            raise AttributeError(f"Could not find Script of {str} in scene")
+        return ret
+
+    def _fail_connect(self, api_port: int, ip_adress: str) -> NoReturn:
+        self._logger(
+            """CoppeliaSim Api Connection Error
+            Failed connecting to remote API server
+            Is the simulation running / playing?
+
+            If not on Linux with --net=host:
+            Did you specify the IP adress of your computer in scripts/setup.bash?
+            """
+        )
+        self._logger(f"Looked for API at port: {api_port} at IP adress: {ip_adress}")
+        # Yes, sys.exit(1) gets caught by the zmq runtime. No, I don't know why.
+        quit_hard()
+
+
+# This only works on Unix. Luckily, we are in Docker.
+def timeout(func: Callable[[], T], timeout_duration: int = 10) -> T:
+    def handler(_signum, _frame):
+        raise TimeoutError()
+
+    # set the timeout handler
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(timeout_duration)
+    try:
+        return func()
+    finally:
+        signal.alarm(0)
+
+
+# The API code catches too much, making it hard to quit when failing.
+# This is about as agressive as it gets, and should not be used except in containers.
+def quit_hard() -> NoReturn:
+    os.kill(os.getpid(), signal.SIGKILL)
+    # The above is what does it, but the below is to make the type system happy
+    sys.exit(1)
