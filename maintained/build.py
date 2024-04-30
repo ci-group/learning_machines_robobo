@@ -232,7 +232,6 @@ def main(args: List[str]) -> None:
             "coppelia_sim",
             "learning_machines",
             "data_files",
-            "learning_machines_prey",
             "robobo_interface",
             "robobo_msgs",
         ],
