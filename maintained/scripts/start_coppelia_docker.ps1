@@ -24,4 +24,4 @@ docker build -t coppelia_sim .
 Pop-Location
 Remove-Item -Path $tempDir -Recurse -Force
 
-Invoke-Expression -Command "docker run -it --rm -p $($apiPort):$($apiPort) --name coppelia_$($apiPort) coppelia_sim '-GzmqRemoteApi.rpcPort=$($apiPort)'"
+Invoke-Expression -Command "docker run -it --rm -p '$($apiPort):$($apiPort)' --name 'coppelia_$($apiPort)' coppelia_sim '-GzmqRemoteApi.rpcPort=$($apiPort)'"
