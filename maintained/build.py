@@ -229,7 +229,6 @@ def main(args: List[str]) -> None:
             "start_coppelia_sim.zsh",
         ],
         caktin_packages=[
-            "coppelia_sim",
             "learning_machines",
             "data_files",
             "robobo_interface",
