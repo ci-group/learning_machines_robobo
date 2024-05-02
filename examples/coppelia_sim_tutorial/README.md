@@ -14,7 +14,7 @@ If you're wondering what extracting to `./CoppeliaSim` or means here, it is to s
 
 #### Mac post-download
 
-On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the current directory (so to `./coppeliaSim.app`) so the commands below work. Note that MacOS might tell you it cannot verify the integrety of the app and refuse to run it. To give it permissions anyway, open finder in the current directory (with `open .`), and control-click the application to show the menu that lets you overwrite these settings.
+On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move this file to the directory this README is in, (to `./coppeliaSim.app`) so the commands below work. Note that MacOS might tell you it cannot verify the integrety of the app and refuse to run it. To give it permissions anyway, open finder in the current directory (with `open .`), and control-click the application to show the menu that lets you overwrite these settings.
 
 ### Running CoppeliaSim
 
@@ -26,7 +26,7 @@ I am going to presume you know what a venv is, but, if you don't, you can just u
 
 #### Running the executable
 
-By default, running CoppeliaSim is as easy as just running (You should always run with SHELL=true, which is to say, from the command line, never by clicking an executable in a graphical interface):
+By default, running CoppeliaSim is as easy as just running the following from a terminal: (You should always run with SHELL=true, which is to say, from the command line, never by clicking an executable in a graphical interface.)
 
 ```sh
 # On Windows:
@@ -47,7 +47,7 @@ If these commands say that the file does not exist, either you're not in the cor
 
 For the full startup options, please refer to the [docs](https://www.coppeliarobotics.com/helpFiles/en/commandLine.htm).
 
-The executable takes several commandline arguments, one of them being the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./CoppeliaSim/coppeliaSim ./scenes/Robobo_Scene.ttt` or similar for your OS. 
+The executable takes several commandline arguments, one of them being the scene to load. So, to load CoppeliaSim with a scene, for example, the `./scenes/Robobo_Scene.ttt`, you can simply run `./CoppeliaSim/coppeliaSim ./scenes/Robobo_Scene.ttt` or similar for your OS.
 
 If all this worked, you have installed CoppeliaSim correctly. Just copy-paste this `CoppeliaSim` directory (or, on macOS, `coppeliaSim.app` file) around, from this example directory to the `full_project_setup` example to your own project directory to make sure it's available everywhere.
 
@@ -57,13 +57,17 @@ One thing you'll notice is little text/script icons next to some nodes in the Sc
 
 ### Running with the shell scripts
 
-To make running CoppeliaSim a bit more ergonomic, we provide some really simple shell scripts to call CoppeliaSim. In some sense, they are nothing more than some documentation on what arguments you might want to pass. You can call these like `bash ./scripts/start_coppelia_sim.sh` on Linux, `zsh ./scripts/start_coppelia_sim.zsh` on MacOS, and `.\start_coppelia_sim.ps1` on Windows, and have documentation on what arguments you can pass in them.
+To make running CoppeliaSim a bit more ergonomic, we provide some really simple shell scripts to call CoppeliaSim. In some sense, they are nothing more than some documentation on what arguments you might want to pass. You can call these like `bash ./scripts/start_coppelia_sim.sh` on Linux, `zsh ./scripts/start_coppelia_sim.zsh` on MacOS, and `.\start_coppelia_sim.ps1` on Windows. The arguments you can pass are:
+
+- (required positional first argument) the scene you want to load, which is to say, some `.ttt` file.
+- (second positional argument) The TCP port to host the ZMQ Remote API on. Which is to say, the port your python code will use to connect to it. Passing this can be useful for training your controlers, as CoppeliaSim usually uses around 2 cores, so any system with more than that can get advantage by running multiple in paralel, which means connecting over different ports.
+- (only flag argument, but needs to be after the positional arguments) -h. If passed, CoppeliaSim will run in headless mode (which is to say, wihout a graphical interface,) this is also useful when training your controlers, as it makes the sim take less resources. CoppeliaSim itself indeed also accepts a `-H` for "true headless" mode, but beware: on some systems, this might cause issues with the camera not giving out any image.
 
 ## Lua
 
 Wait? We are learning an entirely new programming language? Well, yes. But, don't worry. Lua is a language that is designed specifically to be easy to pick up. You'll come across it more often if you end up doing professional software development. It's a programming language designed to write config files and small add-ons in. I usually call it "sentient json" for that reason. It's famously easy to interface with from C, and quite fast. For example, it's the configuration / modding language of choice for games like World of Warcraft, Roblox and Factorio, and development tools ranging from Neovim to Redis to MediaWiki (the backend of Wikipedia and WikiData). Most people who write it are just making config files, and don't really know the language either. Just... bluff your way through this one. Just [read the Wikipedia page](<https://en.wikipedia.org/wiki/Lua_(programming_language)#Features>), and copy that when you need a loop, if-statement of similar. The standard library is effectively nonexistent, and the syntax is extremely minimal, without support for classes or overloading or any other non-essential feature, so everything the language has to offer is in those few examples.
 
-Technically, CoppeliaSim also supports Python scripts. However, this has only been since recently, and we didn't get that working in time for the course. You can try to play around with that if you want. However, I encourage you to use Lua, as that is what the Robobo itself uses, meaning you can peak that code whenever you need to see how to get something working.
+Technically, CoppeliaSim also supports Python scripts. However, this has only been since recently, and we didn't get that working in time for the course. You can try to play around with that if you want. However, I encourage you to use Lua, as that is what the Robobo itself uses, meaning you can peek that code whenever you need to see how to get something working.
 
 ### The used Lua scripts
 
@@ -106,14 +110,18 @@ After this, you can run CoppeliaSim (e.g. `./CoppeliaSim/coppeliaSim.sh ./scenes
 
 If something isn't working correctly (So, kind of working, but with errors), the first thing to run is its dependency error checker. This will report if all dynamically linked libraries are available (`.dll` on Windows, `.so` on Unix). It's name is `libLoadErrorCheck`, and where it lives depends on your OS and installation method. Just searching for a file of this name in the directory you extracted CoppeliaSim to should let you find it.
 
-If this script fails on MacOS and Windows, you have found the problem, but all you can do is try to re-download and re-extract everything, and if that doesn't work, your OS is having problems, and should be troubleshoot on a case-by-case basis, and you should try googeling some error messages.
+If this script fails on MacOS and Windows, you have found the problem, but all you can do is try to re-download and re-extract everything, and if that doesn't work, your OS is having problems, and should be troubleshoot on a case-by-case basis. You should try googeling some error messages.
+
+If you really cannot get it working (and this also applies to Linux,) you can always resort to the **advanced usage** Docker running method of CoppeliaSim. This is not ideal, as it does not give you the option of seeing the GUI at all, but it at least gives you the option to run the code to make sure it does _something_. This is especially useful if there are some minor details you cannot get running (e.g. The camera won't manage to send you images on your machine, sending only black instead.)
 
 If the script fails on Linux, you can try to install the `.so` file yourself. It might be that your distribution simply doesn't ship it by default, and it can just be installed trough your package manager. If that doesn't work, you can find a working version of the file elsewhere, and put it in `./CoppeliaSim/` (Maybe modifying `$LD_LIBRARY_PATH` to get it recognised). Wrince and repeat with recursive dependencies (Find those with `ldd libSomething.so.0`)
 
 For example, if you get this common error:
+
 ```
 [Connectivity >> ZMQ remote API server@addOnScript:error]   plugin simZMQ: Cannot load library [PATH]/CoppeliaSim/libsimZMQ.so: (libbsd.so.0: cannot open shared object file: No such file or directory)
 ```
+
 You should be able to read that `libbsd` does not exist on this sytem. This error happens on Fedora, because it doesn't ship with `libbsd`. Installing it (`sudo dnf install libbsd`) solves the issue.
 
 This is a recursive dependency, so `libLoadErrorCheck` finds nothing, but `ldd ./CoppeliaSim/libsimZMQ.so` reports the `libbsd.so.0 => not found`
