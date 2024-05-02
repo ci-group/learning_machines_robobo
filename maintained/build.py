@@ -55,13 +55,13 @@ def is_ignored_path(path: Path) -> bool:
     )
 
 
-def remove_existing_in(directory: Path) -> None:
+def remove_existing_in(directory: Path, yes: bool) -> None:
     to_del: List[Path] = []
     for file in directory.iterdir():
         if is_ignored_path(file):
             continue
 
-        if input(f"\n{file} exists. Should it be removed? [y/N]") in ["y", "yes", "Y"]:
+        if yes or input(f"\n{file} exists. Delete? [y/N]") in ["y", "yes", "Y"]:
             to_del.append(file)
         else:
             sys.exit("Not removing any files. Exiting")
@@ -128,6 +128,7 @@ def make_tutorial(
 @dataclass
 class Args:
     adv_coppelia_sim: bool
+    yes: bool
 
 
 def parse_args(args: List[str]) -> Args:
@@ -145,21 +146,28 @@ def parse_args(args: List[str]) -> Args:
             """,
     )
     parser.add_argument(
+        "-y",
+        action="store_true",
+        help="Answer yes to all prompts. Specifically prompts on if you want to delete files.",
+        default=False,
+        required=False,
+    )
+    parser.add_argument(
         "--advanced_coppelia_sim",
         action="store_true",
         help="If passed, a more advanced Dockerfile to run CoppeliaSim is created.",
         default=False,
         required=False,
     )
-    arguments = parser.parse_args()
-    return Args(adv_coppelia_sim=arguments.advanced_coppelia_sim)
+    arguments = parser.parse_args(args)
+    return Args(adv_coppelia_sim=arguments.advanced_coppelia_sim, yes=arguments.y)
 
 
 def main(args: List[str]) -> None:
     arguments = parse_args(args)
 
     for directory in MANAGED_DIRS:
-        remove_existing_in(directory)
+        remove_existing_in(directory, arguments.yes)
 
     make_tutorial(DOCKER_TUTORIAL, scripts=["convert_line_endings.py"])
 
