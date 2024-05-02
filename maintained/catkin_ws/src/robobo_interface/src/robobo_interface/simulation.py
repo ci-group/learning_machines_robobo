@@ -387,13 +387,13 @@ class SimulationRobobo(IRobobo):
     def pause_simulation(self):
         """Pause the simulation"""
         self._sim.pauseSimulation()
-        while self._sim.getSimulationState() != self._sim.simulation_paused:
+        while not self.is_paused():
             time.sleep(0.002)
 
     def stop_simulation(self):
         """Stop the simulation"""
         self._sim.stopSimulation()
-        while self._sim.getSimulationState() != self._sim.simulation_stopped:
+        while not self.is_stopped():
             time.sleep(0.002)
 
     def is_stopped(self) -> bool:
@@ -538,13 +538,20 @@ class SimulationRobobo(IRobobo):
             self._food_script = None
 
     def _get_object(self, name: str) -> int:
-        ret = self._sim.getObject(name)
+        # CoppeliaSim is a mess sometimes.
+        try:
+            ret = self._sim.getObject(name)
+        except:
+            raise AttributeError(f"Could not find {str} in scene")
         if ret < 0:
             raise AttributeError(f"Could not find {str} in scene")
         return ret
 
     def _get_childscript(self, obj_handle: int) -> int:
-        ret = self._sim.getScript(self._sim.scripttype_childscript, obj_handle)
+        try:
+            ret = self._sim.getScript(self._sim.scripttype_childscript, obj_handle)
+        except:
+            raise AttributeError(f"Could not find Script of {str} in scene")
         if ret < 0:
             raise AttributeError(f"Could not find Script of {str} in scene")
         return ret
