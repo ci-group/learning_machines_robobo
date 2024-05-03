@@ -3,9 +3,6 @@
 # This should really be a Cmake file or shell script, but, to make sure all TAs can use it,
 # It's python.
 
-# To spam yes at all the questions, use:
-# yes | ./build.py
-
 # To run scripts after building, run:
 # chmod -R u+x **/*.sh
 
@@ -181,19 +178,18 @@ def main(args: List[str]) -> None:
     for directory in MANAGED_DIRS:
         remove_existing_in(directory, arguments.yes)
 
-    make_tutorial(DOCKER_TUTORIAL, scripts=["convert_line_endings.py"])
+    make_tutorial(DOCKER_TUTORIAL)
 
     make_tutorial(
         HARDWARE_SETUP,
         caktin_packages=["robobo_msgs"],
-        scripts=["convert_line_endings.py", ("setup_ros_uri.bash", "setup.bash")],
+        scripts=[("setup_ros_uri.bash", "setup.bash")],
         dockerfile="hardware.dockerfile",
     )
 
     make_tutorial(
         ROS_TUTORIAL_HELP,
         caktin_packages=["my_robot_controller"],
-        scripts=["convert_line_endings.py"],
         dockerfile="ros_tutorial.dockerfile",
     )
 
@@ -223,7 +219,6 @@ def main(args: List[str]) -> None:
     make_tutorial(
         ROS_BASIC_SETUP,
         scripts=[
-            "convert_line_endings.py",
             "run.ps1",
             "run.sh",
             "run_apple_sillicon.zsh",
@@ -239,7 +234,6 @@ def main(args: List[str]) -> None:
     make_tutorial(
         FULL_PROJECT_SETUP,
         scripts=[
-            "convert_line_endings.py",
             "entrypoint.bash",
             "setup.bash",
             "run.sh",

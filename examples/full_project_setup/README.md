@@ -143,7 +143,6 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   ├── arena_push_hard.ttt
 │   └── Robobo_Scene.ttt
 ├── scripts
-│   ├── convert_line_endings.py
 │   ├── entrypoint.bash
 │   ├── run_apple_sillicon.zsh
 │   ├── run.ps1
@@ -160,7 +159,7 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 
 ### Scripts
 
-All the scripts in `./script` should be familiar, with the `convert_line_endings.py` from the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial), `start_coppelia_sim.*` from the [CoppeliaSim tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), the `entrypoint.bash` explained in the [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup) tutorial and the `setup.bash` and `run.*` from that same tutorial you used to run the code. `results/` should also be familiar to you, it is the exact same as it was in `basic_ros_setup`.
+All the scripts in `./script` should be familiar, with the, `start_coppelia_sim.*` from the [CoppeliaSim tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), the `entrypoint.bash` explained in the [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup) tutorial and the `setup.bash` and `run.*` from that same tutorial you used to run the code. `results/` should also be familiar to you, it is the exact same as it was in `basic_ros_setup`.
 
 ### Models
 

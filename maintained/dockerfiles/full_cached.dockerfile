@@ -1,6 +1,6 @@
 FROM ros:noetic as base
 
-RUN apt-get update -y && apt-get install -y python3 python3-pip git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y python3 python3-pip git dos2unix && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies.
 
@@ -36,15 +36,20 @@ WORKDIR /root/catkin_ws
 # catkin_make can do an incremental compile instead, massivly speeding up build time.
 COPY --from=builder /root/catkin_ws/ ./
 
-# This copies the local catkin_ws into the docker container, and then runs catkin_make on it.
+# This copies the local catkin_ws into the docker container.
 COPY ./catkin_ws .
-RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
 # Set up the envoirement to actually run the code
 COPY ./scripts/entrypoint.bash ./entrypoint.bash
 COPY ./scripts/setup.bash ./setup.bash
-COPY ./scripts/convert_line_endings.py ./convert_line_endings.py
-RUN python3 ./convert_line_endings.py "*.bash" "**/*.py"
+
+# Convert the line endings for the Windows users,
+# calling `dos2unix` on all files ending in `.py` or `.bash`
+RUN find . -type f \( -name '*.py' -o -name '*.bash' \) -exec 'dos2unix' -l -- '{}' \; && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
+
+# Compile the catkin_ws.
+RUN bash -c 'source /opt/ros/noetic/setup.bash && catkin_make'
+
 RUN chmod -R u+x /root/catkin_ws/
 
 # Uncomment these lines and comment out the last line for debugging

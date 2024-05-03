@@ -68,7 +68,7 @@ There are three things you need to know `docker build`, `Dockerfile`, and `docke
 
 The Dockerfile is the thing that specifies what's inside the little computer. It specifies what to install, what configuration to set up, and all that.
 
-The first thing we need to say about this is that Docker does not like Windows `\r\n` (CRLF) line endings, and wants files to have `\n` (LF) line endings instead. In `scripts`, there is a tool that does this, called `convert_line_endings.py`. In all provided dockerfiles in other examples, this is run automatically on your code, but if anything weird doesn't work and you are on Windows, checking the line endings (including those of your Dockerfile) is one of the first things you should try.
+The first thing we need to say about this is that Docker does not like Windows `\r\n` (CRLF) line endings, and wants files to have `\n` (LF) line endings instead. This shouldn't be something you have to worry about, as files are converted (using a tool called `dos2unix` and a powershell command) for you in all scripts, but if anything inexplicable doesn't work and you are on Windows, checking the line endings (including those of your Dockerfile) is one of the first things you should try.
 
 Here is a small example, that installs Ubuntu as a base, and then installs git on ubuntu:
 

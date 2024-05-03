@@ -11,7 +11,7 @@ RUN apt-get update -y && apt-get install -y python3 python3-pip git && rm -rf /v
 
 # These are package requirements for the dependencies.
 # You should add to these if you add python packages that require c libraries to be installed
-RUN apt-get update -y && apt-get install ffmpeg libsm6 libxext6 ros-noetic-opencv-apps -y && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install ffmpeg libsm6 libxext6 ros-noetic-opencv-apps dos2unix -y && rm -rf /var/lib/apt/lists/*
 
 # The python3 interpreter is already being shilled by ros:noetic, so no need for a venv.
 COPY ./requirements.txt /requirements.txt
@@ -20,15 +20,20 @@ RUN python3 -m pip install -r /requirements.txt && rm /requirements.txt
 # This cd's into a new `catkin_ws` directory anyone starting the shell will end up in.
 WORKDIR /root/catkin_ws
 
-# This copies the local catkin_ws into the docker container, and then runs catkin_make on it.
+# This copies the local catkin_ws into the docker container.
 COPY ./catkin_ws .
-RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
 # Set up the envoirement to actually run the code
 COPY ./scripts/entrypoint.bash ./entrypoint.bash
 COPY ./scripts/setup.bash ./setup.bash
-COPY ./scripts/convert_line_endings.py ./convert_line_endings.py
-RUN python3 ./convert_line_endings.py "*.bash" "**/*.py"
+
+# Convert the line endings for the Windows users,
+# calling `dos2unix` on all files ending in `.py` or `.bash`
+RUN find . -type f \( -name '*.py' -o -name '*.bash' \) -exec 'dos2unix' -l -- '{}' \; && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
+
+# Compile the catkin_ws.
+RUN bash -c 'source /opt/ros/noetic/setup.bash && catkin_make'
+
 RUN chmod -R u+x /root/catkin_ws/
 
 # Uncomment these lines and comment out the last line for debugging
