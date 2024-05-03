@@ -18,6 +18,6 @@ ENV PATH=$COPPELIASIM_ROOT_DIR:$PATH
 
 COPY ./to_open.ttt /root/workdir/to_open.ttt
 
-RUN echo '#!/bin/bash\ncd $COPPELIASIM_ROOT_DIR\n/usr/bin/xvfb-run --server-args "-ac -screen 0, 1024x1024x24" coppeliaSim /root/workdir/to_open.ttt -H "$@"' > /root/workdir/entrypoint.bash && chmod a+x /root/workdir/entrypoint.bash
+RUN echo '#!/bin/bash\ncd $COPPELIASIM_ROOT_DIR\n/usr/bin/xvfb-run --server-args "-ac -screen 0, 1024x1024x24" coppeliaSim /root/workdir/to_open.ttt -h "$@"' > /root/workdir/entrypoint.bash && chmod a+x /root/workdir/entrypoint.bash
 
 ENTRYPOINT [ "/root/workdir/entrypoint.bash" ]
