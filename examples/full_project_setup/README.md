@@ -258,6 +258,14 @@ This will use three seperate python threads / processes, to connect to the three
 
 You can run this with your OS's equivilant of `./scripts/run.sh` without any further arguments (as don't parse any in python's `__main__`)
 
+### Speeding up build times by caching the C++ stages
+
+Using [Docker's multi-stage builds feature](https://docs.docker.com/build/building/multi-stage/), it is possible to take advantage of Docker's caching functionality to get incremental compiles to work, meaning you won't have to re-compile the (presumably untouched) C++ code every time you run `docker build`. Tough this dockerfile is not the default for the full project setup (as it's likely to be somewhat overwhelming,) you can make use of it. 
+
+To get access to this, you have to re-build the examples (as will is the case for all "advanced usage" sections,) This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this. To re-build cd into `maintained/` of this project, and run `python3 build.py --cached_cpp_builds` from the `maintained/` directory.
+
+If you cd back into the full project setup after this, you will see the Dockerfile is replaced with a new, longer one that does roughly the same things, but in a multi-stage process.
+
 ## Troubleshooting
 
 - My smartphone does not connect to the wifi or has a limited connection -> try to update the date/time of the phone. Also, make sure you're on a somewhat private network (eduroam does not work.)

@@ -127,8 +127,9 @@ def make_tutorial(
 
 @dataclass
 class Args:
-    adv_coppelia_sim: bool
     yes: bool
+    adv_coppelia_sim: bool
+    cache_cpp: bool
 
 
 def parse_args(args: List[str]) -> Args:
@@ -159,8 +160,19 @@ def parse_args(args: List[str]) -> Args:
         default=False,
         required=False,
     )
+    parser.add_argument(
+        "--cached_cpp_builds",
+        action="store_true",
+        help="If passed, a more complex Dockerfile for the full project setup is creaetd, massivly speeding up compile times.",
+        default=False,
+        required=False,
+    )
     arguments = parser.parse_args(args)
-    return Args(adv_coppelia_sim=arguments.advanced_coppelia_sim, yes=arguments.y)
+    return Args(
+        yes=arguments.y,
+        adv_coppelia_sim=arguments.advanced_coppelia_sim,
+        cache_cpp=arguments.cached_cpp_builds,
+    )
 
 
 def main(args: List[str]) -> None:
@@ -223,6 +235,7 @@ def main(args: List[str]) -> None:
         requirements="full_requirements.txt",
     )
 
+    full_docker = "full_cached.dockerfile" if arguments.cache_cpp else "full.dockerfile"
     make_tutorial(
         FULL_PROJECT_SETUP,
         scripts=[
@@ -250,7 +263,7 @@ def main(args: List[str]) -> None:
             "arena_push_hard.ttt",
             "Robobo_Scene.ttt",
         ],
-        dockerfile="full.dockerfile",
+        dockerfile=full_docker,
         requirements="full_requirements.txt",
     )
 
