@@ -9,20 +9,13 @@ Follow these steps to install and run the robot simulator:
    ```
 
 2. **Install Python 3.8:**
-   - To ensure compatibility, use Python 3.8. If you don't have Python installed, consider using Anaconda.
-    - If using Anaconda, download it [here](https://www.anaconda.com/download).
-    
-    ```shell
-    conda create -n learning_machines python=3.8
-    conda activate learning_machines
-    conda install -c conda-forge numpy
-    conda install -c conda-forge opencv
-    ```
+   - You can use specific python versions with `pyenv` or `brew`, depending on how you set up python.
+      - Note that annaconda (and other distributions which do more than just shill the executable,) may not work.
 
-    - For general Python users:
+    - Create a venv, and install dependencies:
 
     ```shell
-    python3.8 -m venv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
     ```

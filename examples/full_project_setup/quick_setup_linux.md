@@ -9,8 +9,8 @@ Follow these steps to install and run the robot simulator:
    ```
 
 2. **Install Python 3.8:**
-   - To ensure compatibility, use Python 3.8. If you don't have Python installed, do so using your distro's package manager.
-   - Create a venv, and activate it.
+   - To ensure compatibility, use Python 3.8. If you don't have this version installed, do so using your distro's package manager.
+   - Create a venv, and install the dependencies.
 
     ```shell
     python3.8 -m venv .venv
