@@ -91,6 +91,12 @@ class HardwareRobobo(IRobobo):
     """The class to use to interact with the hardware Robobo
     Implements the IRobobo interface, and shouldn't really be used outside of that.
 
+    Specific hardware documentation of the robobo can be found at the scratch part of the Robobo docs:
+    - Actuation (Robot): http://education.theroboboproject.com/en/scratch3/base-actuation-blocks
+    - Sensors (Robot): http://education.theroboboproject.com/en/scratch3/base-sensing-blocks
+    - Actuation (Smartphone): http://education.theroboboproject.com/en/scratch3/smartphone-actuation-blocks
+    - Sensors (Smartphone): http://education.theroboboproject.com/en/scratch3/smartphone-sensing-blocks
+
     On the hardware, read operations only update when they change, meaning that any value will
     be 0 if it didn't change since calling initialising this class.
 
@@ -164,9 +170,11 @@ class HardwareRobobo(IRobobo):
         )
 
         # Battery indicators are nice to have
+        self._robot_battery_val = 0.0
         self._robot_battery_sub = rospy.Subscriber(
             ROBOT_BATTERY_TOPIC, Int8, self._robot_battery_callback
         )
+        self._phone_battery_val = 0.0
         self._phone_battery_sub = rospy.Subscriber(
             PHONE_BATTERY_TOPIC, Int8, self._phone_battery_callback
         )
@@ -385,6 +393,14 @@ class HardwareRobobo(IRobobo):
         """Get the wheel orientation and speed of the robot"""
         return self._wheelpos
 
+    def read_phone_battery(self) -> float:
+        """Get the battety percentage of the phone"""
+        self._phone_battery_val
+
+    def read_robot_battery(self) -> float:
+        """Get the battety percentage of the robot"""
+        self._robot_battery_val
+
     def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
         How to do this depends on the kind of robot, and so is to be found here.
@@ -454,9 +470,11 @@ class HardwareRobobo(IRobobo):
         self._used_pids.discard(ros_data.data)
 
     def _phone_battery_callback(self, ros_data: Int8) -> None:
+        self._phone_battery_val = ros_data.data
         if ros_data.data < 10:
             self._logger(f"Phone battery is getting low: {ros_data.data}%")
 
     def _robot_battery_callback(self, ros_data: Int8) -> None:
+        self._robot_battery_val = ros_data.data
         if ros_data.data < 10:
             self._logger(f"Robot battery is getting low: {ros_data.data}%")
