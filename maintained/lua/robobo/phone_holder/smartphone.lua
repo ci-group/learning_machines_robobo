@@ -29,10 +29,3 @@ readAccelerationSensor = function(inIntegers, inFloats, inStrings, inBuffer)
     pos_anterior = pos
     return {}, aceleracion, {}, ""
 end
-
-getCameraImage = function(inIntegers, inFloats, inStrings, inBuffer)
-    -- We don't need to call handleVisionSensor because the camera is implicitly handled
-    -- https://coppeliarobotics.com/helpFiles/en/explicitHandling.htm
-    image, resX, resY = sim.getVisionSensorCharImage(smartphone_camera)
-    return { resX, resY }, {}, {}, image
-end

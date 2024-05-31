@@ -1,7 +1,7 @@
 FROM ros:noetic
 
 # These are some extra dependencies we need to use the Robobo, don't worry about it.
-RUN apt-get update -y && apt-get install ffmpeg libsm6 libxext6 ros-noetic-opencv-apps -y && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install ffmpeg libsm6 libxext6 ros-noetic-opencv-apps dos2unix -y && rm -rf /var/lib/apt/lists/*
 
 # Install CURL, as we need it for debugging.
 # Add anything you want to also have available here.
@@ -15,6 +15,11 @@ WORKDIR /root/catkin_ws
 COPY ./catkin_ws .
 COPY ./scripts/setup.bash ./setup.bash
 
+# Convert the line endings for the Windows users,
+# calling `dos2unix` on all files ending in `.py` or `.bash`
+RUN find . -type f \( -name '*.py' -o -name '*.bash' \) -exec 'dos2unix' -l -- '{}' \; && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
+
+# Compile the ROS code.
 RUN bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
 # Load everything in the bashrc to make sure all commands are available and evoirement variables are set.

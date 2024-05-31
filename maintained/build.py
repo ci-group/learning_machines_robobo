@@ -3,17 +3,16 @@
 # This should really be a Cmake file or shell script, but, to make sure all TAs can use it,
 # It's python.
 
-# To spam yes at all the questions, use:
-# yes | ./build.py
-
 # To run scripts after building, run:
 # chmod -R u+x **/*.sh
 
 import sys
 import shutil
+import argparse
 from pathlib import Path
+from dataclasses import dataclass
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 # Using Cmake style stuff because what else would I use.
 EXAMPLES = Path(__file__).parent.parent.joinpath("examples").resolve(strict=True)
@@ -45,18 +44,21 @@ BASE = Path(__file__).parent.resolve(strict=True)
 def is_ignored_path(path: Path) -> bool:
     """When true, the item of this name will not be deleted when building"""
     return (
-        any(reserved in path.name.lower() for reserved in ["coppeliasim", "assets"])
+        any(
+            reserved in path.name.lower()
+            for reserved in ["coppeliasim", "assets", ".venv"]
+        )
         or path.suffix == ".md"
     )
 
 
-def remove_existing_in(directory: Path) -> None:
+def remove_existing_in(directory: Path, yes: bool) -> None:
     to_del: List[Path] = []
     for file in directory.iterdir():
         if is_ignored_path(file):
             continue
 
-        if input(f"\n{file} exists. Should it be removed? [y/N]") in ["y", "yes", "Y"]:
+        if yes or input(f"\n{file} exists. Delete? [y/N]") in ["y", "yes", "Y"]:
             to_del.append(file)
         else:
             sys.exit("Not removing any files. Exiting")
@@ -71,13 +73,13 @@ def remove_existing_in(directory: Path) -> None:
 def make_tutorial(
     where: Path,
     *,
-    scripts: List[Union[str, Tuple[str, str]]] = [],
-    caktin_packages: List[str] = [],
-    models: List[Union[str, Tuple[str, str]]] = [],
-    scenes: List[Union[str, Tuple[str, str]]] = [],
+    scripts: Sequence[Union[str, Tuple[str, str]]] = [],
+    caktin_packages: Sequence[str] = [],
+    models: Sequence[Union[str, Tuple[str, str]]] = [],
+    scenes: Sequence[Union[str, Tuple[str, str]]] = [],
     dockerfile: Optional[str] = None,
     lua: bool = False,
-    requirements: bool = False,
+    requirements: Optional[str] = None,
 ):
     def get_base_target(name: str) -> Tuple[Path, Path]:
         base = BASE / name
@@ -114,45 +116,109 @@ def make_tutorial(
     if lua:
         shutil.copytree((BASE / "lua"), (where / "lua_scripts"))
 
-    if requirements:
-        shutil.copyfile((BASE / "requirements.txt"), (where / "requirements.txt"))
+    if requirements is not None:
+        shutil.copyfile(
+            (BASE / "requirements" / requirements), (where / "requirements.txt")
+        )
 
 
-def main() -> None:
+@dataclass
+class Args:
+    yes: bool
+    adv_coppelia_sim: bool
+    cache_cpp: bool
+
+
+def parse_args(args: List[str]) -> Args:
+    parser = argparse.ArgumentParser(
+        prog="learning_machines_robobo_build",
+        description="""
+            The build script of learning_machines_robobo.
+
+            This script deletes everything that is in `examples/` and re-creates it from maintained/.
+            The exceptions, the files that are not getting deleted, are:
+                **/assets/
+                **/.venv/
+                **/coppeliasim/
+                **/*.md
+            """,
+    )
+    parser.add_argument(
+        "-y",
+        action="store_true",
+        help="Answer yes to all prompts. Specifically prompts on if you want to delete files.",
+        default=False,
+        required=False,
+    )
+    parser.add_argument(
+        "--advanced_coppelia_sim",
+        action="store_true",
+        help="If passed, a more advanced Dockerfile to run CoppeliaSim is created.",
+        default=False,
+        required=False,
+    )
+    parser.add_argument(
+        "--cached_cpp_builds",
+        action="store_true",
+        help="If passed, a more complex Dockerfile for the full project setup is creaetd, massivly speeding up compile times.",
+        default=False,
+        required=False,
+    )
+    arguments = parser.parse_args(args)
+    return Args(
+        yes=arguments.y,
+        adv_coppelia_sim=arguments.advanced_coppelia_sim,
+        cache_cpp=arguments.cached_cpp_builds,
+    )
+
+
+def main(args: List[str]) -> None:
+    arguments = parse_args(args)
+
     for directory in MANAGED_DIRS:
-        remove_existing_in(directory)
+        remove_existing_in(directory, arguments.yes)
 
-    make_tutorial(DOCKER_TUTORIAL, scripts=["convert_line_endings.py"])
+    make_tutorial(DOCKER_TUTORIAL)
 
     make_tutorial(
         HARDWARE_SETUP,
         caktin_packages=["robobo_msgs"],
-        scripts=["convert_line_endings.py", ("setup_ros_uri.bash", "setup.bash")],
+        scripts=[("setup_ros_uri.bash", "setup.bash")],
         dockerfile="hardware.dockerfile",
     )
 
     make_tutorial(
         ROS_TUTORIAL_HELP,
         caktin_packages=["my_robot_controller"],
-        scripts=["convert_line_endings.py"],
         dockerfile="ros_tutorial.dockerfile",
     )
 
-    make_tutorial(
-        COPPELIA_SIM_TUTORIAL,
-        scripts=[
+    coppelia_dockerfile = "coppelia.dockerfile" if arguments.adv_coppelia_sim else None
+    scripts = (
+        [
+            "start_coppelia_docker.sh",
+            "start_coppelia_docker.ps1",
+            "start_coppelia_docker_apple_sillicon.zsh",
+        ]
+        if arguments.adv_coppelia_sim
+        else [
             "start_coppelia_sim.sh",
             "start_coppelia_sim.ps1",
             "start_coppelia_sim.zsh",
-        ],
+        ]
+    )
+    make_tutorial(
+        COPPELIA_SIM_TUTORIAL,
+        scripts=scripts,
         scenes=["Robobo_Scene.ttt"],
         lua=True,
+        dockerfile=coppelia_dockerfile,
+        requirements="coppeliasim_tutorial_requirements.txt",
     )
 
     make_tutorial(
         ROS_BASIC_SETUP,
         scripts=[
-            "convert_line_endings.py",
             "run.ps1",
             "run.sh",
             "run_apple_sillicon.zsh",
@@ -161,13 +227,13 @@ def main() -> None:
         ],
         caktin_packages=["my_first_package", "data_files"],
         dockerfile="full.dockerfile",
-        requirements=True,
+        requirements="full_requirements.txt",
     )
 
+    full_docker = "full_cached.dockerfile" if arguments.cache_cpp else "full.dockerfile"
     make_tutorial(
         FULL_PROJECT_SETUP,
         scripts=[
-            "convert_line_endings.py",
             "entrypoint.bash",
             "setup.bash",
             "run.sh",
@@ -178,10 +244,8 @@ def main() -> None:
             "start_coppelia_sim.zsh",
         ],
         caktin_packages=[
-            "coppelia_sim",
             "learning_machines",
             "data_files",
-            "learning_machines_prey",
             "robobo_interface",
             "robobo_msgs",
         ],
@@ -193,10 +257,10 @@ def main() -> None:
             "arena_push_hard.ttt",
             "Robobo_Scene.ttt",
         ],
-        dockerfile="full.dockerfile",
-        requirements=True,
+        dockerfile=full_docker,
+        requirements="full_requirements.txt",
     )
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

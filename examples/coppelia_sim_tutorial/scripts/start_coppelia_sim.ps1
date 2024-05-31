@@ -5,7 +5,7 @@ param(
     [Parameter(Mandatory=$true, Position=0, HelpMessage="Path to the .ttt scene to load in CoppeliaSim")]
     [string] $scenePath,
     [Parameter(Mandatory=$false, Position=1, HelpMessage="The TCP port to start the CoppeliaSim API at")]
-    [int] $apiPort = 19999,
+    [int] $apiPort = 23000,
     [Parameter(Mandatory=$false, Position=2, HelpMessage="Wether to run in headless (GUI-less) mode")]
     [switch] $headless
 )
@@ -13,4 +13,4 @@ param(
 $h = if ($headless.IsPresent) {"-h"} else {""}
 
 # Presumes you have CoppeliaSim extracted to ./CoppeliaSim
-.\CoppeliaSim\coppeliaSim.exe "$scenePath" $h "-gREMOTEAPISERVERSERVICE_$($apiPort)_FALSE_TRUE"
+.\CoppeliaSim\coppeliaSim.exe "$scenePath" $h "-GzmqRemoteApi.rpcPort=$($apiPort)"

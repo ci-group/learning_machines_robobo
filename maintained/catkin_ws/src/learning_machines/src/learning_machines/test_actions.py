@@ -8,6 +8,7 @@ from robobo_interface import (
     LedColor,
     SoundEmotion,
     SimulationRobobo,
+    HardwareRobobo,
 )
 
 
@@ -51,7 +52,12 @@ def test_sim(rob: SimulationRobobo):
     print(rob.is_running())
     rob.play_simulation()
     print(rob.get_sim_time())
-    print(rob.position())
+    print(rob.get_position())
+
+
+def test_hardware(rob: HardwareRobobo):
+    print("Phone battery level: ", rob.read_phone_battery())
+    print("Robot battery level: ", rob.read_robot_battery())
 
 
 def run_all_actions(rob: IRobobo):
@@ -62,7 +68,9 @@ def run_all_actions(rob: IRobobo):
     test_move_and_wheel_reset(rob)
     if isinstance(rob, SimulationRobobo):
         test_sim(rob)
-        rob.set_realtime()
+
+    if isinstance(rob, HardwareRobobo):
+        test_hardware(rob)
 
     test_phone_movement(rob)
 

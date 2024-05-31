@@ -53,7 +53,6 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 ├── results
 │   └── hello.txt
 ├── scripts
-│   ├── convert_line_endings.py
 │   ├── entrypoint.bash
 │   ├── run.ps1
 │   ├── run.sh
@@ -96,7 +95,6 @@ The scripts directory might be a bit cryptic at first, but you should by now be 
 
 - `run.sh` and `run.ps1` are the scripts we used earlier to start docker.
 - `setup.bash` you should already be familiar with from the `hardware_setup`. It's unused for this specific project (as we're only printing Hello World), but it is the file that contains the IPs the project needs to be able to connect to the different devices, specifically the phone of the robobo and the IP of your computer to find CoppeliaSim.
-- `convert_line_endings.py` is used to make sure that your files have the right line endings. The Dockerfile calls this for you, so this should not be something to worry about.
 
 Lastly, there is `entrypoint.bash`. This is the script that the docker container will call to run your code. We need this separate bash script to make sure we have the entire environment ROS set up available, including all packages we have installed. As you can see, it calls the `my_node.py` script from the `my_first_package` package with `rosrun`, passing through any and all command line arguments passed into itself (That's what `"$@"` does).
 

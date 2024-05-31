@@ -1,5 +1,7 @@
 # Full project example
 
+*Note: to quickly install everything for this project (For example, to run on another machine), go to `quick_setup_[your_os].md` for the checklist.*
+
 This is the example you are expected to use as a project template. The structure is the same as [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup), it contains the same dockerfile and some of the same scripts and packages, but it contains a lot more stuff on top of that. First of all, it contains the same `start_coppelia_sim` script as [coppelia_sim_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), meaning you should also copy-past CoppeliaSim to here, such that `./CoppeliaSim` (or `coppeliaSim.app`) exists. It also contains the `setup.bash` from [hardware_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/hardware_setup) that you should configure to have the `ROS_MASTER_URI`.
 
 ## Running the code that is there
@@ -25,6 +27,8 @@ similarly, on Linux, you can run `hostname -I` to get all the information, but t
 ```sh
 hostname -I | awk '{print $1}'
 ```
+
+If this command does not work on Mac, you can go to wifi settings -> network settings (unde the "more" tab of the network), which will show you your IP address.
 
 Finally, on macOS, you can run `ifconfig` for all information, and (presuming you only have one network card on your laptop), this to get only what you are looking for:
 
@@ -143,7 +147,6 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   ├── arena_push_hard.ttt
 │   └── Robobo_Scene.ttt
 ├── scripts
-│   ├── convert_line_endings.py
 │   ├── entrypoint.bash
 │   ├── run_apple_sillicon.zsh
 │   ├── run.ps1
@@ -160,7 +163,7 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 
 ### Scripts
 
-All the scripts in `./script` should be familiar, with the `convert_line_endings.py` from the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial), `start_coppelia_sim.*` from the [CoppeliaSim tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), the `entrypoint.bash` explained in the [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup) tutorial and the `setup.bash` and `run.*` from that same tutorial you used to run the code. `results/` should also be familiar to you, it is the exact same as it was in `basic_ros_setup`.
+All the scripts in `./script` should be familiar, with the, `start_coppelia_sim.*` from the [CoppeliaSim tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/coppelia_sim_tutorial), the `entrypoint.bash` explained in the [basic_ros_setup](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_basic_setup) tutorial and the `setup.bash` and `run.*` from that same tutorial you used to run the code. `results/` should also be familiar to you, it is the exact same as it was in `basic_ros_setup`.
 
 ### Models
 
@@ -258,13 +261,21 @@ This will use three seperate python threads / processes, to connect to the three
 
 You can run this with your OS's equivilant of `./scripts/run.sh` without any further arguments (as don't parse any in python's `__main__`)
 
+### Speeding up build times by caching the C++ stages
+
+Using [Docker's multi-stage builds feature](https://docs.docker.com/build/building/multi-stage/), it is possible to take advantage of Docker's caching functionality to get incremental compiles to work, meaning you won't have to re-compile the (presumably untouched) C++ code every time you run `docker build`. Tough this dockerfile is not the default for the full project setup (as it's likely to be somewhat overwhelming,) you can make use of it. 
+
+To get access to this, you have to re-build the examples (as will is the case for all "advanced usage" sections,) This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this. To re-build cd into `maintained/` of this project, and run `python3 build.py --cached_cpp_builds` from the `maintained/` directory.
+
+If you cd back into the full project setup after this, you will see the Dockerfile is replaced with a new, longer one that does roughly the same things, but in a multi-stage process.
+
 ## Troubleshooting
 
 - My smartphone does not connect to the wifi or has a limited connection -> try to update the date/time of the phone. Also, make sure you're on a somewhat private network (eduroam does not work.)
 - My phone’s Bluetooth keeps disconnecting from the Robobo -> this indeed sometimes happens. Maybe you can make a script to deal with it.
 - My script keeps trying to connect to the physical Robobo, but nothing happens -> check if the `ROS_MASTER_URI` in `scripts/setup.bash` matches your phone’s current/updated IP address.
 - The infrared sensors of my Robobo keep constantly receiving info, even though nothing is touching it -> they may be broken. Get a new Robobo with your supervisor
-- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, how to find your IP is listed [here](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/full_project_setup#running-with-simulation).
+- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, how to find your IP is listed [here](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/full_project_setup#running-with-simulation). It might also be an issue with unstable IP adresses (which is to say eduroam), so connecting to a private network might also help. 
 - Stuff trows an error, but I cannot find why because it's all in the black box that is Docker. -> In the [docker_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial), it is shown how to run docker in "interactive" mode. To do that for this example, you should change the `run` script (and the Dockerfile) to start the container like that.
 - I want to start a new docker container, but another one is still running because it crashed. How do I close it? -> You need to run `docker container stop [id]`, you can read up on this in the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial#managing-running-containers)
 - Docker is taking up way too much space / RAM -> On Windows and MacOS, it is expected that Docker uses a few dozen gigs of storage and about 10G ram when available. That's just because it's a seperate computer, with its own operating system and everything. However, it can sometimes be good to run `docker container prune`, as described in the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial#deleting-built-images)

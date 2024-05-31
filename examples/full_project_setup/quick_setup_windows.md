@@ -9,39 +9,31 @@ Follow these steps to install and run the robot simulator:
    ```
 
 2. **Install Python 3.8:**
-   - To ensure compatibility, use Python 3.8. If you don't have Python installed, consider using Anaconda.
-    - If using Anaconda, download it [here](https://www.anaconda.com/download).
-    
-    ```powershell
-    conda create -n learning_machines python=3.8
-    conda activate learning_machines
-    conda install -c conda-forge numpy
-    conda install -c conda-forge opencv
-    ```
+   - To ensure compatibility, use Python 3.8. You can install this seperately, and then run with the `py` launcher.
 
-    - For general Python users:
+    - Create a venv, and install the dependencies:
 
     ```powershell
-    virtualenv lm_venv
-    source lm_venv/bin/activate
-    pip install -r requirements. txt
+    py -3.8 -m venv .venv
+    .venv\Scripts\Activate.ps1
+    py -3.8 -m pip install -r requirements.txt
     ```
 
 3. **Install Docker (for Windows):**
    - Install WSL2.
    - Enable hardware virtualization.
-   - Refer to [this link](https://docs.docker.com/desktop/install/windows-install/) for assistance.
+   - Refer to [the docs](https://docs.docker.com/desktop/install/windows-install/) for assistance.
 
 4. **Setup CoppeliaSim:**
    - Download the educational version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads).
     - Make sure to download the zip version for Windows.
-    - Extract the contents to `learning_machines_robobo/examples/full_project_setup/CoppeliaSim`.
+    - Extract the contents to `learning_machines_robobo\examples\full_project_setup\CoppeliaSim`.
 
 ## Running the Simulator
 
 Once everything is downloaded, you can start the simulator:
 
-### 1. Update `scripts/setup.bash` with Your IP Address
+### 1. Update `scripts\setup.bash` with Your IP Address
 
 On Windows PowerShell, run:
 
@@ -49,15 +41,15 @@ On Windows PowerShell, run:
 (Get-NetIPAddress | Where-Object { $_.AddressState -eq "Preferred" -and $_.ValidLifetime -lt "24:00:00" }).IPAddress
 ```
 
-Update the line in `scripts/setup.bash`:
+Update the line in `scripts\setup.bash`:
 
-```powershell
+```bash
 export COPPELIA_SIM_IP="your.ip.address"
 ```
 
 ### 2. Start CoppeliaSim
 
-Assuming you are currently in `learning_machines_robobo/examples/full_project_setup/`, run the following command in PowerShell:
+Assuming you are currently in `learning_machines_robobo\examples\full_project_setup\`, run the following command in PowerShell (with the venv active):
 
 ```powershell
 .\scripts\start_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt
@@ -74,12 +66,12 @@ Assuming you are currently in `learning_machines_robobo/examples/full_project_se
 .\scripts\run.ps1 --simulation
 ```
 
-*Note: The executed code is located at `full_project_setup\catkin_ws\src\learning_machines\src\learning_machines\test_actions.py`.*
+*Note: The executed code is located at `full_project_setup\catkin_ws\src\learning_machines\scripts\learning_robobo_controller.py` and `full_project_setup\catkin_ws\src\learning_machines\src\learning_machines\test_actions.py`.*
 
 *Note: The docker build takes a while. After it successfully runs, you should see the Robobo move the phone, and the following in your terminal:*
 
 <p allign="center">
-  <img src="./assets/windows_terminal_ss.png" />
+  <img src="./assets/resulting_print.png" />
 </p>
 
 Congratulations! You've successfully completed the setup. 
