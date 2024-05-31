@@ -3,31 +3,34 @@
 Follow these steps to install and run the robot simulator:
 
 1. **Clone the Repository:**
+
    ```pwsh
    git clone https://github.com/ci-group/learning_machines_robobo.git
    cd learning_machines_robobo
    ```
 
 2. **Install Python 3.8:**
-   - To ensure compatibility, use Python 3.8. You can install this seperately, and then run with the `py` launcher.
 
-    - Create a venv, and install the dependencies:
+   - To ensure compatibility, use Python 3.8. You can install this separately, and then run with the `py` launcher.
 
-    ```powershell
-    py -3.8 -m venv .venv
-    .venv\Scripts\Activate.ps1
-    py -3.8 -m pip install -r requirements.txt
-    ```
+   - Create a venv, and install the dependencies:
+
+   ```powershell
+   py -3.8 -m venv .venv
+   .venv\Scripts\Activate.ps1
+   py -3.8 -m pip install -r requirements.txt
+   ```
 
 3. **Install Docker (for Windows):**
+
    - Install WSL2.
    - Enable hardware virtualization.
    - Refer to [the docs](https://docs.docker.com/desktop/install/windows-install/) for assistance.
 
 4. **Setup CoppeliaSim:**
    - Download the educational version of CoppeliaSim from their [website](https://www.coppeliarobotics.com/downloads).
-    - Make sure to download the zip version for Windows.
-    - Extract the contents to `learning_machines_robobo\examples\full_project_setup\CoppeliaSim`.
+   - Make sure to download the zip version for Windows.
+   - Extract the contents to `learning_machines_robobo\examples\full_project_setup\CoppeliaSim`.
 
 ## Running the Simulator
 
@@ -55,7 +58,7 @@ Assuming you are currently in `learning_machines_robobo\examples\full_project_se
 .\scripts\start_coppelia_sim.ps1 .\scenes\Robobo_Scene.ttt
 ```
 
-*Note: The scene that CoppeliaSim starts with is specified here.*
+_Note: The scene that CoppeliaSim starts with is specified here._
 
 ### 3. Running the Code
 
@@ -66,12 +69,12 @@ Assuming you are currently in `learning_machines_robobo\examples\full_project_se
 .\scripts\run.ps1 --simulation
 ```
 
-*Note: The executed code is located at `full_project_setup\catkin_ws\src\learning_machines\scripts\learning_robobo_controller.py` and `full_project_setup\catkin_ws\src\learning_machines\src\learning_machines\test_actions.py`.*
+_Note: The executed code is located at_ `full_project_setup\catkin_ws\src\learning_machines\scripts\learning_robobo_controller.py` _and_ `full_project_setup\catkin_ws\src\learning_machines\src\learning_machines\test_actions.py`.
 
-*Note: The docker build takes a while. After it successfully runs, you should see the Robobo move the phone, and the following in your terminal:*
+_Note: The docker build takes a while. After it successfully runs, you should see the Robobo move the phone, and the following in your terminal:_
 
 <p allign="center">
   <img src="./assets/resulting_print.png" />
 </p>
 
-Congratulations! You've successfully completed the setup. 
+Congratulations! You've successfully completed the setup.

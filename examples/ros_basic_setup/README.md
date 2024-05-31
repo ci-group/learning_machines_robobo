@@ -1,8 +1,8 @@
-## Basic template containing an ROS package
+## Basic template containing a ROS package
 
-This is a small package that shows you how an ROS system is set up.
+This is a small package that shows you how a ROS system is set up.
 
-The reason this is a separate repository is that you can look around and see the simplest version of each file. The result of this package is just a hello world. It prints the one argument you pass through the command line, it then logs that, saves the log in a file, and saves "Hello!" to another file.
+The reason this is a separate repository is that you can look around and see the simplest version of each file. The result of this package is just a Hello World. It prints the one argument you pass through the command line, it then logs that, saves the log in a file, and saves "Hello!" to another file.
 
 If you haven't followed the [ros tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/ros_tutorial_help), this thing is going to be a bit harder to follow, as you're new to the idea of a `catikin_ws` and all that. However, fear not, what you need to know will be explained.
 
@@ -69,11 +69,15 @@ After the base image is loaded, we install some dependencies. Specifically, I in
 
 If a package is not specified in requirements.txt, it won't exist in the container, and your code won't be able to find it. If you never written one of these files before, check out the [docs](https://pip.pypa.io/en/stable/reference/requirements-file-format/).
 
-After the Python dependencies are installed, we run copy over the catkin workspace and run `catkin_make` (This has to be done in a slightly convoluted manner with an inline script... don't worry about it.) If you haven't followed the ROS tutorial, you won't know what that is, but it doesn't matter either. It's just something we need to run to make ROS recognize this as a project. If we had C code in here, it would be compiled in this step.
+After the Python dependencies are installed, we run copy over the catkin workspace and call `dos2unix`, this is to convert any files with windows-isms like `\r\n` newlines or `utf-8-sig` encodings to Unix standards. Note that this is still needed on Unix systems if you have teammates on Windows that might commit that stuff in. (Git has a setting that allows to to specify if you want to commit in Unix or Dos mode, but most people don't set it.)
+
+Once everything is ready, we run `catkin_make`. If you haven't followed the ROS tutorial, you won't know what that is, but it doesn't matter either. It's just something we need to run to make ROS recognize this as a project. If we had C code in here, it would be compiled in this step.
 
 Next up, you'll see that `chmod` is called. This is a Linux command that tells the OS that the specified file is allowed to be executed. ROS likes this to be true for some files in your workspace, and, because we are lazy (and are running this in an isolated container), we set it true for all files.
 
-Lastly, a few things are sourced into bashrc. This is to make sure that the shell we are opening when running the code works, and that executables like `roscore` and `rosrun` exist. This is the only thing that is different in the actual example, as, there, we call these executables directly from the Dockerfile.
+Then, commited-out lines source a few things into bashrc. You can uncomment these when debugging to make sure that the shell you are opening when running the code works, and that executables like `roscore` and `rosrun` exist.
+
+Lastly, `entrypoint.bash` is set as the entrypoint. For the full project setup, this is needed to deal with some weird setup, but, for now, it's only for parity.
 
 ### catkin_ws
 

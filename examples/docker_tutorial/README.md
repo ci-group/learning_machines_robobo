@@ -18,7 +18,7 @@ The main reason we use it is ROS noetic, which is a mess to install, and works b
 
 ## Installing Docker
 
-The first thing that's important is installing it. What we are going to need is the [Docker engine](https://docs.docker.com/engine/install/), which can only be directly installed on Linux. This is not an accident, Docker is Linux-based and depends on it. Luckily enough, there exists the [Docker Desktop](https://docs.docker.com/desktop/), which is a software suite that will install the Docker engine for you on any operating system (by installing a Linux VM and running docker in that). It also comes with a ton more stuff, like a GUI and Docker-compose, but we won't touch those here. We only care about the engine and the CLI.
+The first thing that's important is installing it. What we are going to need is the [Docker engine](https://docs.docker.com/engine/install/), which can only be directly installed on Linux. This is not an accident, Docker is Linux-based and depends on it. Luckily enough, there exists the [Docker Desktop](https://docs.docker.com/desktop/), which is a software suite that will install the Docker engine for you on any operating system (by installing a Linux VM or WSL and running docker in that). It also comes with a ton more stuff, like a GUI and Docker-compose, but we won't touch those here. We only care about the engine and the CLI.
 
 During the installation process, you can use all default settings, and you can click "continue without logging in," as you don't need an account, either.
 
@@ -251,9 +251,9 @@ sudo chown -R $(id -u):$(id -g) $HOME/.docker
 
 If that doesn't work. You should really just google and, if you cannot find anything, ask. Docker can be hard to install, and this not working might happen depending on how you specifically set up your own computer.
 
-### Running with Apple Sillicon
+### Running with Apple Silicon
 
-Running docker with a machine on Apple sillicon, so far, has just worked. But, later on in the course it won't. Because of that, in `full_project_setup`, we provide you with another script: `run_apple_sillicon.zsh`, in which we add one flag: `--platform linux/amd64`, which specifies to `buildx` to run or build the container under the `x86` (amd64) CPU architecture (and virtualise that when needed).
+Running docker with a machine on Apple silicon, so far, has just worked. But, later on in the course, it won't. Because of that, in `full_project_setup`, we provide you with another script: `run_apple_sillicon.zsh`, in which we add one flag: `--platform linux/amd64`, which specifies to `buildx` to run or build the container under the `x86` (amd64) CPU architecture (and virtualise that when needed).
 
 To get all this running, first of all, enable experimental features in docker desktop. It's in the settings somewhere, but they move it around so much it's hard to tell you exactly where to look.
 
@@ -263,22 +263,22 @@ After you have enabled experimental features (and maybe restart your machine aft
 docker buildx create --use
 ```
 
-Another issue you might run into with docker on apple scillicon is:
+Another issue you might run into with docker on Apple Scillicon is:
 
 ```
 Operation not permitted (src/thread.cpp:281)
 qemu: uncaught target signal 6 (Aborted) - core dumped
 ```
 
-This is usually caused by Docker desktop trying to run your code multi-threaded somehow, but the docker virtualisation layer not allowing for this. For this, go into the docker desktop settings, Resources, and then make sure the amount of CPUs Docker Desktop is allowed to use is set to 1.
+This is usually caused by Docker desktop trying to run your code multi-threaded somehow, but the Docker virtualisation layer not allowing for this. For this, go into the docker desktop settings, Resources, and then make sure the amount of CPUs Docker Desktop is allowed to use is set to 1.
 
-After that, the `--platform linux/amd64` flag is going to work on your system, and you can use the `run_apple_sillicon.zsh` script to run insetad of the `run.sh` scripts. Macs with intel processors are not affected by this.
+After that, the `--platform linux/amd64` flag is going to work on your system, and you can use the `run_apple_sillicon.zsh` script to run instead of the `run.sh` script. Macs with intel processors are not affected by this.
 
 ### Looking ahead
 
 In `run.sh` / `run.ps1`, which are the scripts you'll use to start docker for the full project setup, we use a bunch more flags and things. These, you don't have to worry about. However, here is a quick summary of what they are, and how we use them:
 
-- `-v [host_path]:[container_path]` mount a volume. Basically, this allows you to have some directory on your own system to which the container can read and write. This is used such that you can save your results on your own system, but should be used with care, as having two operating systems mount the same file system can cause unexpected issues, especially on Windows.
+- `-v [host_path]:[container_path]` mount a volume. Basically, this allows you to have some directory on your own system to which the container can read and write. This is used such that you can save your results on your own system but should be used with care, as having two operating systems mount the same file system can cause unexpected issues, especially on Windows.
 - `-p [host_port]:[container_port]` Expose or link a TCP port from the container to your host. Used for talking with the robot.
 - `--rm` Remove any container of the same name that is already running.
 - `-t` Allocate a pseudo-TTY. Without it, some print functions from the container wouldn't show up on your own terminal when running.
