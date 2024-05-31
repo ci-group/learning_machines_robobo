@@ -46,7 +46,7 @@ Once everything is downloaded, you can start the simulator:
 On your terminal, run:
 
 ```shell
-ipconfig getifaddr en1
+ipconfig getifaddr en0
 ```
 
 Update the line in `scripts/setup.bash`:
@@ -54,6 +54,8 @@ Update the line in `scripts/setup.bash`:
 ```bash
 export COPPELIA_SIM_IP="your.ip.address"
 ```
+
+This command might not work, if it doesn't, revert to the section in the full guide.
 
 ### 2. Start CoppeliaSim
 

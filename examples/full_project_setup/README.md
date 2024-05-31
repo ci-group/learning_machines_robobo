@@ -28,6 +28,8 @@ similarly, on Linux, you can run `hostname -I` to get all the information, but t
 hostname -I | awk '{print $1}'
 ```
 
+If this command does not work on Mac, you can go to wifi settings -> network settings (unde the "more" tab of the network), which will show you your IP address.
+
 Finally, on macOS, you can run `ifconfig` for all information, and (presuming you only have one network card on your laptop), this to get only what you are looking for:
 
 ```zsh
@@ -273,7 +275,7 @@ If you cd back into the full project setup after this, you will see the Dockerfi
 - My phone’s Bluetooth keeps disconnecting from the Robobo -> this indeed sometimes happens. Maybe you can make a script to deal with it.
 - My script keeps trying to connect to the physical Robobo, but nothing happens -> check if the `ROS_MASTER_URI` in `scripts/setup.bash` matches your phone’s current/updated IP address.
 - The infrared sensors of my Robobo keep constantly receiving info, even though nothing is touching it -> they may be broken. Get a new Robobo with your supervisor
-- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, how to find your IP is listed [here](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/full_project_setup#running-with-simulation).
+- My script keeps trying to connect to CoppeliaSim, but nothing happens -> check if your code matches your machine’s current/updated IP address. For this, You want your local IP, how to find your IP is listed [here](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/full_project_setup#running-with-simulation). It might also be an issue with unstable IP adresses (which is to say eduroam), so connecting to a private network might also help. 
 - Stuff trows an error, but I cannot find why because it's all in the black box that is Docker. -> In the [docker_tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial), it is shown how to run docker in "interactive" mode. To do that for this example, you should change the `run` script (and the Dockerfile) to start the container like that.
 - I want to start a new docker container, but another one is still running because it crashed. How do I close it? -> You need to run `docker container stop [id]`, you can read up on this in the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial#managing-running-containers)
 - Docker is taking up way too much space / RAM -> On Windows and MacOS, it is expected that Docker uses a few dozen gigs of storage and about 10G ram when available. That's just because it's a seperate computer, with its own operating system and everything. However, it can sometimes be good to run `docker container prune`, as described in the [docker tutorial](https://github.com/ci-group/learning_machines_robobo/tree/master/examples/docker_tutorial#deleting-built-images)
