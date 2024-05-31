@@ -170,11 +170,11 @@ class HardwareRobobo(IRobobo):
         )
 
         # Battery indicators are nice to have
-        self._robot_battery_val = 0.0
+        self._robot_battery_val = 100.0
         self._robot_battery_sub = rospy.Subscriber(
             ROBOT_BATTERY_TOPIC, Int8, self._robot_battery_callback
         )
-        self._phone_battery_val = 0.0
+        self._phone_battery_val = 100.0
         self._phone_battery_sub = rospy.Subscriber(
             PHONE_BATTERY_TOPIC, Int8, self._phone_battery_callback
         )
@@ -394,12 +394,26 @@ class HardwareRobobo(IRobobo):
         return self._wheelpos
 
     def read_phone_battery(self) -> float:
-        """Get the battety percentage of the phone"""
-        self._phone_battery_val
+        """Get the battety percentage of the phone
+
+        Note that the battery nodes don't send their data frequently,
+        this might be the default value (100) if you call it in the first minute
+
+        If the battery is below 10%, this code will log it automatically,
+        so no need to implement that.
+        """
+        return self._phone_battery_val
 
     def read_robot_battery(self) -> float:
-        """Get the battety percentage of the robot"""
-        self._robot_battery_val
+        """Get the battety percentage of the robot
+
+        Note that the battery nodes don't send their data frequently,
+        this might be the default value (100) if you call it in the first minute
+
+        If the battery is below 10%, this code will log it automatically,
+        so no need to implement that.
+        """
+        return self._robot_battery_val
 
     def sleep(self, seconds: float) -> None:
         """Block for a an amount of seconds.
