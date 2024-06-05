@@ -40,10 +40,10 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   │   ├── my_first_package
 │   │   │   ├── scripts
 │   │   │   │   └── my_node.py
-│   │   │   ├── src
+│   │   │   ├── src 
 │   │   │   │   └── my_first_package
-│   │   │   │       ├── example_process.py
-│   │   │   │       └── __init__.py
+│   │   │   │       ├── __init__.py
+│   │   │   │       └── example_process.py
 │   │   │   ├── CMakeLists.txt
 │   │   │   ├── package.xml
 │   │   │   └── setup.py
@@ -54,6 +54,7 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   └── hello.txt
 ├── scripts
 │   ├── entrypoint.bash
+│   ├── run_apple_sillicon.zsh
 │   ├── run.ps1
 │   ├── run.sh
 │   └── setup.bash

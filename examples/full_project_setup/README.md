@@ -118,20 +118,15 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   │   │   ├── src
 │   │   │   │   └── robobo_interface
 │   │   │   │       ├── utils
-│   │   │   │       │   ├── __init__.py
-│   │   │   │       │   └── sets.py
+│   │   │   │       │   └── ...
+│   │   │   │       ├── __init__.py
 │   │   │   │       ├── base.py
 │   │   │   │       ├── datatypes.py
 │   │   │   │       ├── hardware.py
-│   │   │   │       ├── __init__.py
 │   │   │   │       └── simulation.py
 │   │   │   ├── CMakeLists.txt
 │   │   │   ├── package.xml
 │   │   │   └── setup.py
-│   │   ├── learning_machines_prey
-│   │   │   └── ...
-│   │   ├── coppelia_sim
-│   │   │   └── ...
 │   │   ├── data_files
 │   │   │   └── ...
 │   │   └── robobo_msgs
