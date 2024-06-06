@@ -98,7 +98,7 @@ class HardwareRobobo(IRobobo):
     - Sensors (Smartphone): http://education.theroboboproject.com/en/scratch3/smartphone-sensing-blocks
 
     On the hardware, read operations only update when they change, meaning that any value will
-    be 0 if it didn't change since calling initialising this class.
+    be 0 if it hasn't changed since initialising this class.
 
     Blocking on the Robobo itself behaves differently than blocking on the simulation.
     Any new call to one particular service (which is to say, a function that takes a `blockid` as argument)
@@ -114,15 +114,15 @@ class HardwareRobobo(IRobobo):
     you can still experiment with them.
 
     Arguments you should understand:
-    camera: bool = False -> Wether to initialise the camera (this makes it slower)
+    camera: bool = False -> Whether to initialise the camera (this makes it slower)
 
     Arguments you only have to understand if you want to do advanced stuff:
     xmlrpc_port: Optional[int] = None -> The port to start the xmlrps of the ROS node at.
-        If None, it will try to see if ROS_XMLRPC_PORT is set, and use that.
-        If that envoirement variable is not set, it will default to 45100
+    If None, it will try to see if ROS_XMLRPC_PORT is set, and use that.
+    If that environment variable is not set, it will default to 45100
     tcpros_port: Optional[int] = None -> The port to start the tcpros of the ROS node at.
-        If None, it will try to see if ROS_XMLRPC_PORT is set, and use that.
-        If that envoirement variable is not set, it will default to 45101
+    If None, it will try to see if ROS_XMLRPC_PORT is set, and use that.
+    If that environment variable is not set, it will default to 45101
     logger: Callable[[str], None] = print -> The function to use for logging / printing.
     """
 
@@ -134,7 +134,7 @@ class HardwareRobobo(IRobobo):
         logger: Callable[[str], None] = rospy.loginfo,
     ) -> None:
         """This sets up the HardwareRobobo, and presumes everything is running
-        So, it cannot be started up unless the Robobo is actually connected.
+        This means that this class cannot be initialised unless the Robobo is connected.
 
         Arguments
         camera: bool - Whether or not to enable the camera
@@ -226,11 +226,12 @@ class HardwareRobobo(IRobobo):
         blockid: Optional[int] = None,
     ) -> int:
         """Move the robot wheels for `millis` time
+        This function is asynchronous.
 
         Arguments
         left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement, negative backward.
         right_speed: speed of the right wheel. Range: -100-0-100. 0 is no movement, negative backward.
-        millis: how many millisecond to move the robot
+        millis: how many milliseconds to move the robot
         blockid: A unique 'blockid' for end-of-movement notification at /robot/unlock/move topic.
             Use a value that is within a 16-bit integer limit
             If None is passed, a random available blockid is chosen.
@@ -249,7 +250,7 @@ class HardwareRobobo(IRobobo):
 
     def reset_wheels(self) -> None:
         """Allows to reset the wheel encoder positions to 0.
-        After calling this topic both encoders (topic /robot/wheels) will start again
+        After calling this both encoders reset, making the current position the new reference
         in position 0.
         """
         self._reset_wheels_src()
@@ -282,6 +283,8 @@ class HardwareRobobo(IRobobo):
     def read_irs(self) -> List[Optional[float]]:
         """Returns sensor readings:
         [BackL, BackR, FrontL, FrontR, FrontC, FrontRR, BackC, FrontLL]
+
+        Notice that specs of dust or other imperfections can easily mess up individual readings.
         """
         return self._irs_values
 
@@ -306,6 +309,7 @@ class HardwareRobobo(IRobobo):
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
     ) -> int:
         """Command the robot to move the smartphone holder in the horizontal (pan) axis.
+        This function is asynchronous.
 
         Notice that the robot, especially on high speeds, doesn't always run perfectly
 
@@ -347,7 +351,7 @@ class HardwareRobobo(IRobobo):
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
     ) -> int:
         """Command the robot to move the smartphone holder in the vertical (tilt) axis.
-        This function is asyncronous.
+        This function is asynchronous.
 
         Arguments
         tilt_position: Angle to position the tilt at. Range: 26-109.

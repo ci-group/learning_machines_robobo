@@ -18,7 +18,7 @@ Follow these steps to install and run the robot simulator:
    ```powershell
    py -3.8 -m venv .venv
    .venv\Scripts\Activate.ps1
-   py -3.8 -m pip install -r requirements.txt
+   python -m pip install -r requirements.txt
    ```
 
 3. **Install Docker (for Windows):**

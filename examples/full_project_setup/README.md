@@ -118,20 +118,15 @@ Everything here is structured as follows (`tree -a --dirsfirst`):
 │   │   │   ├── src
 │   │   │   │   └── robobo_interface
 │   │   │   │       ├── utils
-│   │   │   │       │   ├── __init__.py
-│   │   │   │       │   └── sets.py
+│   │   │   │       │   └── ...
+│   │   │   │       ├── __init__.py
 │   │   │   │       ├── base.py
 │   │   │   │       ├── datatypes.py
 │   │   │   │       ├── hardware.py
-│   │   │   │       ├── __init__.py
 │   │   │   │       └── simulation.py
 │   │   │   ├── CMakeLists.txt
 │   │   │   ├── package.xml
 │   │   │   └── setup.py
-│   │   ├── learning_machines_prey
-│   │   │   └── ...
-│   │   ├── coppelia_sim
-│   │   │   └── ...
 │   │   ├── data_files
 │   │   │   └── ...
 │   │   └── robobo_msgs
@@ -269,7 +264,7 @@ You can run this with your OS's equivalent of `./scripts/run.sh` without any fur
 
 Using [Docker's multi-stage builds feature](https://docs.docker.com/build/building/multi-stage/), it is possible to take advantage of Docker's caching functionality to get incremental compiles to work, meaning you won't have to re-compile the (presumably untouched) C++ code every time you run `docker build`. Tough this dockerfile is not the default for the full project setup (as it's likely to be somewhat overwhelming,) you can make use of it.
 
-To get access to this, you have to re-build the examples (as is the case for all "advanced usage" sections,) This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this. To re-build cd into `maintained/` of this project, and run `python3 build.py --cached_cpp_builds` from the `maintained/` directory.
+To get access to this, you have to re-build the examples (as is the case for all "advanced usage" sections,) using the [build script](https://github.com/ci-group/learning_machines_robobo/blob/master/maintained/build.py). This deletes any changed files inside the `examples/` directory, so make sure you don't have any files saved here before running this (Also, the command will fail if there are any files owned by root, so make sure to delete any created `results/` directories). To re-build cd into `maintained/` of this project, and run `python3 build.py --cached_cpp_builds -y`. Alternativly, you can run `python3 build.py -h` to see the commandline arguments the script supports. If this fails for weird reasons, it might be easiest to just re-clone the repository, and run it there, to copy over what you need.
 
 If you cd back into the full project setup after this, you will see the Dockerfile is replaced with a new, longer one that does roughly the same things, but in a multi-stage process.
 
