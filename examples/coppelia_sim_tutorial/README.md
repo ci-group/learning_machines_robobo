@@ -22,7 +22,7 @@ On MacOS, after it is downloaded you will have a `coppeliaSim.app` file. Move th
 
 The first thing to do when running CoppeliaSim is to create a Python virtual environment and install some requirements on it. Technically speaking, we don't need it just jet, but CoppeliaSim gives you nice red error messages if you don't, and those can be confusing.
 
-I am going to presume you know what a venv is, but, if you don't, you can just use the [default `venv` module](https://docs.python.org/3.8/library/venv.html), as we don't need any of the fancy features of poetry or anaconda. (In fact, Anaconda specifically is known to cause issues, and I recommend using venv or Virtualenv.) So, just `python3.8 -m venv .venv` and then `source ./venv/bin/activate` or `.\.venv\Scripts\Activate.ps1`. After this, the Python modules you need are already in `requirements.txt`, so you can just run `python -m pip install -r requirements.txt` to install those.
+I am going to presume you know what a venv is, but, if you don't, you can just use the [default `venv` module](https://docs.python.org/3.8/library/venv.html), as we don't need any of the fancy features of poetry or anaconda. (In fact, Anaconda specifically is known to cause issues, and I recommend using venv or Virtualenv.) So, just `python3.8 -m venv .venv` (or whatever is the equivilant for the way you launch python3.8) and then `source ./.venv/bin/activate` or `.\.venv\Scripts\Activate.ps1`. After this, the Python modules you need are already in `requirements.txt`, so you can just run `python -m pip install -r requirements.txt` to install those.
 
 #### Running the executable
 
