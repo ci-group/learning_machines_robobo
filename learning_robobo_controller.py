@@ -3,7 +3,7 @@ import sys
 print("THE PATH IS", sys.path)
 
 from robobo_interface import SimulationRobobo
-from learning_machines import run_all_actions, HardwareRobobo, move_till_obstacle
+from learning_machines import run_all_actions, HardwareRobobo, move_till_obstacle, plot_sensor, plot_avg_sensor
 
 if __name__ == "__main__":
     # You can do better argument parsing than this!
@@ -20,6 +20,8 @@ if __name__ == "__main__":
         raise ValueError(f"{sys.argv[1]} is not a valid argument.")
 
     # run_all_actions(rob)
-    move_till_obstacle(rob)
-
-        # plot_sensor_data(rob)
+    # move_till_obstacle(rob)
+    # plot_maker(rob)
+    front_sensor_data = move_till_obstacle(rob)
+    plot_sensor(front_sensor_data)
+    plot_avg_sensor(front_sensor_data)
