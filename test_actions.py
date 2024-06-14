@@ -76,7 +76,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Here is our part
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 """
-
+import random
 def turn_right(rob: IRobobo):
     rob.move_blocking(120, -120, 450)
     rob.sleep(0.2)
@@ -121,7 +121,7 @@ def move_till_obstacle(rob: IRobobo):
             rob.sleep(0.2)
             
             if move_counts > 20: # if nothing happens for a while, stop
-                print("I got bored, I will stop now.")
+                print("I got boDDDred,SKATA I will stop now.")
                 rob.stop_simulation()
                 break
     print("results: \n", front_sensor_data)
