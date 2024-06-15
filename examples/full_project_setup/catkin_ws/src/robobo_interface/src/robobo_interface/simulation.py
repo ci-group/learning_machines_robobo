@@ -448,18 +448,16 @@ class SimulationRobobo(IRobobo):
 
         This only works in the simulation.
         """
-        orient = self._sim.getOBjectOrientation(self._robobo, self._sim.handle_world)
+        orient = self._sim.getObjectOrientation(self._robobo, self._sim.handle_world)
         return Orientation(*orient)
 
     def set_position(self, position: Position, orientation: Orientation) -> None:
-        """Set the position of the Robobo in the simulation"""
-        self._sim.setObjectPosition(
-            self._robobo, [position.x, position.y, position.z], self._sim.handle_world
-        )
+        """Set the position of the Robobo in the simulation
+        More information at: https://manual.coppeliarobotics.com/en/positionOrientationTransformation.htm
+        """
+        self._sim.setObjectPosition(self._robobo, [position.x, position.y, position.z])
         self._sim.setObjectOrientation(
-            self._robobo,
-            [orientation.yaw, orientation.pitch, orientation.roll],
-            self._sim.handle_world,
+            self._robobo, [orientation.yaw, orientation.pitch, orientation.roll]
         )
 
     def base_position(self) -> Position:
@@ -578,7 +576,7 @@ class SimulationRobobo(IRobobo):
 def timeout(func: Callable[[], T], timeout_duration: int = 10) -> T:
     def timeouterror_handler(_signum, _frame):
         raise TimeoutError()
-    
+
     original_handler = signal.getsignal(signal.SIGALRM)
 
     # set the timeout handler

@@ -45,14 +45,21 @@ def test_phone_movement(rob: IRobobo):
 
 
 def test_sim(rob: SimulationRobobo):
-    print(rob.get_sim_time())
-    print(rob.is_running())
+    print("Current simulation time:", rob.get_sim_time())
+    print("Is the simulation currently running? ", rob.is_running())
     rob.stop_simulation()
-    print(rob.get_sim_time())
-    print(rob.is_running())
+    print("Simulation time after stopping:", rob.get_sim_time())
+    print("Is the simulation running after shutting down? ", rob.is_running())
     rob.play_simulation()
-    print(rob.get_sim_time())
-    print(rob.get_position())
+    print("Simulation time after starting again: ", rob.get_sim_time())
+    print("Current robot position: ", rob.get_position())
+    print("Current robot orientation: ", rob.get_orientation())
+
+    pos = rob.get_position()
+    orient = rob.get_orientation()
+    rob.set_position(pos, orient)
+    print("Position the same after setting to itself: ", pos == rob.get_position())
+    print("Orient the same after setting to itself: ", orient == rob.get_orientation())
 
 
 def test_hardware(rob: HardwareRobobo):
