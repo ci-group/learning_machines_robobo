@@ -114,7 +114,7 @@ class SimulationRobobo(IRobobo):
         blockid: Optional[int] = None,
     ) -> int:
         """Move the robot wheels for `millis` time
-        This function is asynchronous.
+        This function is asynchronous. You likely want `move_blocking` instead.
 
         Arguments
         left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement, negative backward.
@@ -229,7 +229,7 @@ class SimulationRobobo(IRobobo):
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
     ) -> int:
         """Command the robot to move the smartphone holder in the horizontal (pan) axis.
-        This function is asynchronous.
+        This function is asynchronous. You likely want `set_phone_pan_blocking` instead.
 
         Arguments
         pan_position: Angle to position the pan at. Range: 11-343.
@@ -274,7 +274,7 @@ class SimulationRobobo(IRobobo):
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
     ) -> int:
         """Command the robot to move the smartphone holder in the vertical (tilt) axis.
-        This function is asynchronous.
+        This function is asynchronous. You likely want `set_phone_tilt_blocking` instead.
 
         Arguments
         tilt_position: Angle to position the tilt at. Range: 26-109.
