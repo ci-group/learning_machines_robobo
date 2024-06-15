@@ -288,7 +288,7 @@ class HardwareRobobo(IRobobo):
         """
         return self._irs_values
 
-    def get_image_front(self) -> NDArray[numpy.uint8]:
+    def read_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array in cv2 format.
 
         You can, for example, write this image to file with:
@@ -397,7 +397,7 @@ class HardwareRobobo(IRobobo):
         """Get the wheel orientation and speed of the robot"""
         return self._wheelpos
 
-    def read_phone_battery(self) -> float:
+    def phone_battery(self) -> float:
         """Get the battety percentage of the phone
 
         Note that the battery nodes don't send their data frequently,
@@ -408,7 +408,7 @@ class HardwareRobobo(IRobobo):
         """
         return self._phone_battery_val
 
-    def read_robot_battery(self) -> float:
+    def robot_battery(self) -> float:
         """Get the battety percentage of the robot
 
         Note that the battery nodes don't send their data frequently,

@@ -29,7 +29,7 @@ def test_move_and_wheel_reset(rob: IRobobo):
 
 def test_sensors(rob: IRobobo):
     print("IRS data: ", rob.read_irs())
-    image = rob.get_image_front()
+    image = rob.read_image_front()
     cv2.imwrite(str(FIGURES_DIR / "photo.png"), image)
     print("Phone pan: ", rob.read_phone_pan())
     print("Phone tilt: ", rob.read_phone_tilt())
@@ -61,9 +61,10 @@ def test_sim(rob: SimulationRobobo):
     print("Position the same after setting to itself: ", pos == rob.get_position())
     print("Orient the same after setting to itself: ", orient == rob.get_orientation())
 
+
 def test_hardware(rob: HardwareRobobo):
-    print("Phone battery level: ", rob.read_phone_battery())
-    print("Robot battery level: ", rob.read_robot_battery())
+    print("Phone battery level: ", rob.phone_battery())
+    print("Robot battery level: ", rob.robot_battery())
 
 
 def run_all_actions(rob: IRobobo):

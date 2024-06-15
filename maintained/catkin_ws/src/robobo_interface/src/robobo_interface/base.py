@@ -128,7 +128,7 @@ class IRobobo(ABC):
         ...
 
     @abstractmethod
-    def get_image_front(self) -> NDArray[numpy.uint8]:
+    def read_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array in cv2 format.
 
         You can, for example, write this image to file with:

@@ -41,6 +41,9 @@ class SimulationRobobo(IRobobo):
     However, if you want the robot to move the tilt motor while also driving and such,
     you can still experiment with them.
 
+    Some functions start with `read_` others with `get_`
+    Information retrieved from `read_` is available in hardware, that from `get_` not.
+
     Arguments you should understand:
     identifier: int = 0 -> The value number to use. If you have one robobo in the scene,
     or want to use the first one, this is 0. Else, increase the value
@@ -210,7 +213,7 @@ class SimulationRobobo(IRobobo):
         )
         return list(ints)
 
-    def get_image_front(self) -> NDArray[numpy.uint8]:
+    def read_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array in cv2 format.
 
         You can, for example, write this image to file with:
@@ -419,7 +422,7 @@ class SimulationRobobo(IRobobo):
         """
         return self._sim.getSimulationTime()
 
-    def nr_food_collected(self) -> int:
+    def get_nr_food_collected(self) -> int:
         """Return the amount of food currently collected.
 
         This only works in the simulation
@@ -460,7 +463,7 @@ class SimulationRobobo(IRobobo):
             self._robobo, [orientation.yaw, orientation.pitch, orientation.roll]
         )
 
-    def base_position(self) -> Position:
+    def get_base_position(self) -> Position:
         """Get the position of the base to deliver food at.
 
         This only works in the simulation.
