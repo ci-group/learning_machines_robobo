@@ -517,24 +517,24 @@ class SimulationRobobo(IRobobo):
     def _initialise_handles(self) -> None:
         # fmt: off
         self._robobo = self._get_object(f"/Robobo{self._identifier}")
-        self._wheels_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Left_Motor"))
-        self._leds_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Back_L"))
-        self._ir_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/IR_Back_C"))
-        self._pan_motor_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Pan_Motor"))
-        self._tilt_motor_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor"))
-        self._smartphone_script = self._get_childscript(self._get_object(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable"))
+        self._wheels_script = self._get_childscript(f"/Robobo{self._identifier}/Left_Motor")
+        self._leds_script = self._get_childscript(f"/Robobo{self._identifier}/Back_L")
+        self._ir_script = self._get_childscript(f"/Robobo{self._identifier}/IR_Back_C")
+        self._pan_motor_script = self._get_childscript(f"/Robobo{self._identifier}/Pan_Motor")
+        self._tilt_motor_script = self._get_childscript(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor")
+        self._smartphone_script = self._get_childscript(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable")
         self._smartphone_camera = self._get_object(f"/Robobo{self._identifier}/Pan_Motor/Pan_Respondable/Tilt_Motor/Smartphone_Respondable/Smartphone_camera")
         # fmt: on
 
         try:
             self._base = self._get_object("/Base")
-            self._base_script = self._get_childscript(self._base)
+            self._base_script = self._get_childscript("/Base")
         except AttributeError:
             self._base = None
             self._base_script = None
 
         try:
-            self._food_script = self._get_childscript(self._get_object("/Food"))
+            self._food_script = self._get_childscript("/Food")
         except AttributeError:
             self._food_script = None
 
@@ -543,18 +543,20 @@ class SimulationRobobo(IRobobo):
         try:
             ret = self._sim.getObject(name)
         except:
-            raise AttributeError(f"Could not find {str} in scene")
+            raise AttributeError(f"Could not find {name} in scene")
         if ret < 0:
-            raise AttributeError(f"Could not find {str} in scene")
+            raise AttributeError(f"Could not find {name} in scene")
         return ret
 
-    def _get_childscript(self, obj_handle: int) -> int:
+    def _get_childscript(self, name: str) -> int:
+        # Call get_object in here, mostly to get better error messages.
+        obj_handle = self._get_object(name)
         try:
             ret = self._sim.getScript(self._sim.scripttype_childscript, obj_handle)
         except:
-            raise AttributeError(f"Could not find Script of {str} in scene")
+            raise AttributeError(f"Could not find Script of {name} in scene")
         if ret < 0:
-            raise AttributeError(f"Could not find Script of {str} in scene")
+            raise AttributeError(f"Could not find Script of {name} in scene")
         return ret
 
     def _fail_connect(self, api_port: int, ip_adress: str) -> NoReturn:
@@ -574,16 +576,19 @@ class SimulationRobobo(IRobobo):
 
 # This only works on Unix. Luckily, we are in Docker.
 def timeout(func: Callable[[], T], timeout_duration: int = 10) -> T:
-    def handler(_signum, _frame):
+    def timeouterror_handler(_signum, _frame):
         raise TimeoutError()
+    
+    original_handler = signal.getsignal(signal.SIGALRM)
 
     # set the timeout handler
-    signal.signal(signal.SIGALRM, handler)
+    signal.signal(signal.SIGALRM, timeouterror_handler)
     signal.alarm(timeout_duration)
     try:
         return func()
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, original_handler)
 
 
 # The API code catches too much, making it hard to quit when failing.
