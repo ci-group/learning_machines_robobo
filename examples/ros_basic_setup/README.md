@@ -105,7 +105,7 @@ Lastly, there is `entrypoint.bash`. This is the script that the docker container
 
 ### results
 
-Once you have run the code, you'll find that the `./results` (relative to where you ran the project) is created. This is the directory you can save stuff to by importing `RESULT_DIR` and `FIGURES_DIR` from the `data_files` package. This is where your persistent files will live.
+Once you have run the code, you'll find that the `./results` (relative to where you ran the project) is created. This is the directory you can save stuff to by importing `RESULTS_DIR` and `FIGURES_DIR` from the `data_files` package. This is where your persistent files will live.
 
 ### References
 
