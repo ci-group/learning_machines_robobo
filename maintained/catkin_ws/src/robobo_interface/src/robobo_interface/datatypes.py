@@ -1,5 +1,10 @@
 from enum import Enum
+from math import isclose
 from dataclasses import dataclass
+
+
+# The simulation can be quite imprecise, not to speak about the hardware.
+TOLERANCE = 0.1
 
 
 class Emotion(Enum):
@@ -72,6 +77,15 @@ class Acceleration:
     y: float = 0.0
     z: float = 0.0
 
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Position):
+            return (
+                isclose(self.x, __o.x, abs_tol=TOLERANCE)
+                and isclose(self.y, __o.y, abs_tol=TOLERANCE)
+                and isclose(self.z, __o.z, abs_tol=TOLERANCE)
+            )
+        return NotImplemented
+
 
 @dataclass
 class Position:
@@ -80,6 +94,15 @@ class Position:
     x: float = 0.0
     y: float = 0.0
     z: float = 0.0
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Position):
+            return (
+                isclose(self.x, __o.x, abs_tol=TOLERANCE)
+                and isclose(self.y, __o.y, abs_tol=TOLERANCE)
+                and isclose(self.z, __o.z, abs_tol=TOLERANCE)
+            )
+        return NotImplemented
 
 
 @dataclass
@@ -90,6 +113,15 @@ class Orientation:
     pitch: float = 0.0
     roll: float = 0.0
 
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Orientation):
+            return (
+                isclose(self.yaw, __o.yaw, abs_tol=TOLERANCE)
+                and isclose(self.pitch, __o.pitch, abs_tol=TOLERANCE)
+                and isclose(self.roll, __o.roll, abs_tol=TOLERANCE)
+            )
+        return NotImplemented
+
 
 @dataclass
 class WheelPosition:
@@ -99,3 +131,13 @@ class WheelPosition:
     wheel_pos_l: float = 0.0
     wheel_speed_r: float = 0.0
     wheel_speed_l: float = 0.0
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, WheelPosition):
+            return (
+                isclose(self.wheel_pos_r, __o.wheel_pos_r, abs_tol=TOLERANCE)
+                and isclose(self.wheel_pos_l, __o.wheel_pos_l, abs_tol=TOLERANCE)
+                and isclose(self.wheel_speed_r, __o.wheel_speed_r, abs_tol=TOLERANCE)
+                and isclose(self.wheel_speed_l, __o.wheel_speed_l, abs_tol=TOLERANCE)
+            )
+        return NotImplemented

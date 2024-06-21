@@ -1,4 +1,5 @@
 from .datatypes import (
+    TOLERANCE,
     Emotion,
     SoundEmotion,
     LedColor,
@@ -14,6 +15,7 @@ from .simulation import SimulationRobobo
 
 __all__ = (
     "IRobobo",
+    "TOLERANCE",
     "Emotion",
     "SoundEmotion",
     "LedColor",

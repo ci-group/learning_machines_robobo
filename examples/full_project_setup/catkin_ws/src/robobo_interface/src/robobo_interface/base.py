@@ -55,6 +55,7 @@ class IRobobo(ABC):
         blockid: Optional[int] = None,
     ) -> int:
         """Move the robot wheels for `millis` time
+        This function is asynchronous. You likely want `move_blocking` instead.
 
         Arguments
         left_speed: speed of the left wheel. Range: -100-0-100. 0 is no movement.
@@ -127,7 +128,7 @@ class IRobobo(ABC):
         ...
 
     @abstractmethod
-    def get_image_front(self) -> NDArray[numpy.uint8]:
+    def read_image_front(self) -> NDArray[numpy.uint8]:
         """Get the image from the front camera as a numpy array in cv2 format.
 
         You can, for example, write this image to file with:
@@ -140,7 +141,7 @@ class IRobobo(ABC):
         self, pan_position: int, pan_speed: int, blockid: Optional[int] = None
     ) -> int:
         """Command the robot to move the smartphone holder in the horizontal (pan) axis.
-        This function is asynchronous.
+        This function is asynchronous. You likely want `set_phone_pan_blocking` instead.
 
         Arguments
         pan_position: Angle to position the pan at. Range: 11-343.
@@ -176,7 +177,7 @@ class IRobobo(ABC):
         self, tilt_position: int, tilt_speed: int, blockid: Optional[int] = None
     ) -> int:
         """Command the robot to move the smartphone holder in the vertical (tilt) axis.
-        This function is asynchronous.
+        This function is asynchronous. You likely want `set_phone_tilt_blocking` instead.
 
         Arguments
         tilt_position: Angle to position the tilt at. Range: 26-109.
@@ -234,13 +235,12 @@ class IRobobo(ABC):
         Which is to say, only return once the action is completed.
         Useful for all functions that take a blockid argument.
 
-        To call this with a function, use partially applied versions. Pass all arguments
-        except the blockid, which will be provided by this function.
+        To call this with a function, use partially applied versions, passing all arguments.
         example:
         `rob.perform_blocking(functools.partial(rob.move, 10, 100, 250))`
 
         Arguments:
-        f: Callable[[int], None]. Some function to call.
+        f: Callable[[], int]. Some function to call that retuns a blockid.
         """
         blockid = f()
         while self.is_blocked(blockid):
@@ -262,4 +262,13 @@ class IRobobo(ABC):
 
     def _first_unblocked(self) -> int:
         """Get the first available blockid"""
-        return min(set(range(1, 768)) - self._used_pids)
+        try:
+            return min(set(range(1, 768)) - self._used_pids)
+        except ValueError:
+            raise RuntimeError(
+                """Out of BlockIDs, cannot queue more unblocking actions.
+                This error likly happened because non-blocking functions were used instead of blocking ones.
+                e.g. `rob.move()` instead of `rob.move_blocking()` or `rob.set_phone_tilt()` instead of `rob.set_phone_tilt_blocking()`
+                Please either call the blocking functions (preferred), or call `rob.block()` after queueing at most one of each type.
+                """
+            )

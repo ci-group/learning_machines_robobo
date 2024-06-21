@@ -5,7 +5,7 @@ import argparse
 
 # Import our own code from src/
 from my_first_package import ExampleProcess
-from data_files import RESULT_DIR
+from data_files import RESULTS_DIR
 
 from typing import List
 
@@ -17,7 +17,7 @@ def setup_logging():
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
-            logging.FileHandler(str(RESULT_DIR / "example.log"), encoding="utf-8"),
+            logging.FileHandler(str(RESULTS_DIR / "example.log"), encoding="utf-8"),
             logging.StreamHandler(sys.stdout),
         ],
     )
@@ -39,7 +39,7 @@ def report(what: str):
     process = ExampleProcess(logging.info)
     process.example_method(what)
     logging.info("Finished")
-    with RESULT_DIR.joinpath("hello.txt").open("w") as f:
+    with RESULTS_DIR.joinpath("hello.txt").open("w") as f:
         f.write("Hello!")
 
 

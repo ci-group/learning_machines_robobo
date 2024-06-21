@@ -14,6 +14,9 @@ from dataclasses import dataclass
 
 from typing import List, Optional, Sequence, Tuple, Union
 
+if sys.version_info < (3, 9):
+    sys.exit("ERROR: Build script has to be run with at least python 3.9")
+
 # Using Cmake style stuff because what else would I use.
 EXAMPLES = Path(__file__).parent.parent.joinpath("examples").resolve(strict=True)
 
