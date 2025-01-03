@@ -13,7 +13,7 @@ function sysCall_actuation()
         -- Cuando la diferencia entre la posicion objetivo y la actual sea menor a 2 se detiene la articulacion y se resetean las variables globales
         if (posicion_objetivo - posicion_actual) * parametro < 1 then
             sim.setJointTargetVelocity(motor, 0)
-            sim.setInt32Signal(signal, 0)
+            sim.setIntProperty(sim.handle_scene, signal, 0)
             v = 0
         end
     end
@@ -38,7 +38,7 @@ movePanTo = function(parametros, inFloat, inString, inBuffer) -- "s" es un vecto
     end
     if v > 0 then
         signal = inString[1]
-        sim.setInt32Signal(signal, 1) -- Definicion de una variable global que bloquea la funcion (1) o la desbloquea (0)
+        sim.setIntProperty(sim.handle_scene, signal, 1) -- Definicion de una variable global que bloquea la funcion (1) o la desbloquea (0)
         posicion_inicial = math.floor(sim.getJointPosition(motor) * 180 / math.pi) -- Posicion del pan en el momento de la llamada a la funcion
         -- Comparacion de la posicion objetivo del pan con la posicion actual y asignacion del sentido de giro de la articulacion
         if posicion_objetivo > posicion_inicial then

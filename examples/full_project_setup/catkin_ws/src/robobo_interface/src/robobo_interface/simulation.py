@@ -67,6 +67,7 @@ class SimulationRobobo(IRobobo):
         logger: Callable[[str], None] = print,
         timeout_dur: int = 10,
     ):
+        self._id = identifier
         self._logger = logger
         self._used_pids: LockedSet[int] = LockedSet()
         self._identifier = f"[{identifier}]"
@@ -371,7 +372,9 @@ class SimulationRobobo(IRobobo):
         Arguments:
         blockid: the id to check
         """
-        res = self._sim.getInt32Signal(self._block_string(blockid))
+        res = self._sim.getIntProperty(
+            self._sim.handle_scene, self._block_string(blockid)
+        )
         if res == 0:
             self._used_pids.discard(blockid)
             return False
@@ -513,7 +516,9 @@ class SimulationRobobo(IRobobo):
         """Return some unique string based on the identifier and the blockid
         to make sure they don't overlap
         """
-        return f"Block_{self._identifier}_{blockid}"
+        # This is technically overkill with the new properties instead of the old signals,
+        # But re-doing that would require rewriting some stuff that's not really worth it.
+        return f"signal.block_{self._id}_{blockid}"
 
     def _initialise_handles(self) -> None:
         # fmt: off
