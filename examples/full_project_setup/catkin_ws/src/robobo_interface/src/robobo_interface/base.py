@@ -34,8 +34,7 @@ class IRobobo(ABC):
     _used_pids: LockedSet[int]
 
     @abstractmethod
-    def __init__(self, *args, **kwargs) -> None:
-        ...
+    def __init__(self, *args, **kwargs) -> None: ...
 
     @abstractmethod
     def set_emotion(self, emotion: Emotion) -> None:
